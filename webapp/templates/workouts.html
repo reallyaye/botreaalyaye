@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Тренировки{% endblock %}
+{% block content %}
+    <section class="add-workout">
+        <h2>Добавить тренировку</h2>
+        <form action="/workouts/add" method="post">
+            <input type="hidden" name="user_id" value="{{ user_id }}">
+            <label>
+                Тип тренировки:<br>
+                <input type="text" name="workout_type" required>
+            </label><br>
+            <label>
+                Длительность (мин):<br>
+                <input type="number" name="duration" required>
+            </label><br>
+            <label>
+                Детали (необязательно):<br>
+                <textarea name="details" rows="2"></textarea>
+            </label><br>
+            <button type="submit">Добавить</button>
+        </form>
+    </section>
+
+    <section class="list-workouts">
+        <h2>Последние тренировки</h2>
+        {% if workouts %}
+            <ul>
+            {% for id, type, duration, details, created in workouts %}
+                <li>
+                    <strong>{{ created.split('.')[0] }}</strong> —
+                    {{ type }}, {{ duration }} мин
+                    {% if details %} ({{ details }}){% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>У вас пока нет сохранённых тренировок.</p>
+        {% endif %}
+    </section>
+{% endblock %}

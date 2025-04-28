@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Фитнес-WebApp{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1><a href="/">🏋️ Фитнес-WebApp</a></h1>
+        <nav>
+            <a href="/">Главная</a> |
+            <a href="/profile/?user_id={{ user_id }}">Профиль</a> |
+            <a href="/workouts/?user_id={{ user_id }}">Тренировки</a>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>© 2025 Фитнес-WebApp</p>
+    </footer>
+</body>
+</html>

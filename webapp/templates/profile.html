@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+    <section class="profile">
+        <h2>Ваш профиль</h2>
+        <form action="/profile/update" method="post">
+            <input type="hidden" name="user_id" value="{{ user_id }}">
+            <label>
+                Имя:<br>
+                <input type="text" name="first_name" value="{{ profile.first_name }}">
+            </label><br>
+            <label>
+                Фамилия:<br>
+                <input type="text" name="last_name" value="{{ profile.last_name }}">
+            </label><br>
+            <label>
+                Username:<br>
+                <input type="text" name="username" value="{{ profile.username }}">
+            </label><br>
+            <button type="submit">Сохранить</button>
+        </form>
+    </section>
+{% endblock %}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Дашборд фитнеса</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    img { max-width: 100%; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  </style>
+</head>
+<body>
+  <h1>👋 Ваш фитнес-дашборд</h1>
+
+  <h2>График веса</h2>
+  <img src="/dashboard/plot/weight" alt="График веса" />
+
+  <h2>Последние тренировки</h2>
+  {% if workouts %}
+    <table>
+      <tr><th>Дата</th><th>Упражнение</th><th>Длит., мин</th><th>Детали</th></tr>
+    {% for _id, w_type, dur, det, created in workouts %}
+      <tr>
+        <td>{{ created.split(".")[0] }}</td>
+        <td>{{ w_type }}</td>
+        <td>{{ dur }}</td>
+        <td>{{ det or "" }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% else %}
+    <p>У вас ещё нет тренировок.</p>
+  {% endif %}
+</body>
+</html>
