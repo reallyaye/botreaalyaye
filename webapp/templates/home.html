@@ -1,15 +1,17 @@
+{# webapp/templates/home.html #}
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>👋 Фитнес-WebApp</h1>
-  {% set uid = user_id %}
-  <p><strong>Ваш user_id</strong> = {{ uid }}</p>
+  <h2>Добро пожаловать в WebApp!</h2>
+  <p>Ваш <strong>user_id</strong> = {{ user_id }}</p>
+
   <ul>
-    <li><a href="/register?user_id={{ uid }}">Зарегистрировать профиль</a></li>
-    <li><a href="/profile?user_id={{ uid }}">Профиль</a></li>
-    <li><a href="/workouts?user_id={{ uid }}">Тренировки</a></li>
-    <li><a href="/weight?user_id={{ uid }}">Вес</a></li>
-    <li><a href="/programs?user_id={{ uid }}">Генератор программ</a></li>
-    <li><a href="/programs/custom?user_id={{ uid }}">Свои программы</a></li>
+    <li><a href="/register?user_id={{ user_id }}">Зарегистрировать профиль</a></li>
+    <li><a href="/profile?user_id={{ user_id }}">Перейти в профиль</a></li>
+    <li><a href="/workouts?user_id={{ user_id }}">Перейти к тренировкам</a></li>
+    <li><a href="/weight?user_id={{ user_id }}">Перейти к весу</a></li>
+    <li><a href="/programs?user_id={{ user_id }}">Генерировать программу</a></li>
+    <li><a href="/programs/custom?user_id={{ user_id }}">Мои программы</a></li>
+    <li><a href="/dashboard?user_id={{ user_id }}">Дашборд</a></li>
   </ul>
 {% endblock %}

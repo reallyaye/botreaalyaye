@@ -1,23 +1,33 @@
+{# webapp/templates/programs.html #}
 {% extends "base.html" %}
+
 {% block content %}
-  <h2>Генерация программы</h2>
+  <h2>📋 Сгенерировать программу</h2>
+
   <form method="post" action="/programs/generate">
+    <!-- скрытый user_id -->
     <input type="hidden" name="user_id" value="{{ user_id }}">
+
     <label>Цель программы:<br>
       <select name="goal">
-      {% for g in goals %}
-        <option value="{{ g }}">{{ g }}</option>
-      {% endfor %}
+        {% for g in goals %}
+          <option value="{{ g }}">{{ g }}</option>
+        {% endfor %}
       </select>
-    </label><br><br>
+    </label>
+    <br><br>
+
     <label>Тип программы:<br>
       <select name="p_type">
-        <!-- заранее передавать types для первого goal или заменить на <input> -->
-        <option value="Первый тип">Первый тип</option>
-        <option value="Второй тип">Второй тип</option>
+        {% for t in types %}
+          <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
       </select>
-    </label><br><br>
+    </label>
+    <br><br>
+
     <button type="submit">Сгенерировать</button>
   </form>
-  <p><a href="/programs/custom?user_id={{ user_id }}">Мои собственные программы</a></p>
+
+  <p><a href="/programs/custom?user_id={{ user_id }}">Мои собственные программы →</a></p>
 {% endblock %}

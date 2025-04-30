@@ -126,11 +126,16 @@ async def weight_add(
 
 @app.get("/programs", response_class=HTMLResponse)
 async def programs_home(request: Request, user_id: int = Depends(require_user)):
+    goals = list_goals()
+    # для первого значения goals[0] получаем список типов
+    types = list_types(goals[0]) if goals else []
     return templates.TemplateResponse("programs.html", {
         "request": request,
-        "goals": list_goals(),
-        "user_id": user_id
+        "user_id": user_id,
+        "goals": goals,
+        "types": types
     })
+
 
 @app.post("/programs/generate", response_class=HTMLResponse)
 async def programs_generate(
