@@ -21,12 +21,14 @@ async def start_handler(message: Message):
     )
 
     # 2) Формируем инлайн-кнопку WebApp с подставленным user_id
-    webapp_url = os.getenv("WEBAPP_URL", "").rstrip("/")
+    base_url = os.getenv("WEBAPP_URL", "").rstrip("/")
+    webapp_url = f"{base_url}?user_id={message.from_user.id}"
     button = InlineKeyboardButton(
         text="🚀 Открыть WebApp",
-        web_app=WebAppInfo(url=f"{webapp_url}?user_id={message.from_user.id}")
+        web_app=WebAppInfo(url=webapp_url)
     )
-    kb = InlineKeyboardMarkup(row_width=1).add(button)
+    # Здесь важная правка: передаём inline_keyboard, а не row_width
+    kb = InlineKeyboardMarkup(inline_keyboard=[[button]])
 
     await message.answer(
         "Или нажмите на кнопку ниже, чтобы сразу перейти в WebApp:",
