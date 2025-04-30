@@ -27,7 +27,20 @@ app.mount(
     name="static",
 )
 
-templates = Jinja2Templates(directory="templates")
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+BASE_DIR    = Path(__file__).resolve().parent
+STATIC_DIR  = BASE_DIR / "static"
+TEMPLATES_DIR = BASE_DIR / "templates"
+
+# Монтируем статику
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+# Указываем абсолютный путь к папке с Jinja2-шаблонами
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+
 
 
 @app.get("/", response_class=HTMLResponse)
