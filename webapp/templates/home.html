@@ -6,6 +6,9 @@
     <h2>Добро пожаловать в WebApp!</h2>
     <p>Ваш <strong>user_id</strong> = {{ uid }}</p>
     <ul>
+      <!-- Вот тут -->
+      <li><a href="/register?user_id={{ uid }}">Зарегистрировать профиль</a></li>
+
       <li><a href="/profile?user_id={{ uid }}">Перейти в профиль</a></li>
       <li><a href="/workouts?user_id={{ uid }}">Перейти к тренировкам</a></li>
     </ul>

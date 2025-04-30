@@ -33,6 +33,13 @@ def require_user(user_id: str = Query(None, description="Telegram user_id")) -> 
 async def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
+@app.get("/register")
+async def register(request: Request, user_id: int = Depends(require_user)):
+    from services.db import register_user
+    await register_user({"id": user_id})
+    # после регистрации переходим к профилю
+    return RedirectResponse(f"/profile?user_id={user_id}", status_code=302)
+
 @app.get("/profile", response_class=HTMLResponse)
 async def profile(request: Request, user_id: int = Depends(require_user)):
     prof = await get_user_profile(user_id)
