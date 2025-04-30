@@ -14,6 +14,7 @@ if not WEBAPP_URL:
 # 2) Утилитарные кнопки
 btn_back      = KeyboardButton(text="◀️ Назад")
 cancel_button = KeyboardButton(text="Отмена")
+cancel_keyboard = ReplyKeyboardMarkup([[cancel_button]], resize_keyboard=True, one_time_keyboard=True)
 
 # 3) Клавиатура «Отмена» для FSM
 cancel_keyboard = ReplyKeyboardMarkup(
