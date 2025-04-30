@@ -1,23 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Добро пожаловать в WebApp!</h2>
-
-  {# Берём user_id из query_params, JS в base.html автоматически его вставляет #}
-  {% set uid = request.query_params.get("user_id") %}
-
-  {% if uid %}
-    <p>Ваш <strong>user_id</strong> = {{ uid }}</p>
-    <ul>
-      <li><a href="/register?user_id={{ uid }}">Зарегистрировать профиль</a></li>
-      <li><a href="/profile?user_id={{ uid }}">Перейти в профиль</a></li>
-      <li><a href="/workouts?user_id={{ uid }}">Перейти к тренировкам</a></li>
-    </ul>
-  {% else %}
-    <p style="color: red;">
-      Не удалось определить ваш Telegram-ID автоматически.  
-      Пожалуйста, убедитесь, что вы открыли WebApp  
-      именно из Telegram (нажав кнопку «Открыть WebApp» в боте).
-    </p>
-  {% endif %}
+  <h1>👋 Фитнес-WebApp</h1>
+  {% set uid = user_id %}
+  <p><strong>Ваш user_id</strong> = {{ uid }}</p>
+  <ul>
+    <li><a href="/register?user_id={{ uid }}">Зарегистрировать профиль</a></li>
+    <li><a href="/profile?user_id={{ uid }}">Профиль</a></li>
+    <li><a href="/workouts?user_id={{ uid }}">Тренировки</a></li>
+    <li><a href="/weight?user_id={{ uid }}">Вес</a></li>
+    <li><a href="/programs?user_id={{ uid }}">Генератор программ</a></li>
+    <li><a href="/programs/custom?user_id={{ uid }}">Свои программы</a></li>
+  </ul>
 {% endblock %}
