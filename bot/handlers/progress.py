@@ -12,8 +12,10 @@ from bot.keyboards import main_menu, cancel_keyboard, cancel_button
 
 router = Router()
 
+
 class ProgressForm(StatesGroup):
     weight = State()
+
 
 @router.message(Command("add_weight"))
 @router.message(F.text == "Добавить вес")
@@ -22,10 +24,12 @@ async def start_weight_flow(message: Message, state: FSMContext):
     await message.answer("⚖️ Введите ваш вес (кг):", reply_markup=cancel_keyboard)
     await state.set_state(ProgressForm.weight)
 
+
 @router.message(F.text == "Отмена")
 async def cancel_progress(message: Message, state: FSMContext):
     await state.clear()
     await message.answer("❌ Операция отменена.", reply_markup=main_menu)
+
 
 @router.message(StateFilter(ProgressForm.weight))
 async def weight_chosen(message: Message, state: FSMContext):
@@ -33,10 +37,13 @@ async def weight_chosen(message: Message, state: FSMContext):
     try:
         value = float(text)
     except ValueError:
-        return await message.answer("⚠️ Введите корректное число.", reply_markup=cancel_keyboard)
+        return await message.answer(
+            "⚠️ Введите корректное число.", reply_markup=cancel_keyboard
+        )
     await add_progress(message.from_user.id, metric="weight", value=value)
     await state.clear()
     await message.answer(f"✅ Вес {value} кг сохранён.", reply_markup=main_menu)
+
 
 @router.message(Command("view_weight"))
 @router.message(F.text == "Показать вес")

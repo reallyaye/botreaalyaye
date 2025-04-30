@@ -1,23 +1,31 @@
-# bot/handlers/commands.py
-
+import os
 from aiogram import Router, F
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from aiogram.filters.command import Command
 
 from services.db import register_user
 from services.profile import get_user_profile
-from bot.keyboards import main_menu  # убрали webapp_kb
+from bot.keyboards import main_menu
 
 router = Router()
 
 @router.message(Command("start"))
 async def start_handler(message: Message):
     await register_user(message.from_user)
+    # показываем reply-меню
     await message.answer(
         "👋 Привет! Я твой фитнес-бот.\nВыберите раздел в меню ниже:",
         reply_markup=main_menu
     )
-    # Кнопка WebApp уже в main_menu, второго сообщения не нужно
+    # добавляем отдельно inline-кнопку с user_id
+    kb = InlineKeyboardMarkup(row_width=1)
+    kb.add(
+        InlineKeyboardButton(
+            text="🚀 Открыть WebApp",
+            web_app=WebAppInfo(url=f"{os.getenv('WEBAPP_URL')}?user_id={message.from_user.id}")
+        )
+    )
+    await message.answer("Или нажмите на WebApp-кнопку ниже:", reply_markup=kb)
 
 @router.message(Command("profile"))
 async def profile_handler(message: Message):
@@ -37,11 +45,12 @@ async def help_handler(message: Message):
     await message.answer(
         "❓ Помощь по боту:\n"
         "/start — начать работу\n"
-        "/profile — посмотреть профиль\n"
-        "/help — помощь",
+        "/profile — профиль\n"
+        "/help — справка",
         reply_markup=main_menu
     )
 
+# кнопки на reply-клавиатуре
 @router.message(F.text == "👤 Профиль")
 async def profile_button(message: Message):
     await profile_handler(message)

@@ -1,5 +1,3 @@
-# bot/handlers/workouts.py
-
 from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.filters.command import Command
@@ -10,7 +8,7 @@ from aiogram.filters.state import StateFilter
 from services.db import add_workout, get_workouts
 from bot.keyboards import (
     main_menu, type_keyboard, difficulty_keyboard,
-    cancel_keyboard, cancel_button
+    cancel_keyboard, cancel_button,
 )
 
 router = Router()
@@ -37,15 +35,15 @@ async def cancel_flow(message: Message, state: FSMContext):
 @router.message(StateFilter(WorkoutForm.workout_type))
 async def type_chosen(message: Message, state: FSMContext):
     await state.update_data(workout_type=message.text)
-    await message.answer("⏱ Укажите длительность в минутах:", reply_markup=cancel_keyboard)
+    await message.answer("⏱ Укажите длительность:", reply_markup=cancel_keyboard)
     await state.set_state(WorkoutForm.duration)
 
 @router.message(StateFilter(WorkoutForm.duration))
 async def duration_chosen(message: Message, state: FSMContext):
     if not message.text.isdigit():
-        return await message.answer("⚠️ Введите число минут.", reply_markup=cancel_keyboard)
+        return await message.answer("⚠️ Введите число.", reply_markup=cancel_keyboard)
     await state.update_data(duration=int(message.text))
-    await message.answer("💪 Выберите сложность выполнения:", reply_markup=difficulty_keyboard)
+    await message.answer("💪 Выберите сложность:", reply_markup=difficulty_keyboard)
     await state.set_state(WorkoutForm.difficulty)
 
 @router.message(StateFilter(WorkoutForm.difficulty))
@@ -56,11 +54,10 @@ async def difficulty_chosen(message: Message, state: FSMContext):
 
 @router.message(StateFilter(WorkoutForm.weight))
 async def weight_chosen(message: Message, state: FSMContext):
-    text = message.text.replace(",", ".")
     try:
-        w = float(text)
+        w = float(message.text.replace(",", "."))
     except ValueError:
-        return await message.answer("⚠️ Введите число (например 60 или 75.5).", reply_markup=cancel_keyboard)
+        return await message.answer("⚠️ Неверный формат.", reply_markup=cancel_keyboard)
     await state.update_data(weight=w)
     await message.answer("📝 Введите детали (или «Нет»):", reply_markup=cancel_keyboard)
     await state.set_state(WorkoutForm.details)
@@ -68,37 +65,36 @@ async def weight_chosen(message: Message, state: FSMContext):
 @router.message(StateFilter(WorkoutForm.details))
 async def details_chosen(message: Message, state: FSMContext):
     data = await state.get_data()
-    raw  = message.text or ""
-    details = None if raw.lower() in ("нет", "-", "none") else raw
-    details_str = f"сложность: {data['difficulty']}, вес: {data['weight']} кг"
-    if details:
-        details_str += f", {details}"
+    det  = None if message.text.lower() in ("нет", "-", "none") else message.text
+    details = f"сложность: {data['difficulty']}, вес: {data['weight']} кг"
+    if det:
+        details += f", {det}"
 
     await add_workout(
         user_id=message.from_user.id,
         workout_type=data["workout_type"],
         duration=data["duration"],
-        details=details_str
+        details=details,
     )
-    reply = (
-        f"✅ Сохранено: «{data['workout_type']}», "
-        f"{data['duration']} мин, "
-        f"{data['difficulty'].lower()}, "
-        f"{data['weight']} кг"
-    )
-    if details:
-        reply += f", {details}"
+
+    reply = (f"✅ Сохранено: «{data['workout_type']}», "
+             f"{data['duration']} мин, "
+             f"{data['difficulty'].lower()}, "
+             f"{data['weight']} кг")
+    if det:
+        reply += f", {det}"
+
     await message.answer(reply, reply_markup=main_menu)
     await state.clear()
 
 @router.message(Command("view_workouts"))
 @router.message(F.text == "Показать тренировки")
-async def view_workouts_handler(message: Message):
+async def view_workouts(message: Message):
     rows = await get_workouts(message.from_user.id, limit=10)
     if not rows:
-        return await message.answer("ℹ️ У вас нет тренировок.", reply_markup=main_menu)
-    text = "📝 Последние тренировки:\n\n"
-    for _id, w_type, dur, det, created in rows:
-        date = created.split(".")[0]
-        text += f"• {date}: {w_type}, {dur} мин ({det})\n"
+        return await message.answer("ℹ️ Нет тренировок.", reply_markup=main_menu)
+    text = "📝 Последние:\n" + "\n".join(
+        f"• {r[4].split('.')[0]}: {r[1]}, {r[2]} мин ({r[3]})"
+        for r in rows
+    )
     await message.answer(text, reply_markup=main_menu)
