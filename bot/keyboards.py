@@ -1,42 +1,52 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+# bot/keyboards.py
 
-# Кнопка отмены во время ввода
+import os
+from dotenv import load_dotenv
+from aiogram.types import (
+    ReplyKeyboardMarkup, KeyboardButton,
+    WebAppInfo,
+)
+
+# 1) Загрузка WEBAPP_URL из .env
+load_dotenv()
+WEBAPP_URL = os.getenv("WEBAPP_URL")
+if not WEBAPP_URL:
+    raise RuntimeError("WEBAPP_URL не задана в .env")
+
+# 2) Кнопки
+btn_back      = KeyboardButton(text="◀️ Назад")
 cancel_button = KeyboardButton(text="Отмена")
+
 cancel_keyboard = ReplyKeyboardMarkup(
     keyboard=[[cancel_button]],
     resize_keyboard=True,
-    one_time_keyboard=True
+    one_time_keyboard=True,
 )
 
-# «Назад» ко всем разделам
-btn_back = KeyboardButton(text="◀️ Назад")
-
-# Главное меню
-btn_trainings = KeyboardButton(text="🏋️ Тренировки")
-btn_params    = KeyboardButton(text="⚙️ Параметры")
-btn_programs  = KeyboardButton(text="📋 Программы")
-btn_profile   = KeyboardButton(text="👤 Профиль")
-btn_help      = KeyboardButton(text="❓ Помощь")
-
+# 3) Главное меню с WebApp-кнопкой
 main_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [btn_trainings, btn_params],
-        [btn_programs, btn_profile],
-        [btn_help],
+        [KeyboardButton(text="🏋️ Тренировки"), KeyboardButton(text="⚙️ Параметры")],
+        [KeyboardButton(text="📋 Программы"),   KeyboardButton(text="👤 Профиль")],
+        [KeyboardButton(text="❓ Помощь"),       KeyboardButton(
+            text="🌐 Открыть WebApp",
+            web_app=WebAppInfo(url=WEBAPP_URL)
+        )],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
 )
 
-# Меню «Тренировки» (для навигации)
+# 4) Меню «Тренировки»
 trainings_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Добавить тренировку"), KeyboardButton(text="Показать тренировки")],
         [btn_back],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    one_time_keyboard=True,
 )
 
-# Выбор типа упражнения
+# 4.1) Выбор типа тренировки
 type_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Приседания"), KeyboardButton(text="Жим лёжа")],
@@ -44,46 +54,49 @@ type_keyboard = ReplyKeyboardMarkup(
         [cancel_button],
     ],
     resize_keyboard=True,
-    one_time_keyboard=True
+    one_time_keyboard=True,
 )
 
-# **Новая**: выбор сложности
+# 4.2) Выбор сложности
 difficulty_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="Легко"),
             KeyboardButton(text="Нормально"),
-            KeyboardButton(text="Сложно")
+            KeyboardButton(text="Сложно"),
         ],
         [cancel_button],
     ],
     resize_keyboard=True,
-    one_time_keyboard=True
+    one_time_keyboard=True,
 )
 
-# Меню «Параметры»
+# 5) Меню «Параметры»
 params_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Добавить вес"), KeyboardButton(text="Показать вес")],
         [btn_back],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    one_time_keyboard=True,
 )
 
-# Меню «Программы»
+# 6) Меню «Программы»
 programs_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Сгенерировать программу"), KeyboardButton(text="Мои программы")],
         [btn_back],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    one_time_keyboard=True,
 )
 
-# Меню управления «Мои программы»
+# 6.1) Меню «Мои программы»
 my_programs_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Добавить свою программу"), KeyboardButton(text="Удалить программу")],
+        [KeyboardButton(text="Добавить программу"), KeyboardButton(text="Удалить программу")],
         [btn_back],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    one_time_keyboard=True,
 )

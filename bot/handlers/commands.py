@@ -1,20 +1,26 @@
+# bot/handlers/commands.py
+
+from aiogram import Router, F
 from aiogram.types import Message
-from aiogram.filters import Command
+from aiogram.filters.command import Command
 
 from services.db import register_user
 from services.profile import get_user_profile
-from bot.keyboards import main_menu
+from bot.keyboards import main_menu  # убрали webapp_kb
 
-async def start_handler(message: Message) -> None:
-    """ /start — регистрация и главное меню """
+router = Router()
+
+@router.message(Command("start"))
+async def start_handler(message: Message):
     await register_user(message.from_user)
     await message.answer(
-        "👋 Привет! Я твой фитнес-бот.\n\nВыбери раздел в меню ниже:",
+        "👋 Привет! Я твой фитнес-бот.\nВыберите раздел в меню ниже:",
         reply_markup=main_menu
     )
+    # Кнопка WebApp уже в main_menu, второго сообщения не нужно
 
-async def profile_handler(message: Message) -> None:
-    """ /profile или кнопка «👤 Профиль» """
+@router.message(Command("profile"))
+async def profile_handler(message: Message):
     profile = await get_user_profile(message.from_user.id)
     if not profile:
         return await message.answer("Профиль не найден. Введите /start.")
@@ -26,22 +32,20 @@ async def profile_handler(message: Message) -> None:
     )
     await message.answer(text, reply_markup=main_menu)
 
-async def help_handler(message: Message) -> None:
-    """ /help или кнопка «❓ Помощь» """
-    text = (
+@router.message(Command("help"))
+async def help_handler(message: Message):
+    await message.answer(
         "❓ Помощь по боту:\n"
-        "Выберите раздел в главном меню."
+        "/start — начать работу\n"
+        "/profile — посмотреть профиль\n"
+        "/help — помощь",
+        reply_markup=main_menu
     )
-    await message.answer(text, reply_markup=main_menu)
 
-def register_handlers(dp) -> None:
-    dp.message.register(start_handler,   Command(commands=["start"]))
-    dp.message.register(profile_handler, Command(commands=["profile"]))
-    dp.message.register(help_handler,    Command(commands=["help"]))
+@router.message(F.text == "👤 Профиль")
+async def profile_button(message: Message):
+    await profile_handler(message)
 
-    # Навигация по кнопкам
-    dp.message.register(start_handler,      lambda m: m.text == "🏋️ Тренировки")
-    dp.message.register(start_handler,      lambda m: m.text == "⚙️ Параметры")
-    dp.message.register(start_handler,      lambda m: m.text == "📋 Программы")
-    dp.message.register(profile_handler,    lambda m: m.text == "👤 Профиль")
-    dp.message.register(help_handler,       lambda m: m.text == "❓ Помощь")
+@router.message(F.text == "❓ Помощь")
+async def help_button(message: Message):
+    await help_handler(message)

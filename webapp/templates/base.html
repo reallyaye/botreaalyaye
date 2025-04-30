@@ -1,25 +1,46 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Фитнес-WebApp{% endblock %}</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+  <meta charset="UTF-8">
+  <title>Фитнес-WebApp</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script>
+    // Telegram Web App JS API: берём initDataUnsafe.user.id
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.Telegram && Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+
+        const uid = tg.initDataUnsafe?.user?.id;
+        if (uid) {
+          const params = new URLSearchParams(window.location.search);
+          if (!params.has('user_id')) {
+            params.set('user_id', uid);
+            // перезагрузить страницу с ?user_id=…
+            window.location.search = params.toString();
+          }
+        }
+      }
+    });
+  </script>
 </head>
 <body>
-    <header>
-        <h1><a href="/">🏋️ Фитнес-WebApp</a></h1>
-        <nav>
-            <a href="/">Главная</a> |
-            <a href="/profile/?user_id={{ user_id }}">Профиль</a> |
-            <a href="/workouts/?user_id={{ user_id }}">Тренировки</a>
-        </nav>
-    </header>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-    <footer>
-        <p>© 2025 Фитнес-WebApp</p>
-    </footer>
+  <header>
+    <h1>🏋️ Фитнес-WebApp</h1>
+    {% set uid = request.query_params.get("user_id", "") %}
+    <nav>
+      <a href="/?user_id={{ uid }}">Главная</a> |
+      <a href="/profile?user_id={{ uid }}">Профиль</a> |
+      <a href="/workouts?user_id={{ uid }}">Тренировки</a>
+    </nav>
+    <hr>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    <hr>
+    <small>© 2025 Фитнес-WebApp</small>
+  </footer>
 </body>
 </html>

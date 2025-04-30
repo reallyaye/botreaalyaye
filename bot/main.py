@@ -4,20 +4,22 @@ import os
 import asyncio
 from pathlib import Path
 from dotenv import load_dotenv
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from aiogram.types import (
-    BotCommandScopeDefault,
-    BotCommandScopeAllPrivateChats,
-    BotCommandScopeAllGroupChats,
-    BotCommandScopeAllChatAdministrators,
-)
-from bot.handlers import commands, workouts, progress, programs, navigation, custom_programs
 from services.db import init_db
 
-# Загрузка .env
-BASE_DIR = Path(__file__).resolve().parent.parent
+# routers
+from bot.handlers.commands        import router as commands_router
+from bot.handlers.navigation      import router as navigation_router
+from bot.handlers.workouts        import router as workouts_router
+from bot.handlers.progress        import router as progress_router
+from bot.handlers.programs        import router as programs_router
+from bot.handlers.custom_programs import router as custom_programs_router
+
+# load .env
+BASE_DIR = Path(__file__).parent.parent
 load_dotenv(dotenv_path=BASE_DIR / ".env", override=True)
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -25,40 +27,23 @@ ADMIN_ID  = int(os.getenv("ADMIN_ID", "0"))
 if not BOT_TOKEN or not ADMIN_ID:
     raise RuntimeError("TELEGRAM_BOT_TOKEN и ADMIN_ID должны быть заданы в .env")
 
-async def on_startup():
-    # Инициализация БД
+async def on_startup(bot: Bot):
     await init_db()
-
-    # Сброс списка команд
-    bot = Bot(token=BOT_TOKEN)
-    await bot.delete_my_commands()
-    await bot.set_my_commands([], scope=BotCommandScopeDefault())
-    await bot.set_my_commands([], scope=BotCommandScopeAllPrivateChats())
-    await bot.set_my_commands([], scope=BotCommandScopeAllGroupChats())
-    await bot.set_my_commands([], scope=BotCommandScopeAllChatAdministrators())
-    await bot.session.close()
+    await bot.delete_webhook(drop_pending_updates=True)
 
 async def main():
     bot = Bot(token=BOT_TOKEN)
-    storage = MemoryStorage()
-    dp  = Dispatcher(storage=storage)
+    dp  = Dispatcher(storage=MemoryStorage())
 
-    # Удаляем webhook, чтобы иметь возможность стартовать polling
-    await bot.delete_webhook(drop_pending_updates=True)
+    # подключаем все routers
+    dp.include_router(commands_router)
+    dp.include_router(navigation_router)
+    dp.include_router(workouts_router)
+    dp.include_router(progress_router)
+    dp.include_router(programs_router)
+    dp.include_router(custom_programs_router)
 
-    # Регистрируем хэндлеры
-    commands.register_handlers(dp)
-    navigation.register_handlers(dp)
-    workouts.register_handlers(dp)
-    progress.register_handlers(dp)
-    programs.register_handlers(dp)
-    custom_programs.register_handlers(dp)
-
-    # Регистрируем on_startup
     dp.startup.register(on_startup)
-    dp.shutdown.register(lambda: print("🛑 Bot stopped"))
-
-    # Запускаем polling
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
