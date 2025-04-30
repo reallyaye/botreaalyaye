@@ -1,32 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
+  <h2>Добро пожаловать в WebApp!</h2>
+
+  {# Берём user_id из query_params, JS в base.html автоматически его вставляет #}
   {% set uid = request.query_params.get("user_id") %}
+
   {% if uid %}
-    <h2>Добро пожаловать в WebApp!</h2>
     <p>Ваш <strong>user_id</strong> = {{ uid }}</p>
     <ul>
-      <!-- Вот тут -->
       <li><a href="/register?user_id={{ uid }}">Зарегистрировать профиль</a></li>
-
       <li><a href="/profile?user_id={{ uid }}">Перейти в профиль</a></li>
       <li><a href="/workouts?user_id={{ uid }}">Перейти к тренировкам</a></li>
     </ul>
   {% else %}
-    <h2>Добро пожаловать в WebApp!</h2>
     <p style="color: red;">
-      Чтобы продолжить, WebApp должен знать ваш Telegram-ID.  
-      Если вы открыли это вне Telegram — просто введите его ниже.  
-      Если же ждёте автоподстановку из Telegram — проверьте,  
-      что нажали кнопку «Открыть WebApp» именно **внутри** Telegram.
+      Не удалось определить ваш Telegram-ID автоматически.  
+      Пожалуйста, убедитесь, что вы открыли WebApp  
+      именно из Telegram (нажав кнопку «Открыть WebApp» в боте).
     </p>
-
-    <form method="get" action="/">
-      <label>
-        Ваш Telegram user_id:<br>
-        <input name="user_id" type="text" placeholder="Например 123456789" required>
-      </label><br><br>
-      <button type="submit">Продолжить</button>
-    </form>
   {% endif %}
 {% endblock %}
