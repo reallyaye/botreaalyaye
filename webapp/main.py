@@ -14,7 +14,19 @@ async def startup():
     await init_db()
 
 # Статика и шаблоны
-app.mount("/static", StaticFiles(directory="static"), name="static")
+from pathlib import Path
+# …
+
+# вычисляем абсолютный путь к папке webapp/static
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+
+app.mount(
+    "/static",
+    StaticFiles(directory=STATIC_DIR),
+    name="static",
+)
+
 templates = Jinja2Templates(directory="templates")
 
 
