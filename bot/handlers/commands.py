@@ -11,21 +11,27 @@ router = Router()
 
 @router.message(Command("start"))
 async def start_handler(message: Message):
+    # Регистрируем пользователя в БД, если нужно
     await register_user(message.from_user)
-    # показываем reply-меню
+
+    # 1) Отправляем основное reply-меню
     await message.answer(
         "👋 Привет! Я твой фитнес-бот.\nВыберите раздел в меню ниже:",
         reply_markup=main_menu
     )
-    # добавляем отдельно inline-кнопку с user_id
-    kb = InlineKeyboardMarkup(row_width=1)
-    kb.add(
-        InlineKeyboardButton(
-            text="🚀 Открыть WebApp",
-            web_app=WebAppInfo(url=f"{os.getenv('WEBAPP_URL')}?user_id={message.from_user.id}")
-        )
+
+    # 2) Формируем инлайн-кнопку WebApp с подставленным user_id
+    webapp_url = os.getenv("WEBAPP_URL", "").rstrip("/")
+    button = InlineKeyboardButton(
+        text="🚀 Открыть WebApp",
+        web_app=WebAppInfo(url=f"{webapp_url}?user_id={message.from_user.id}")
     )
-    await message.answer("Или нажмите на WebApp-кнопку ниже:", reply_markup=kb)
+    kb = InlineKeyboardMarkup(row_width=1).add(button)
+
+    await message.answer(
+        "Или нажмите на кнопку ниже, чтобы сразу перейти в WebApp:",
+        reply_markup=kb
+    )
 
 @router.message(Command("profile"))
 async def profile_handler(message: Message):
@@ -50,7 +56,7 @@ async def help_handler(message: Message):
         reply_markup=main_menu
     )
 
-# кнопки на reply-клавиатуре
+# Обработчики кликов по reply-кнопкам «👤 Профиль» и «❓ Помощь»
 @router.message(F.text == "👤 Профиль")
 async def profile_button(message: Message):
     await profile_handler(message)
