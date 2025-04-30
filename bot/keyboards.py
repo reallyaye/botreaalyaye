@@ -1,3 +1,5 @@
+# bot/keyboards.py
+
 import os
 from dotenv import load_dotenv
 from aiogram.types import (
@@ -5,25 +7,22 @@ from aiogram.types import (
     InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo,
 )
 
-# 1) Загрузка WEBAPP_URL из .env
 load_dotenv()
 WEBAPP_URL = os.getenv("WEBAPP_URL")
 if not WEBAPP_URL:
     raise RuntimeError("WEBAPP_URL не задана в .env")
 
-# 2) Утилитарные кнопки
-btn_back      = KeyboardButton(text="◀️ Назад")
-cancel_button = KeyboardButton(text="Отмена")
-cancel_keyboard = ReplyKeyboardMarkup([[cancel_button]], resize_keyboard=True, one_time_keyboard=True)
 
-# 3) Клавиатура «Отмена» для FSM
+# кнопка «Отмена»
+cancel_button = KeyboardButton(text="Отмена")
 cancel_keyboard = ReplyKeyboardMarkup(
     keyboard=[[cancel_button]],
     resize_keyboard=True,
-    one_time_keyboard=True
+    one_time_keyboard=True,
 )
 
-# 4) Главное reply-меню (без WebApp)
+
+# главное меню
 main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="🏋️ Тренировки"), KeyboardButton(text="⚙️ Параметры")],
@@ -33,41 +32,53 @@ main_menu = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 
-# 5) Inline-кнопка для открытия WebApp
+
+# Inline-кнопка открытия WebApp
 webapp_inline_kb = InlineKeyboardMarkup(
-    inline_keyboard=[[
-        InlineKeyboardButton(
-            text="🚀 Открыть WebApp",
-            web_app=WebAppInfo(url=WEBAPP_URL)
-        )
-    ]]
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="🌐 Открыть WebApp",
+                web_app=WebAppInfo(url=WEBAPP_URL)
+            )
+        ]
+    ]
 )
 
-# 6) Меню «Тренировки»
+
+# меню «Тренировки»
 trainings_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="Добавить тренировку"),
             KeyboardButton(text="Показать тренировки"),
         ],
-        [btn_back],
+        [KeyboardButton(text="◀️ Назад")],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-# 6.1) Выбор типа тренировки
+
+# меню типов тренировок
 type_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Приседания"), KeyboardButton(text="Жим лёжа")],
-        [KeyboardButton(text="Становая тяга"), KeyboardButton(text="Другое")],
+        [
+            KeyboardButton(text="Приседания"),
+            KeyboardButton(text="Жим лёжа"),
+        ],
+        [
+            KeyboardButton(text="Становая тяга"),
+            KeyboardButton(text="Другое"),
+        ],
         [cancel_button],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-# 6.2) Выбор сложности
+
+# меню сложностей
 difficulty_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
@@ -81,31 +92,43 @@ difficulty_keyboard = ReplyKeyboardMarkup(
     one_time_keyboard=True,
 )
 
-# 7) Меню «Параметры»
+
+# меню «Параметры»
 params_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Добавить вес"), KeyboardButton(text="Показать вес")],
-        [btn_back],
+        [
+            KeyboardButton(text="Добавить вес"),
+            KeyboardButton(text="Показать вес"),
+        ],
+        [KeyboardButton(text="◀️ Назад")],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-# 8) Меню «Программы»
+
+# меню «Программы»
 programs_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Сгенерировать программу"), KeyboardButton(text="Мои программы")],
-        [btn_back],
+        [
+            KeyboardButton(text="Сгенерировать программу"),
+            KeyboardButton(text="Мои программы"),
+        ],
+        [KeyboardButton(text="◀️ Назад")],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-# 8.1) Меню «Мои программы»
+
+# меню «Мои программы»
 my_programs_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Добавить программу"), KeyboardButton(text="Удалить программу")],
-        [btn_back],
+        [
+            KeyboardButton(text="Добавить программу"),
+            KeyboardButton(text="Удалить программу"),
+        ],
+        [KeyboardButton(text="◀️ Назад")],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
