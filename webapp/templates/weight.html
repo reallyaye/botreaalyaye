@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Записи веса</h2>
+
+  {% if weights %}
+    <ul>
+    {% for _id, w, created in weights %}
+      <li>{{ created.split('.')[0] }}: {{ w }} кг</li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>У вас ещё нет записей веса.</p>
+  {% endif %}
+
+  <hr>
+  <h3>Добавить запись</h3>
+  <form method="post" action="/weight/add">
+    <input type="hidden" name="user_id" value="{{ user_id }}">
+    <label>Вес (кг):<br>
+      <input type="number" step="0.1" name="weight" required>
+    </label><br><br>
+    <button type="submit">Добавить</button>
+  </form>
+{% endblock %}

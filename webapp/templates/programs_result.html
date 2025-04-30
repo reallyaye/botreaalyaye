@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Результат генерации</h2>
+
+  {% if program %}
+    {% for day, exercises in program.items() %}
+      <h3>{{ day }}</h3>
+      <ul>
+      {% for ex in exercises %}
+        <li>{{ ex }}</li>
+      {% endfor %}
+      </ul>
+    {% endfor %}
+  {% else %}
+    <p>По вашему запросу ничего не найдено.</p>
+  {% endif %}
+
+  <p><a href="/programs?user_id={{ user_id }}">← Назад к выбору</a></p>
+{% endblock %}

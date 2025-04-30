@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Мои программы</h2>
+
+  {% if programs %}
+    <ul>
+    {% for idx, (prog_id, prog, created) in programs|enumerate(start=1) %}
+      <li>
+        {{ idx }}. {{ created.split('.')[0] }}<br>
+        <pre>{{ prog }}</pre>
+        <form method="post" action="/programs/custom/delete" style="display:inline">
+          <input type="hidden" name="user_id" value="{{ user_id }}">
+          <input type="hidden" name="prog_id" value="{{ prog_id }}">
+          <button type="submit">Удалить</button>
+        </form>
+      </li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>У вас ещё нет сохранённых программ.</p>
+  {% endif %}
+
+  <hr>
+  <h3>Добавить новую программу</h3>
+  <form method="post" action="/programs/custom/add">
+    <input type="hidden" name="user_id" value="{{ user_id }}">
+    <textarea name="prog" rows="6" cols="50" placeholder="Вставьте текст программы..." required></textarea><br><br>
+    <button type="submit">Сохранить</button>
+  </form>
+{% endblock %}
