@@ -1,13 +1,12 @@
-# services/db.py
-
 import os
 import aiosqlite
 
 DB_PATH = os.getenv("DATABASE_URL", "./db.sqlite3")
 
 async def init_db():
-    """Инициализация базы данных: создание всех таблиц, если их не существует."""
+    """Инициализация базы данных: создание всех таблиц, если они не существуют."""
     async with aiosqlite.connect(DB_PATH) as db:
+        # Таблица пользователей
         await db.execute("""
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY,
@@ -17,6 +16,7 @@ async def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """)
+        # Таблица тренировок
         await db.execute("""
         CREATE TABLE IF NOT EXISTS workouts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,6 +28,7 @@ async def init_db():
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         );
         """)
+        # Таблица прогресса
         await db.execute("""
         CREATE TABLE IF NOT EXISTS progress (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,12 +39,23 @@ async def init_db():
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         );
         """)
+        # Таблица пользовательских программ
         await db.execute("""
         CREATE TABLE IF NOT EXISTS custom_programs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             program TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(user_id)
+        );
+        """)
+        # Таблица веса пользователя
+        await db.execute("""
+        CREATE TABLE IF NOT EXISTS weights (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            weight REAL NOT NULL,
+            recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         );
         """)
@@ -98,7 +110,7 @@ async def get_progress(user_id, metric=None, limit=20):
             )
         return await cur.fetchall()
 
-# Работа с кастомными программами
+# Работа с пользовательскими программами
 async def add_custom_program(user_id: int, program_text: str):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
@@ -127,3 +139,22 @@ async def delete_custom_program(user_id: int, program_id: int) -> bool:
         )
         await db.commit()
         return cur.rowcount > 0
+
+# Работа с весом пользователя
+async def add_weight(user_id: int, weight: float):
+    """Добавляет запись о весе для пользователя."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "INSERT INTO weights(user_id, weight) VALUES (?, ?)",
+            (user_id, weight)
+        )
+        await db.commit()
+
+async def get_weights(user_id: int, limit: int = 20):
+    """Возвращает последние записи веса пользователя."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            "SELECT id, weight, recorded_at FROM weights WHERE user_id = ? ORDER BY recorded_at DESC LIMIT ?",
+            (user_id, limit)
+        )
+        return await cur.fetchall()
