@@ -17,7 +17,8 @@ from services.db import (
     get_weights, add_weight,
     get_custom_programs, add_custom_program, delete_custom_program
 )
-from services.profile import get_user_profile, update_user_profile, register_user as register_user_profile
+from services.profile import get_user_profile, update_user_profile
+from services.db      import register_user_profile
 from services.programs import list_goals, list_types, get_program
 
 # === Приложение и статика ===
