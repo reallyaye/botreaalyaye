@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Добро пожаловать в Фитнес-WebApp!</h2>
+  <p>Это ваше центральное место для управления тренировками и просмотром профиля прямо из Telegram.</p>
+  <p>Перейдите в разделы меню сверху:</p>
+  <ul>
+    <li><a href="/profile?user_id={{ request.query_params.user_id }}">Профиль</a></li>
+    <li><a href="/workouts?user_id={{ request.query_params.user_id }}">Тренировки</a></li>
+  </ul>
+{% endblock %}
