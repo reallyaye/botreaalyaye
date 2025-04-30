@@ -47,7 +47,7 @@ async def main():
     dp.include_router(custom_programs_router)
 
     # Регистрируем on_startup
-    dp.startup.register(lambda _: on_startup(bot))
+    dp.startup.register(on_startup)
 
     # Запускаем long-polling
     await dp.start_polling(bot)
