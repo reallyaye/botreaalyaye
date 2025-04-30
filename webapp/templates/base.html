@@ -2,37 +2,39 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Фитнес-WebApp</title>
+  <title>🏋️ Фитнес-WebApp</title>
   <link rel="stylesheet" href="/static/styles.css">
   <script>
-    // Telegram Web App JS API: берём initDataUnsafe.user.id
-    window.addEventListener('DOMContentLoaded', () => {
-      if (window.Telegram && Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-
-        const uid = tg.initDataUnsafe?.user?.id;
-        if (uid) {
-          const params = new URLSearchParams(window.location.search);
-          if (!params.has('user_id')) {
-            params.set('user_id', uid);
-            // перезагрузить страницу с ?user_id=…
-            window.location.search = params.toString();
-          }
-        }
+  (function() {
+    const tg = window.Telegram?.WebApp;
+    if (!tg) return;  // мы не в Telegram WebApp-контейнере
+    tg.ready();
+    const uid = tg.initDataUnsafe?.user?.id;
+    if (uid) {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('user_id')) {
+        url.searchParams.set('user_id', uid);
+        window.location.replace(url.toString());
       }
-    });
+    }
+  })();
   </script>
 </head>
 <body>
   <header>
     <h1>🏋️ Фитнес-WebApp</h1>
-    {% set uid = request.query_params.get("user_id", "") %}
-    <nav>
-      <a href="/?user_id={{ uid }}">Главная</a> |
-      <a href="/profile?user_id={{ uid }}">Профиль</a> |
-      <a href="/workouts?user_id={{ uid }}">Тренировки</a>
-    </nav>
+    {% set uid = request.query_params.get("user_id") %}
+    {% if uid %}
+      <nav>
+        <a href="/?user_id={{ uid }}">Главная</a> |
+        <a href="/profile?user_id={{ uid }}">Профиль</a> |
+        <a href="/workouts?user_id={{ uid }}">Тренировки</a>
+      </nav>
+    {% else %}
+      <p style="color: #a00;">
+        ❗ Откройте это WebApp из Telegram (кнопкой «Открыть WebApp»), чтобы загрузить ваш профиль.
+      </p>
+    {% endif %}
     <hr>
   </header>
   <main>
@@ -44,3 +46,7 @@
   </footer>
 </body>
 </html>
+<!-- Compare this snippet from webapp/templates/home.html: -->
+<!--  {% extends "base.html" %} 
+ -->
+ -->
