@@ -1,11 +1,9 @@
 # webapp/main.py
 
 import os
-import asyncio
 from pathlib import Path
 from fastapi import (
-    FastAPI, Request, Depends, Form, Query,
-    HTTPException
+    FastAPI, Request, Depends, Form, Query, HTTPException
 )
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -15,10 +13,10 @@ from services.db import (
     init_db,
     get_workouts, add_workout,
     get_weights, add_weight,
-    get_custom_programs, add_custom_program, delete_custom_program
+    get_custom_programs, add_custom_program, delete_custom_program,
+    register_user          # <-- исправлено
 )
 from services.profile import get_user_profile, update_user_profile
-from services.db      import register_user_profile
 from services.programs import list_goals, list_types, get_program
 
 # === Приложение и статика ===
@@ -59,21 +57,21 @@ async def home(request: Request):
 
 # === Profile ===
 
-@app.get("/register", response_class=RedirectResponse)
+@app.get("/register")
 async def register(request: Request, user_id: int = Depends(require_user)):
     # при первом заходе регистрируем профиль
-    await register_user_profile({"id": user_id})
+    await register_user(user_id)  # <-- здесь вызываем register_user(int)
     return RedirectResponse(f"/profile?user_id={user_id}", status_code=302)
 
 @app.get("/profile", response_class=HTMLResponse)
 async def profile_view(request: Request, user_id: int = Depends(require_user)):
     prof = await get_user_profile(user_id)
     if not prof:
-        # если профиля нет — редиректим на регистрацию
         return RedirectResponse(f"/register?user_id={user_id}", status_code=302)
     return templates.TemplateResponse("profile.html", {
         "request": request,
-        "profile": prof
+        "profile": prof,
+        "user_id": user_id
     })
 
 @app.post("/profile/update")
