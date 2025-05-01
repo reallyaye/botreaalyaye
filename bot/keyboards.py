@@ -1,11 +1,8 @@
 import os
 from dotenv import load_dotenv
 from aiogram.types import (
-    ReplyKeyboardMarkup,
-    KeyboardButton,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    WebAppInfo,
+    ReplyKeyboardMarkup, KeyboardButton,
+    InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo,
 )
 
 load_dotenv()
@@ -14,16 +11,16 @@ if not WEBAPP_URL:
     raise RuntimeError("WEBAPP_URL не задана в .env")
 
 # ——— Основные кнопки ———
-btn_train    = KeyboardButton(text="🏋️ Тренировки")
-btn_params   = KeyboardButton(text="⚙️ Параметры")
-btn_programs = KeyboardButton(text="📋 Программы")
-btn_profile  = KeyboardButton(text="👤 Профиль")
-btn_help     = KeyboardButton(text="❓ Помощь")
-btn_ask_ai   = KeyboardButton(text="🤖 Спросить у ИИ")
+btn_train      = KeyboardButton(text="🏋️ Тренировки")
+btn_params     = KeyboardButton(text="⚙️ Параметры")
+btn_programs   = KeyboardButton(text="📋 Программы")
+btn_profile    = KeyboardButton(text="👤 Профиль")
+btn_help       = KeyboardButton(text="❓ Помощь")
+btn_ask_ai     = KeyboardButton(text="🤖 Спросить у ИИ")
 
-# отмена и назад
-cancel_button = KeyboardButton(text="Отмена")
-btn_back      = KeyboardButton(text="◀️ Назад")
+# ——— Отмена и назад ———
+cancel_button  = KeyboardButton(text="Отмена")
+btn_back       = KeyboardButton(text="◀️ Назад")
 
 # ——— Главное меню ———
 main_menu = ReplyKeyboardMarkup(
@@ -35,21 +32,19 @@ main_menu = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 
-# одноразовое меню с «Отмена»
+# ——— Меню с «Отмена» ———
 cancel_keyboard = ReplyKeyboardMarkup(
     keyboard=[[cancel_button]],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-# WebApp-кнопка
+# ——— WebApp-inline-кнопка ———
 webapp_inline_kb = InlineKeyboardMarkup(
-    inline_keyboard=[[
-        InlineKeyboardButton(
-            text="🌐 Открыть WebApp",
-            web_app=WebAppInfo(url=WEBAPP_URL)
-        )
-    ]]
+    inline_keyboard=[[InlineKeyboardButton(
+        text="🌐 Открыть WebApp",
+        web_app=WebAppInfo(url=WEBAPP_URL)
+    )]]
 )
 
 # ——— Меню «Тренировки» ———
@@ -62,18 +57,18 @@ trainings_menu = ReplyKeyboardMarkup(
     one_time_keyboard=True,
 )
 
-# Типы тренировок
+# ——— Типы тренировок ———
 type_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Приседания"), KeyboardButton(text="Жим лёжа")],
         [KeyboardButton(text="Становая тяга"), KeyboardButton(text="Другое")],
-        [cancel_button],
+        [cancel_button],  # ← здесь было btn_cancel
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-# Сложность
+# ——— Сложность ———
 difficulty_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
@@ -81,7 +76,7 @@ difficulty_keyboard = ReplyKeyboardMarkup(
             KeyboardButton(text="Нормально"),
             KeyboardButton(text="Сложно"),
         ],
-        [cancel_button],
+        [cancel_button],  # ← и здесь
     ],
     resize_keyboard=True,
     one_time_keyboard=True,

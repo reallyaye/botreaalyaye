@@ -1,5 +1,3 @@
-# bot/handlers/programs.py
-
 import os
 from aiogram import Router
 from aiogram.types import Message
@@ -11,7 +9,7 @@ from openai import OpenAI
 
 from bot.keyboards import main_menu, cancel_keyboard
 
-# === Инициализация клиента SaMbaNova ===
+# Инициализация клиента SaMbaNova
 client = OpenAI(
     api_key=os.getenv("SAMBANOVA_API_KEY"),
     base_url="https://api.sambanova.ai/v1",
@@ -70,7 +68,6 @@ async def ai_preferences(message: Message, state: FSMContext):
 
     await message.answer("🔍 Составляю программу, подождите…")
 
-    # Формируем текстовый промпт
     prompt = (
         f"Составь недельную тренировочную программу для человека, "
         f"цель: «{data['goal']}», "
@@ -79,7 +76,6 @@ async def ai_preferences(message: Message, state: FSMContext):
         f"По 3–5 упражнений в день, разложи по дням недели."
     )
 
-    # Запрашиваем программу у модели
     response = client.chat.completions.create(
         model="DeepSeek-R1",
         messages=[
