@@ -13,17 +13,19 @@ WEBAPP_URL = os.getenv("WEBAPP_URL")
 if not WEBAPP_URL:
     raise RuntimeError("WEBAPP_URL не задана в .env")
 
-# Основные кнопки
-btn_train     = KeyboardButton(text="🏋️ Тренировки")
-btn_params    = KeyboardButton(text="⚙️ Параметры")
-btn_programs  = KeyboardButton(text="📋 Программы")
-btn_profile   = KeyboardButton(text="👤 Профиль")
-btn_help      = KeyboardButton(text="❓ Помощь")
-btn_ask_ai    = KeyboardButton(text="🤖 Спросить у ИИ")
-btn_cancel    = KeyboardButton(text="Отмена")
+# ——— Основные кнопки ———
+btn_train    = KeyboardButton(text="🏋️ Тренировки")
+btn_params   = KeyboardButton(text="⚙️ Параметры")
+btn_programs = KeyboardButton(text="📋 Программы")
+btn_profile  = KeyboardButton(text="👤 Профиль")
+btn_help     = KeyboardButton(text="❓ Помощь")
+btn_ask_ai   = KeyboardButton(text="🤖 Спросить у ИИ")
+
+# отмена и назад
+cancel_button = KeyboardButton(text="Отмена")
 btn_back      = KeyboardButton(text="◀️ Назад")
 
-# Главное меню (reply) с кнопкой «Спросить у ИИ»
+# ——— Главное меню ———
 main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [btn_train,    btn_params],
@@ -33,26 +35,24 @@ main_menu = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 
-# Кнопка «Отмена» (одноразовая)
+# одноразовое меню с «Отмена»
 cancel_keyboard = ReplyKeyboardMarkup(
-    keyboard=[[btn_cancel]],
+    keyboard=[[cancel_button]],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-# Inline-кнопка открытия WebApp
+# WebApp-кнопка
 webapp_inline_kb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(
-                text="🌐 Открыть WebApp",
-                web_app=WebAppInfo(url=WEBAPP_URL)
-            )
-        ]
-    ]
+    inline_keyboard=[[
+        InlineKeyboardButton(
+            text="🌐 Открыть WebApp",
+            web_app=WebAppInfo(url=WEBAPP_URL)
+        )
+    ]]
 )
 
-# Меню «Тренировки»
+# ——— Меню «Тренировки» ———
 trainings_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Добавить тренировку"), KeyboardButton(text="Показать тренировки")],
@@ -62,18 +62,18 @@ trainings_menu = ReplyKeyboardMarkup(
     one_time_keyboard=True,
 )
 
-# Меню типов тренировок
+# Типы тренировок
 type_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Приседания"), KeyboardButton(text="Жим лёжа")],
         [KeyboardButton(text="Становая тяга"), KeyboardButton(text="Другое")],
-        [btn_cancel],
+        [cancel_button],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-# Меню сложностей
+# Сложность
 difficulty_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
@@ -81,13 +81,13 @@ difficulty_keyboard = ReplyKeyboardMarkup(
             KeyboardButton(text="Нормально"),
             KeyboardButton(text="Сложно"),
         ],
-        [btn_cancel],
+        [cancel_button],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-# Меню «Параметры»
+# ——— Меню «Параметры» ———
 params_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Добавить вес"), KeyboardButton(text="Показать вес")],
@@ -97,7 +97,7 @@ params_menu = ReplyKeyboardMarkup(
     one_time_keyboard=True,
 )
 
-# Меню «Программы» (заменили кнопку «Сгенерировать» на «🤖 Генерировать программу»)
+# ——— Меню «Программы» ———
 programs_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
@@ -110,7 +110,7 @@ programs_menu = ReplyKeyboardMarkup(
     one_time_keyboard=True,
 )
 
-# Меню «Мои программы»
+# ——— Меню «Мои программы» ———
 my_programs_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Добавить программу"), KeyboardButton(text="Удалить программу")],
