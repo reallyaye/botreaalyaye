@@ -1,10 +1,11 @@
-# bot/keyboards.py
-
 import os
 from dotenv import load_dotenv
 from aiogram.types import (
-    ReplyKeyboardMarkup, KeyboardButton,
-    InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    WebAppInfo,
 )
 
 load_dotenv()
@@ -12,26 +13,31 @@ WEBAPP_URL = os.getenv("WEBAPP_URL")
 if not WEBAPP_URL:
     raise RuntimeError("WEBAPP_URL не задана в .env")
 
+# Кнопки
+btn_train      = KeyboardButton(text="🏋️ Тренировки")
+btn_params     = KeyboardButton(text="⚙️ Параметры")
+btn_programs   = KeyboardButton(text="📋 Программы")
+btn_profile    = KeyboardButton(text="👤 Профиль")
+btn_help       = KeyboardButton(text="❓ Помощь")
+btn_ask_ai     = KeyboardButton(text="🤖 Спросить у ИИ")
+cancel_button  = KeyboardButton(text="Отмена")
 
-# кнопка «Отмена»
-cancel_button = KeyboardButton(text="Отмена")
+# Главное меню с кнопкой «Спросить у ИИ»
+main_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [btn_train,    btn_params],
+        [btn_programs, btn_profile],
+        [btn_ask_ai,   btn_help],
+    ],
+    resize_keyboard=True,
+)
+
+# Кнопка «Отмена» (одноразовая)
 cancel_keyboard = ReplyKeyboardMarkup(
     keyboard=[[cancel_button]],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
-
-
-# главное меню
-main_menu = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="🏋️ Тренировки"), KeyboardButton(text="⚙️ Параметры")],
-        [KeyboardButton(text="📋 Программы"),   KeyboardButton(text="👤 Профиль")],
-        [KeyboardButton(text="❓ Помощь")],
-    ],
-    resize_keyboard=True,
-)
-
 
 # Inline-кнопка открытия WebApp
 webapp_inline_kb = InlineKeyboardMarkup(
@@ -45,40 +51,28 @@ webapp_inline_kb = InlineKeyboardMarkup(
     ]
 )
 
-
-# меню «Тренировки»
+# Меню «Тренировки»
 trainings_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [
-            KeyboardButton(text="Добавить тренировку"),
-            KeyboardButton(text="Показать тренировки"),
-        ],
+        [KeyboardButton(text="Добавить тренировку"), KeyboardButton(text="Показать тренировки")],
         [KeyboardButton(text="◀️ Назад")],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-
-# меню типов тренировок
+# Меню типов тренировок
 type_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [
-            KeyboardButton(text="Приседания"),
-            KeyboardButton(text="Жим лёжа"),
-        ],
-        [
-            KeyboardButton(text="Становая тяга"),
-            KeyboardButton(text="Другое"),
-        ],
+        [KeyboardButton(text="Приседания"), KeyboardButton(text="Жим лёжа")],
+        [KeyboardButton(text="Становая тяга"), KeyboardButton(text="Другое")],
         [cancel_button],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-
-# меню сложностей
+# Меню сложностей
 difficulty_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
@@ -92,42 +86,30 @@ difficulty_keyboard = ReplyKeyboardMarkup(
     one_time_keyboard=True,
 )
 
-
-# меню «Параметры»
+# Меню «Параметры»
 params_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [
-            KeyboardButton(text="Добавить вес"),
-            KeyboardButton(text="Показать вес"),
-        ],
+        [KeyboardButton(text="Добавить вес"), KeyboardButton(text="Показать вес")],
         [KeyboardButton(text="◀️ Назад")],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-
-# меню «Программы»
+# Меню «Программы»
 programs_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [
-            KeyboardButton(text="Сгенерировать программу"),
-            KeyboardButton(text="Мои программы"),
-        ],
+        [KeyboardButton(text="Сгенерировать программу"), KeyboardButton(text="Мои программы")],
         [KeyboardButton(text="◀️ Назад")],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
 )
 
-
-# меню «Мои программы»
+# Меню «Мои программы»
 my_programs_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [
-            KeyboardButton(text="Добавить программу"),
-            KeyboardButton(text="Удалить программу"),
-        ],
+        [KeyboardButton(text="Добавить программу"), KeyboardButton(text="Удалить программу")],
         [KeyboardButton(text="◀️ Назад")],
     ],
     resize_keyboard=True,
