@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% block content %}
-  <h2>Ваш профиль</h2>
-  <ul>
-    <li>ID: {{ profile.user_id }}</li>
-    <li>Имя: {{ profile.first_name }} {{ profile.last_name }}</li>
-    <li>Username: @{{ profile.username or '—' }}</li>
-  </ul>
-{% endblock %}
