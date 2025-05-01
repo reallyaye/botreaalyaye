@@ -9,3 +9,4 @@ pyngrok>=6.1.0,<7.0.0
 python-multipart
 matplotlib
 aiofiles
+openai
