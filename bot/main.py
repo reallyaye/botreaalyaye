@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
+import openai
 
 from bot.handlers.commands import router as commands_router
 from bot.handlers.navigation import router as navigation_router
@@ -22,7 +23,7 @@ load_dotenv(BASE_DIR / ".env")
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
-
+openai.api_key = os.getenv("SAMBANOVA_API_KEY")
 if not BOT_TOKEN or not ADMIN_ID:
     raise RuntimeError("TELEGRAM_BOT_TOKEN и ADMIN_ID должны быть заданы в .env")
 

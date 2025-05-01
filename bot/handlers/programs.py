@@ -1,3 +1,4 @@
+from http import client
 import os
 from aiogram import Router
 from aiogram.types import Message
@@ -6,11 +7,12 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters.state import StateFilter
 
 from openai import OpenAI
+import openai
 
 from bot.keyboards import main_menu, cancel_keyboard
 
 # 1) Инициализируем клиент нового API
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = os.getenv("SAMBANOVA_API_KEY")
 
 router = Router()
 
