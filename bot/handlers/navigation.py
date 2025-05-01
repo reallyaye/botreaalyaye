@@ -1,13 +1,9 @@
 #navigation.py
 from aiogram import Router, F
 from aiogram.types import Message
-from bot.keyboards import main_menu, trainings_menu, programs_menu
+from bot.keyboards import main_menu, programs_menu
 
 router = Router()
-
-@router.message(F.text == "🏋️ Тренировки")
-async def nav_trainings(message: Message):
-    await message.answer("🏋️ Раздел «Тренировки»", reply_markup=trainings_menu)
 
 @router.message(F.text == "📋 Программы")
 async def nav_programs(message: Message):

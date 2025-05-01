@@ -70,23 +70,6 @@ async def register_user(user):
         )
         await db.commit()
 
-# Работа с тренировками
-async def add_workout(user_id, workout_type, duration=None, details=None):
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute(
-            "INSERT INTO workouts(user_id, workout_type, duration, details) VALUES (?, ?, ?, ?)",
-            (user_id, workout_type, duration, details)
-        )
-        await db.commit()
-
-async def get_workouts(user_id, limit=20):
-    async with aiosqlite.connect(DB_PATH) as db:
-        cur = await db.execute(
-            "SELECT id, workout_type, duration, details, created_at FROM workouts WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
-            (user_id, limit)
-        )
-        return await cur.fetchall()
-
 # Работа с прогрессом
 async def add_progress(user_id, metric, value):
     async with aiosqlite.connect(DB_PATH) as db:

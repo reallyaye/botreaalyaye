@@ -10,7 +10,6 @@ import openai
 
 from bot.handlers.commands          import router as commands_router
 from bot.handlers.navigation        import router as navigation_router
-from bot.handlers.workouts          import router as workouts_router
 
 from bot.handlers.programs          import router as programs_router
 from bot.handlers.custom_programs   import router as custom_programs_router
@@ -48,8 +47,6 @@ async def main():
     # Регистрируем роутеры
     dp.include_router(commands_router)
     dp.include_router(navigation_router)
-    dp.include_router(workouts_router)
-    # dp.include_router(progress_router)  # ← удалили
     dp.include_router(programs_router)
     dp.include_router(custom_programs_router)
     dp.include_router(ask_router)
