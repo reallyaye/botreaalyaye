@@ -1,5 +1,4 @@
 # bot/keyboards.py
-
 import os
 from dotenv import load_dotenv
 from aiogram.types import (
@@ -28,7 +27,7 @@ btn_back      = KeyboardButton(text="◀️ Назад")
 main_menu = ReplyKeyboardMarkup(
     keyboard=[
         [btn_programs],
-        [btn_ask_ai,   btn_help],
+        [btn_ask_ai, btn_help],
     ],
     resize_keyboard=True,
 )
@@ -53,10 +52,8 @@ webapp_inline_kb = InlineKeyboardMarkup(
 # ——— Меню «Программы» ———
 programs_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [
-            KeyboardButton(text="🤖 Генерировать программу"),
-            KeyboardButton(text="Мои программы"),
-        ],
+        [KeyboardButton(text="🤖 Генерировать программу"),
+         KeyboardButton(text="Мои программы")],
         [btn_back],
     ],
     resize_keyboard=True,
@@ -66,10 +63,8 @@ programs_menu = ReplyKeyboardMarkup(
 # ——— Меню «Мои программы» ———
 my_programs_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [
-            KeyboardButton(text="Добавить программу"),
-            KeyboardButton(text="Удалить программу")
-        ],
+        [KeyboardButton(text="Добавить программу"),
+         KeyboardButton(text="Удалить программу")],
         [btn_back],
     ],
     resize_keyboard=True,
