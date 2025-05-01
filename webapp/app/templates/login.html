@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+  <h1>Вход</h1>
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+  <form method="post" action="/login">
+    <label>
+      <i class="fa fa-user"></i> Логин:<br />
+      <input type="text" name="username" required />
+    </label><br />
+    <label>
+      <i class="fa fa-lock"></i> Пароль:<br />
+      <input type="password" name="password" required />
+    </label><br />
+    <button type="submit">Войти</button>
+  </form>
+  <p>Или войдите через Telegram:</p>
+  <script async src="https://telegram.org/js/telegram-widget.js?22" 
+          data-telegram-login="YourBotName" 
+          data-size="large" 
+          data-auth-url="/telegram-callback" 
+          data-request-access="write"></script>
+  <p>Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+{% endblock %}
