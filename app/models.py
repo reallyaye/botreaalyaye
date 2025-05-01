@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy import Table, Column, Integer, String, DateTime
-from app.db import metadata
+from app.services.db import metadata
 
 users = Table(
     "users",
