@@ -1,5 +1,5 @@
 # bot/handlers/ask_ai.py
-
+import re
 import os
 import asyncio
 from dotenv import load_dotenv
@@ -34,9 +34,7 @@ async def ai_start(message: Message, state: FSMContext):
     # очищаем старые данные и инициализируем историю
     await state.clear()
     await state.update_data(
-        history=[
-            {"role": "system", "content": "You are a helpful assistant."}
-        ]
+        history=[{"role": "system", "content": "You are a helpful assistant."}]
     )
     await message.answer(
         "🖊 Введите, пожалуйста, ваш вопрос для ИИ:",
@@ -51,14 +49,14 @@ async def ai_handle(message: Message, state: FSMContext):
         await state.clear()
         return await message.answer("❌ Диалог с ИИ завершен.", reply_markup=main_menu)
 
-    # сообщение юзера в историю
+    # добавляем сообщение пользователя в историю
     data = await state.get_data()
     history = data.get("history", [])
     history.append({"role": "user", "content": text})
 
     await message.answer("🔎 Обрабатываю ваш запрос…")
 
-    # сам запрос в отдельном потоке (чтобы не блокировать Aiogram)
+    # выполняем вызов ИИ в отдельном потоке
     def ai_request():
         return client.chat.completions.create(
             model="DeepSeek-R1",       # или "gpt-3.5-turbo"
@@ -69,16 +67,21 @@ async def ai_handle(message: Message, state: FSMContext):
 
     try:
         resp = await asyncio.to_thread(ai_request)
-        answer = resp.choices[0].message.content.strip()
+        raw_answer = resp.choices[0].message.content or ""
+        # вырезаем всё между <think> и </think> (включая теги)
+        clean_answer = re.sub(r'<think>.*?</think>', '', raw_answer, flags=re.DOTALL).strip()
     except Exception as e:
-        answer = f"❗ Ошибка при обращении к ИИ:\n{e}"
+        clean_answer = f"❗ Ошибка при обращении к ИИ:\n{e}"
 
-    # добавляем ответ в историю
-    history.append({"role": "assistant", "content": answer})
+    # сохраняем ответ в истории
+    history.append({"role": "assistant", "content": clean_answer})
     await state.update_data(history=history)
 
-    # шлём ответ и остаёмся в том же состоянии
-    await message.answer(answer, reply_markup=cancel_keyboard)
-    # остаёмся в AskAIState.waiting_for_question, чтобы задать новый вопрос
+    # отправляем уже очищенный ответ и остаёмся в том же состоянии
+    await message.answer(clean_answer, reply_markup=cancel_keyboard)
 
-# опционально: можно добавить хэндлер на /cancel или кнопку "Отмена" в любом состоянии
+# при желании можно добавить отдельный хэндлер на команду /cancel:
+@router.message(F.text.lower() == "отмена", StateFilter(AskAIState.waiting_for_question))
+async def ai_cancel(message: Message, state: FSMContext):
+    await state.clear()
+    await message.answer("❌ Диалог с ИИ завершен.", reply_markup=main_menu)
