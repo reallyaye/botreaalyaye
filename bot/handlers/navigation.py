@@ -1,3 +1,4 @@
+#navigation.py
 from aiogram import Router, F
 from aiogram.types import Message
 from bot.keyboards import main_menu, trainings_menu, programs_menu
