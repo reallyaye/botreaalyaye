@@ -1,5 +1,6 @@
 # bot/handlers/programs.py
 
+import re
 import os
 import asyncio
 from aiogram import Router
@@ -10,9 +11,9 @@ from aiogram.filters.state import StateFilter
 from openai import OpenAI
 
 from bot.keyboards import main_menu, cancel_keyboard
+from dotenv import load_dotenv
 
 # подгружаем ключи
-from dotenv import load_dotenv
 load_dotenv()
 API_KEY = os.getenv("SAMBANOVA_API_KEY") or os.getenv("OPENAI_API_KEY")
 if not API_KEY:
@@ -34,23 +35,6 @@ class ProgramAI(StatesGroup):
     weight        = State()
     target_weight = State()
 
-def split_text(text: str, max_len: int = 4000) -> list[str]:
-    """
-    Разбивает текст на части не более max_len символов, 
-    пытаясь резать по переносам строк.
-    """
-    parts = []
-    while len(text) > max_len:
-        # ищем ближайший перенос строки до границы
-        idx = text.rfind("\n", 0, max_len)
-        if idx == -1:
-            idx = max_len
-        parts.append(text[:idx].strip())
-        text = text[idx:].strip()
-    if text:
-        parts.append(text)
-    return parts
-
 @router.message(lambda m: m.text == "🤖 Генерировать программу")
 async def ai_start(message: Message, state: FSMContext):
     await state.clear()
@@ -60,6 +44,7 @@ async def ai_start(message: Message, state: FSMContext):
     )
     await state.set_state(ProgramAI.goal)
 
+# 1) Цель
 @router.message(StateFilter(ProgramAI.goal))
 async def ai_goal(message: Message, state: FSMContext):
     if message.text.lower() == "отмена":
@@ -73,6 +58,7 @@ async def ai_goal(message: Message, state: FSMContext):
     )
     await state.set_state(ProgramAI.frequency)
 
+# 2) Частота
 @router.message(StateFilter(ProgramAI.frequency))
 async def ai_frequency(message: Message, state: FSMContext):
     if message.text.lower() == "отмена":
@@ -86,6 +72,7 @@ async def ai_frequency(message: Message, state: FSMContext):
     )
     await state.set_state(ProgramAI.preferences)
 
+# 3) Предпочтения
 @router.message(StateFilter(ProgramAI.preferences))
 async def ai_preferences(message: Message, state: FSMContext):
     if message.text.lower() == "отмена":
@@ -99,6 +86,7 @@ async def ai_preferences(message: Message, state: FSMContext):
     )
     await state.set_state(ProgramAI.sex)
 
+# 4) Пол
 @router.message(StateFilter(ProgramAI.sex))
 async def ai_sex(message: Message, state: FSMContext):
     if message.text.lower() == "отмена":
@@ -112,6 +100,7 @@ async def ai_sex(message: Message, state: FSMContext):
     )
     await state.set_state(ProgramAI.age)
 
+# 5) Возраст
 @router.message(StateFilter(ProgramAI.age))
 async def ai_age(message: Message, state: FSMContext):
     if message.text.lower() == "отмена":
@@ -125,6 +114,7 @@ async def ai_age(message: Message, state: FSMContext):
     )
     await state.set_state(ProgramAI.weight)
 
+# 6) Текущий вес
 @router.message(StateFilter(ProgramAI.weight))
 async def ai_weight(message: Message, state: FSMContext):
     if message.text.lower() == "отмена":
@@ -138,6 +128,7 @@ async def ai_weight(message: Message, state: FSMContext):
     )
     await state.set_state(ProgramAI.target_weight)
 
+# 7) Желанный вес и вызов ИИ
 @router.message(StateFilter(ProgramAI.target_weight))
 async def ai_target_weight(message: Message, state: FSMContext):
     if message.text.lower() == "отмена":
@@ -174,15 +165,12 @@ async def ai_target_weight(message: Message, state: FSMContext):
 
     try:
         resp = await asyncio.to_thread(_call_ai)
-        program_text = resp.choices[0].message.content.strip()
+        raw = resp.choices[0].message.content or ""
+        # удаляем все блоки <think>...</think>
+        program_text = re.sub(r'<think>.*?</think>', '', raw, flags=re.DOTALL).strip()
     except Exception as e:
         await state.clear()
         return await message.answer(f"❌ Ошибка генерации: {e}", reply_markup=main_menu)
 
-    # Разбиваем на части и отправляем
-    for chunk in split_text(program_text):
-        await message.answer(chunk)
-
-    # После всех частей выводим меню
-    await message.answer("✅ Готово.", reply_markup=main_menu)
+    await message.answer(f"📋 Вот ваша программа на неделю:\n\n{program_text}", reply_markup=main_menu)
     await state.clear()
