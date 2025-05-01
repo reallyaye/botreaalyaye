@@ -6,9 +6,10 @@ from pathlib import Path
 from fastapi import (
     FastAPI, Request, Depends, Form, Query, HTTPException
 )
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi import status
 
 from services.db import (
     init_db,
@@ -150,7 +151,18 @@ async def programs_generate(
         "program": program,
         "user_id": user_id
     })
-
+@app.get("/programs/types", response_class=JSONResponse)
+async def programs_types(
+    goal: str = Query(..., description="Цель программы"),
+    user_id: int = Depends(require_user)
+):
+    """Возвращает JSON-список типов программ для заданной цели."""
+    if goal not in list_goals():
+        return JSONResponse(
+            {"error": "Неизвестная цель"},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+    return JSONResponse({"types": list_types(goal)})
 # === Custom Programs ===
 
 @app.get("/programs/custom", response_class=HTMLResponse)
