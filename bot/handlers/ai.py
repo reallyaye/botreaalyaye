@@ -5,7 +5,8 @@ import asyncio
 import openai
 from aiogram import Router
 from aiogram.types import Message
-from aiogram.filters import Command
+from aiogram.filters.command import Command
+
 
 router = Router()
 
@@ -17,25 +18,26 @@ client = openai.OpenAI(
 
 @router.message(Command("ask"))
 async def ask_handler(message: Message):
-    prompt = message.get_full_command()[1] or message.get_args()
+    # отладка, чтобы точно знать, что хэндлер ловится
+    await message.answer("🔍 Я вас слышу! Обработка /ask...")
+
+    # получаем текст после команды
+    prompt = message.get_args().strip()
     if not prompt:
-        return await message.answer("❗️ Пожалуйста, укажите вопрос: `/ask <текст вашего запроса>`")
+        return await message.answer("❗️ Пожалуйста, укажите вопрос: `/ask <ваш вопрос>`")
 
-    # показываем пользователю, что бот “печатает”
     await message.chat.post_action("typing")
-
-    # так как OpenAI-клиент синхронный, обёртываем в to_thread
     response = await asyncio.to_thread(
         lambda: client.chat.completions.create(
             model="DeepSeek-R1",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant"},
-                {"role": "user", "content": prompt},
+                {"role": "user",   "content": prompt},
             ],
             temperature=0.1,
             top_p=0.1,
         )
     )
 
-    answer = response.choices[0].message.content
-    await message.answer(answer)
+    await message.answer(response.choices[0].message.content)
+
