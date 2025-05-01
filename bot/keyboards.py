@@ -11,22 +11,23 @@ if not WEBAPP_URL:
     raise RuntimeError("WEBAPP_URL не задана в .env")
 
 # ——— Основные кнопки ———
-btn_train    = KeyboardButton(text="🏋️ Тренировки")
-btn_params   = KeyboardButton(text="⚙️ Параметры")
-btn_programs = KeyboardButton(text="📋 Программы")
-btn_ask_ai   = KeyboardButton(text="🤖 Спросить у ИИ")
-btn_help     = KeyboardButton(text="❓ Помощь")
+btn_train       = KeyboardButton(text="🏋️ Тренировки")
+btn_add_weight  = KeyboardButton(text="Добавить вес")
+btn_view_weight = KeyboardButton(text="Показать вес")
+btn_programs    = KeyboardButton(text="📋 Программы")
+btn_ask_ai      = KeyboardButton(text="🤖 Спросить у ИИ")
+btn_help        = KeyboardButton(text="❓ Помощь")
 
 # ——— Отмена и назад ———
 cancel_button = KeyboardButton(text="Отмена")
 btn_back      = KeyboardButton(text="◀️ Назад")
 
-# ——— Главное меню (профиль убран) ———
+# ——— Главное меню ———
 main_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [btn_train,    btn_params],
-        [btn_programs, btn_ask_ai],
-        [btn_help],
+        [btn_train,      btn_add_weight],
+        [btn_view_weight, btn_programs],
+        [btn_ask_ai,     btn_help],
     ],
     resize_keyboard=True,
 )
@@ -40,55 +41,18 @@ cancel_keyboard = ReplyKeyboardMarkup(
 
 # ——— WebApp-inline-кнопка ———
 webapp_inline_kb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(
-                text="🌐 Открыть WebApp",
-                web_app=WebAppInfo(url=WEBAPP_URL)
-            )
-        ]
-    ]
+    inline_keyboard=[[
+        InlineKeyboardButton(
+            text="🌐 Открыть WebApp",
+            web_app=WebAppInfo(url=WEBAPP_URL)
+        )
+    ]]
 )
 
 # ——— Меню «Тренировки» ———
 trainings_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Добавить тренировку"), KeyboardButton(text="Показать тренировки")],
-        [btn_back],
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-)
-
-# ——— Типы тренировок ———
-type_keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="Приседания"), KeyboardButton(text="Жим лёжа")],
-        [KeyboardButton(text="Становая тяга"), KeyboardButton(text="Другое")],
-        [cancel_button],
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-)
-
-# ——— Сложность ———
-difficulty_keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [
-            KeyboardButton(text="Легко"),
-            KeyboardButton(text="Нормально"),
-            KeyboardButton(text="Сложно"),
-        ],
-        [cancel_button],
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-)
-
-# ——— Меню «Параметры» ———
-params_menu = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="Добавить вес"), KeyboardButton(text="Показать вес")],
         [btn_back],
     ],
     resize_keyboard=True,
