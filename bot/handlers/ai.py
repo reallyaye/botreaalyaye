@@ -34,11 +34,8 @@ async def ask_handler(message: Message):
         # Обёртка в to_thread, чтобы не блокировать loop
         response = await asyncio.to_thread(
             lambda: client.chat.completions.create(
-                model="DeepSeek-R1",
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant"},
-                    {"role": "user",   "content": prompt},
-                ],
+                model="DeepSeek-V3-0324",
+                messages=[{"role":"system","content":"You are a helpful assistant"},{"role":"user","content":"Hello"}],
                 temperature=0.1,
                 top_p=0.1,
             )
