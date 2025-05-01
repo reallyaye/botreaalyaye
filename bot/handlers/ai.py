@@ -1,85 +1,63 @@
+# bot/handlers/ask_ai.py
+
 import os
-import re
-import asyncio
 import openai
 
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.types import Message
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters.state import StateFilter
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
 
-from bot.keyboards import main_menu, cancel_keyboard, cancel_button
+from bot.keyboards import cancel_keyboard, main_menu
+
+# Настройка OpenAI-клиента
+openai.api_key = os.getenv("SAMBANOVA_API_KEY")
 
 router = Router()
 
-# клиенты OpenAI
-openai_client = openai.OpenAI(
-    api_key=os.getenv("SAMBANOVA_API_KEY"),
-    base_url="https://api.sambanova.ai/v1",
-)
 
-class AskForm(StatesGroup):
-    question = State()
+class AskAIState(StatesGroup):
+    waiting_for_question = State()
 
 
-@router.message(lambda m: m.text == "🤖 Спросить у ИИ")
-async def start_ask_flow(message: Message, state: FSMContext):
+@router.message(F.text == "🤖 Спросить у ИИ")
+async def ai_start(message: Message, state: FSMContext):
+    # очищаем любые старые состояния
     await state.clear()
-    # инициализируем историю
-    await state.update_data(history=[
-        {"role": "system", "content": (
-            "You are a helpful assistant. "
-            "Answer without any internal reasoning tags."
-        )}
-    ])
+    # просим ввести вопрос
     await message.answer(
-        "📝 Напишите ваш вопрос (или продолжите разговор):",
+        "🖊 Введите, пожалуйста, ваш вопрос для ИИ:",
         reply_markup=cancel_keyboard
     )
-    await state.set_state(AskForm.question)
+    await state.set_state(AskAIState.waiting_for_question)
 
 
-@router.message(lambda m: m.text == cancel_button.text, StateFilter(AskForm.question))
-async def cancel_ask(message: Message, state: FSMContext):
-    await state.clear()
-    await message.answer("❌ Диалог с ИИ завершён.", reply_markup=main_menu)
+@router.message(StateFilter(AskAIState.waiting_for_question))
+async def ai_handle(message: Message, state: FSMContext):
+    question = message.text.strip()
+    # если пользователь нажал «Отмена»
+    if question.lower() == "отмена":
+        await state.clear()
+        return await message.answer("❌ Отменено.", reply_markup=main_menu)
 
-
-@router.message(StateFilter(AskForm.question))
-async def process_ask(message: Message, state: FSMContext):
-    data = await state.get_data()
-    history = data.get("history", [])
-
-    # добавляем новое пользовательское сообщение
-    history.append({"role": "user", "content": message.text})
-
-    await state.update_data(history=history)
-    await message.answer("🔍 Обрабатываю запрос...", reply_markup=cancel_keyboard)
+    # сообщаем, что обрабатываем
+    await message.answer("🔎 Обрабатываю ваш запрос...")
 
     try:
-        # вызываем ИИ со всей историей
-        response = await asyncio.to_thread(
-            openai_client.chat.completions.create,
+        resp = openai.ChatCompletion.create(
             model="DeepSeek-R1",
-            messages=history,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": question},
+            ],
             temperature=0.1,
-            top_p=0.1
+            top_p=0.1,
         )
-        ai_msg = response.choices[0].message.content or ""
+        answer = resp.choices[0].message.content
     except Exception as e:
-        await state.clear()
-        return await message.answer(
-            f"❌ Ошибка API:\n```\n{e}\n```",
-            reply_markup=main_menu
-        )
+        answer = f"❗ Произошла ошибка при обращении к ИИ:\n{e}"
 
-    # сохраняем ответ ИИ в истории
-    history.append({"role": "assistant", "content": ai_msg})
-    await state.update_data(history=history)
-
-    # чистим возможные теги <think>
-    clean = re.sub(r"<think>.*?</think>", "", ai_msg, flags=re.DOTALL).strip()
-    await message.answer(clean or ai_msg, reply_markup=cancel_keyboard)
-    # **Не сбрасываем состояние** — остаёмся в AskForm.question,
-    # чтобы следующий текст пользователя тоже пошёл в тот же поток
+    # отправляем ответ и возвращаем главное меню
+    await message.answer(answer, reply_markup=main_menu)
+    await state.clear()
