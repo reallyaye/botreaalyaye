@@ -1,79 +1,96 @@
 # bot/handlers/programs.py
 
+import os
+import openai
+
 from aiogram import Router
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
-from aiogram.filters import Command
+from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters.state import StateFilter
 
-from services.programs import list_goals, list_types, get_program
-from bot.keyboards import main_menu, cancel_button, cancel_keyboard
+from bot.keyboards import main_menu, cancel_keyboard
+from services.db import add_custom_program  # если нужно сохранить
+# или: from services.programs import get_program  — если остаётесь на внутренних шаблонах
+
+# Инициализируем OpenAI-клиент
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 router = Router()
 
-# 1) Определяем форму FSM
-class ProgramForm(StatesGroup):
-    goal   = State()   # выбор цели
-    p_type = State()   # выбор типа
+class ProgramAI(StatesGroup):
+    goal        = State()  # цель тренировки
+    frequency   = State()  # сколько раз в неделю
+    preferences = State()  # предпочтения/оборудование
 
-# 2) Хендлер запуска диалога
-@router.message(Command("gen_program"))
-@router.message(lambda m: m.text == "Сгенерировать программу")
-async def cmd_start_program(message: Message, state: FSMContext):
+@router.message(lambda m: m.text == "🤖 Генерировать программу")
+async def ai_start(message: Message, state: FSMContext):
     await state.clear()
-    goals = list_goals()
-    kb = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text=g)] for g in goals] + [[KeyboardButton(text=cancel_button.text)]],
-        resize_keyboard=True,
-        one_time_keyboard=True
+    await message.answer(
+        "📝 Расскажите, какая у вас основная цель тренировки? (например: набрать массу, похудеть, выносливость и т.п.)",
+        reply_markup=cancel_keyboard
     )
-    await message.answer("🎯 Выберите цель программы:", reply_markup=kb)
-    await state.set_state(ProgramForm.goal)
+    await state.set_state(ProgramAI.goal)
 
-# 3) Пользователь выбрал цель
-@router.message(StateFilter(ProgramForm.goal))
-async def cmd_goal_chosen(message: Message, state: FSMContext):
-    goal = message.text
-    if goal not in list_goals():
-        return await message.answer("⚠️ Пожалуйста, выберите цель кнопкой.", reply_markup=cancel_keyboard)
-    await state.update_data(goal=goal)
+@router.message(StateFilter(ProgramAI.goal))
+async def ai_goal(message: Message, state: FSMContext):
+    if message.text.lower() == "отмена":
+        await state.clear()
+        return await message.answer("❌ Операция отменена.", reply_markup=main_menu)
 
-    types = list_types(goal)
-    kb = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text=t)] for t in types] + [[KeyboardButton(text=cancel_button.text)]],
-        resize_keyboard=True,
-        one_time_keyboard=True
+    await state.update_data(goal=message.text)
+    await message.answer(
+        "📅 Сколько раз в неделю вы планируете тренироваться?",
+        reply_markup=cancel_keyboard
     )
-    await message.answer("🏷️ Выберите тип программы:", reply_markup=kb)
-    await state.set_state(ProgramForm.p_type)
+    await state.set_state(ProgramAI.frequency)
 
-# 4) Пользователь выбрал тип
-@router.message(StateFilter(ProgramForm.p_type))
-async def cmd_type_chosen(message: Message, state: FSMContext):
+@router.message(StateFilter(ProgramAI.frequency))
+async def ai_frequency(message: Message, state: FSMContext):
+    if message.text.lower() == "отмена":
+        await state.clear()
+        return await message.answer("❌ Операция отменена.", reply_markup=main_menu)
+
+    await state.update_data(frequency=message.text)
+    await message.answer(
+        "⚙️ Есть ли у вас какие-то предпочтения по упражнениям или оборудованию? Если нет — напишите «Нет».",
+        reply_markup=cancel_keyboard
+    )
+    await state.set_state(ProgramAI.preferences)
+
+@router.message(StateFilter(ProgramAI.preferences))
+async def ai_preferences(message: Message, state: FSMContext):
+    if message.text.lower() == "отмена":
+        await state.clear()
+        return await message.answer("❌ Операция отменена.", reply_markup=main_menu)
+
+    # Собираем все ответы
     data = await state.get_data()
-    goal = data["goal"]
-    p_type = message.text
+    data["preferences"] = message.text
 
-    if p_type not in list_types(goal):
-        return await message.answer("⚠️ Пожалуйста, выберите тип кнопкой.", reply_markup=cancel_keyboard)
+    await message.answer("🔍 Составляю вашу программу, чуть-чуть…")
 
-    program = get_program(goal, p_type)
+    # Формируем промпт для OpenAI
+    prompt = (
+        f"Составь недельную тренировочную программу для человека, "
+        f"чья цель: «{data['goal']}», с частотой тренировок {data['frequency']} в неделю, "
+        f"учитывая предпочтения: «{data['preferences']}». "
+        f"Выведи программу по дням недели, по 3–5 упражнений в день."
+    )
+
+    # Делаем запрос
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a professional fitness coach."},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.7,
+        max_tokens=600,
+    )
+
+    program_text = response.choices[0].message.content.strip()
+
+    # Отправляем результат и возвращаемся в главное меню
+    await message.answer(f"📋 Ваша программа на неделю:\n\n{program_text}", reply_markup=main_menu)
     await state.clear()
-
-    if not program:
-        await message.answer("ℹ️ Для этого сочетания цели и типа нет программы.", reply_markup=main_menu)
-        return
-
-    # Формируем ответ
-    text = [f"📋 Программа для «{goal} – {p_type}» на неделю:\n"]
-    for day, exercises in program.items():
-        text.append(f"📅 {day}:")
-        for ex in exercises:
-            text.append(f" • {ex}")
-        text.append("")  # пустая строка между днями
-
-    await message.answer("\n".join(text), reply_markup=main_menu)
-
-# Не забудьте добавить в main.py:
-# dp.include_router(programs_router)
