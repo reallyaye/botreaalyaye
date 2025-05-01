@@ -8,8 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.db import init_db
-from app.routers import auth, dashboard  # позже добавите свои маршруты
-
+from app.routers import auth, dashboard  
 BASE_DIR = Path(__file__).parent.parent
 
 app = FastAPI()

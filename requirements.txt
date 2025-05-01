@@ -12,4 +12,4 @@ aiofiles
 openai>=1.0.0
 sqlalchemy
 passlib
-
+itsdangerous>=2.1.2
