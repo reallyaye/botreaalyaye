@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters.state import StateFilter
 
-from services.db import add_custom_program, get_custom_programs, delete_custom_program
+from bot.services.db import add_custom_program, get_custom_programs, delete_custom_program
 from bot.keyboards import main_menu, cancel_keyboard, cancel_button, my_programs_menu
 
 router = Router()

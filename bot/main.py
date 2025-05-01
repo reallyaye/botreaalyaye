@@ -14,7 +14,7 @@ from bot.handlers.navigation        import router as navigation_router
 from bot.handlers.programs          import router as programs_router
 from bot.handlers.custom_programs   import router as custom_programs_router
 from bot.handlers.ai            import router as ask_router 
-from services.db                    import init_db
+from bot.services.db                   import init_db
 
 # ================== Загрузка конфигурации ==================
 

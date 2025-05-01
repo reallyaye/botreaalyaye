@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters.state import StateFilter
 
-from services.db import add_workout, get_workouts
+from bot.services.db import add_workout, get_workouts
 from bot.keyboards import main_menu, cancel_keyboard
 
 router = Router()
