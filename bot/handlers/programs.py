@@ -1,4 +1,7 @@
+# bot/handlers/programs.py
+
 import os
+from dotenv import load_dotenv
 from aiogram import Router
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
@@ -6,12 +9,18 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters.state import StateFilter
 
 from openai import OpenAI
-
 from bot.keyboards import main_menu, cancel_keyboard
 
-# Инициализация клиента SaMbaNova
+# подгружаем .env, чтобы os.getenv увидел наши ключи
+load_dotenv()
+
+# пытаемся получить ключ из двух возможных переменных
+API_KEY = os.getenv("SAMBANOVA_API_KEY") or os.getenv("OPENAI_API_KEY")
+if not API_KEY:
+    raise RuntimeError("Нужно задать SAMBANOVA_API_KEY или OPENAI_API_KEY в окружении")
+
 client = OpenAI(
-    api_key=os.getenv("SAMBANOVA_API_KEY"),
+    api_key=API_KEY,
     base_url="https://api.sambanova.ai/v1",
 )
 
@@ -76,7 +85,8 @@ async def ai_preferences(message: Message, state: FSMContext):
         f"По 3–5 упражнений в день, разложи по дням недели."
     )
 
-    response = client.chat.completions.create(
+    # отправляем промпт к API
+    resp = client.chat.completions.create(
         model="DeepSeek-R1",
         messages=[
             {"role": "system", "content": "You are a professional fitness coach."},
@@ -86,6 +96,6 @@ async def ai_preferences(message: Message, state: FSMContext):
         top_p=0.1,
     )
 
-    program_text = response.choices[0].message.content.strip()
+    program_text = resp.choices[0].message.content.strip()
     await message.answer(f"📋 Ваша программа на неделю:\n\n{program_text}", reply_markup=main_menu)
     await state.clear()
