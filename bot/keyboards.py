@@ -1,8 +1,13 @@
+# bot/keyboards.py
+
 import os
 from dotenv import load_dotenv
 from aiogram.types import (
-    ReplyKeyboardMarkup, KeyboardButton,
-    InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    WebAppInfo,
 )
 
 load_dotenv()
@@ -49,8 +54,42 @@ webapp_inline_kb = InlineKeyboardMarkup(
 # ——— Меню «Тренировки» ———
 trainings_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Добавить тренировку"), KeyboardButton(text="Показать тренировки")],
+        [
+            KeyboardButton(text="Добавить тренировку"),
+            KeyboardButton(text="Показать тренировки")
+        ],
         [btn_back],
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True,
+)
+
+# ——— Меню типов тренировок ———
+type_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Приседания"),
+            KeyboardButton(text="Жим лёжа")
+        ],
+        [
+            KeyboardButton(text="Становая тяга"),
+            KeyboardButton(text="Другое")
+        ],
+        [cancel_button],
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True,
+)
+
+# ——— Меню сложности тренировки ———
+difficulty_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Легко"),
+            KeyboardButton(text="Нормально"),
+            KeyboardButton(text="Сложно"),
+        ],
+        [cancel_button],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
@@ -72,7 +111,10 @@ programs_menu = ReplyKeyboardMarkup(
 # ——— Меню «Мои программы» ———
 my_programs_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Добавить программу"), KeyboardButton(text="Удалить программу")],
+        [
+            KeyboardButton(text="Добавить программу"),
+            KeyboardButton(text="Удалить программу")
+        ],
         [btn_back],
     ],
     resize_keyboard=True,

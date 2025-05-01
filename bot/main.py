@@ -1,3 +1,4 @@
+#main.py
 import os
 import asyncio
 from pathlib import Path
@@ -10,10 +11,10 @@ import openai
 from bot.handlers.commands          import router as commands_router
 from bot.handlers.navigation        import router as navigation_router
 from bot.handlers.workouts          import router as workouts_router
-# from bot.handlers.progress        import router as progress_router  # ← удалили
+
 from bot.handlers.programs          import router as programs_router
 from bot.handlers.custom_programs   import router as custom_programs_router
-from bot.handlers.ask_ai            import router as ask_router # type: ignore
+from bot.handlers.ai            import router as ask_router 
 from services.db                    import init_db
 
 # ================== Загрузка конфигурации ==================
