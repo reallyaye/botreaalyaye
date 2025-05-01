@@ -12,7 +12,7 @@ from bot.handlers.workouts import router as workouts_router
 from bot.handlers.progress import router as progress_router
 from bot.handlers.programs import router as programs_router
 from bot.handlers.custom_programs import router as custom_programs_router
-from bot.handlers.ai import router as ai_router
+from bot.handlers.ai             import router as ask_router
 from services.db import init_db
 
 # ================== Загрузка конфигурации ==================
@@ -50,8 +50,8 @@ async def main():
     dp.include_router(progress_router)
     dp.include_router(programs_router)
     dp.include_router(custom_programs_router)
-    dp.include_router(ai_router)
-    
+    dp.include_router(ask_router)
+
     # Регистрируем обработчики старта и остановки
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
