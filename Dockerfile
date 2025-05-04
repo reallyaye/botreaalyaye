@@ -1,20 +1,21 @@
-# Используем официальный образ Python
+# Dockerfile
+
 FROM python:3.12-slim
 
-# Рабочая директория внутри контейнера
 WORKDIR /app
 
-# Сначала копируем только requirements (чтобы кешировать layer pip install)
+# Копируем и ставим зависимости
 COPY requirements.txt .
-
-# Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем всё приложение
+# Копируем код
 COPY . .
 
-# Указываем порт (Railway подставит свой $PORT, но CMD прописывает дефолт 8000)
+# Делаем entrypoint исполняемым
+RUN chmod +x entrypoint.sh
+
+# Открываем порт (Railway пробросит свой $PORT автоматически)
 EXPOSE 8000
 
-# Команда по умолчанию — запускаем Uvicorn
-CMD ["uvicorn", "webapp.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# По умолчанию запускаем наш entrypoint
+ENTRYPOINT ["./entrypoint.sh"]
