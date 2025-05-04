@@ -1,21 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Панель пользователя{% endblock %}
 {% block content %}
-  <h1>Добро пожаловать, {{ username }} (ID: {{ user_id }})!</h1>
-  {% if telegram_id %}
-    <p>Ваш Telegram ID: {{ telegram_id }}</p>
-    <form method="POST" action="/dashboard/send-message">
-      <input type="text" name="message" placeholder="Введите сообщение" required>
-      <button type="submit">Отправить в Telegram</button>
-    </form>
-    {% if success %}
-      <p class="success">{{ success }}</p>
-    {% endif %}
-    {% if error %}
-      <p class="error">{{ error }}</p>
-    {% endif %}
-  {% else %}
-    <p>Telegram не подключен. <a href="/telegram-login">Подключить Telegram</a></p>
-  {% endif %}
+  <h1>Добро пожаловать, {{ username }}!</h1>
+  <p>Сегодня: {{ current_time }}</p>
   <p>Здесь будет ваша персональная панель.</p>
 {% endblock %}

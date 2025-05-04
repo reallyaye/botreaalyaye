@@ -10,20 +10,18 @@
 <body>
   <header>
     <nav>
-      <a href="/">Главная</a>
+      <a href="/" {% if request.url.path == "/" %}class="active"{% endif %}>Главная</a>
       {% if is_authenticated %}
-        <a href="/dashboard/">Панель</a>
-        <a href="/workouts">Тренировки</a>
-        <a href="/stats">Статистика</a>
-        {% if not telegram_id %}
-          <a href="/telegram-login">Подключить Telegram</a>
-        {% endif %}
+        <a href="/profile/" {% if request.url.path == "/profile/" %}class="active"{% endif %}>Профиль</a>
+        <a href="/dashboard/" {% if request.url.path == "/dashboard/" %}class="active"{% endif %}>Панель</a>
+        <a href="/workouts/" {% if request.url.path == "/workouts/" %}class="active"{% endif %}>Тренировки</a>
+        <a href="/stats/" {% if request.url.path == "/stats/" %}class="active"{% endif %}>Статистика</a>
         <form action="/logout" method="post" style="display:inline">
           <button type="submit">Выйти</button>
         </form>
       {% else %}
-        <a href="/login">Войти</a>
-        <a href="/register">Регистрация</a>
+        <a href="/login" {% if request.url.path == "/login" %}class="active"{% endif %}>Войти</a>
+        <a href="/register" {% if request.url.path == "/register" %}class="active"{% endif %}>Регистрация</a>
       {% endif %}
     </nav>
   </header>

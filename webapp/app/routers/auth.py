@@ -2,9 +2,7 @@
 from fastapi import APIRouter, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from webapp.app.services.db import authenticate_user, register_user, get_user_by_telegram_id
-from sqlalchemy.ext.asyncio import AsyncSessionLocal
-from webapp.app.services.db import User
+from webapp.app.services.db import authenticate_user, register_user, AsyncSessionLocal, User
 from sqlalchemy import select
 
 router = APIRouter()
@@ -46,17 +44,3 @@ async def register(request: Request, username: str = Form(...), password: str = 
         return RedirectResponse("/dashboard", status_code=302)
     except Exception as e:
         return templates.TemplateResponse("register.html", {"request": request, "error": f"Ошибка: {str(e)}", "is_authenticated": False})
-
-# --- вход через Telegram (для обработки callback) ---
-@router.post("/telegram-callback")
-async def telegram_callback(request: Request, id: str = Form(...), first_name: str = Form(...), username: str = Form(...)):
-    try:
-        telegram_id = id
-        user = await get_user_by_telegram_id(telegram_id)
-        if not user:
-            await register_user(username, telegram_id=telegram_id)  # Пароль не требуется для Telegram
-            user = await get_user_by_telegram_id(telegram_id)
-        request.session["user_id"] = user.id
-        return RedirectResponse("/dashboard", status_code=302)
-    except Exception as e:
-        return templates.TemplateResponse("login.html", {"request": request, "error": f"Ошибка Telegram: {str(e)}", "is_authenticated": False})

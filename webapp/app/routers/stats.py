@@ -1,47 +1,37 @@
-# webapp/app/routers/dashboard.py
+# webapp/app/routers/stats.py
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-import os
-from pathlib import Path
-from dotenv import load_dotenv
 from webapp.app.services.db import get_user_by_id, User
-from datetime import datetime
-
-load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 router = APIRouter()
 templates = Jinja2Templates(directory="webapp/app/templates")
 
-# 1) Функция проверки сессии
+# Функция проверки сессии (переиспользуем)
 async def get_current_user(request: Request):
     uid = request.session.get("user_id")
     if not uid:
         return RedirectResponse("/login", status_code=302)
     user = await get_user_by_id(uid)
     if not user:
-        request.session.clear()  # Очищаем сессию, если пользователь не найден
+        request.session.clear()
         return RedirectResponse("/login", status_code=302)
     return user
 
-# 2) Эндпоинт dashboard с зависимостью
+# Эндпоинт для статистики
 @router.get("/", response_class=HTMLResponse)
-async def dashboard(
+async def stats(
     request: Request,
     user: User = Depends(get_current_user)
 ):
     if isinstance(user, RedirectResponse):
-        return user  # Если get_current_user вернул редирект, возвращаем его
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return user
     return templates.TemplateResponse(
-        "dashboard.html",
+        "stats.html",
         {
             "request": request,
             "user_id": user.id,
             "username": user.username,
-            "is_authenticated": True,
-            "success": request.session.pop("success", None),
-            "error": request.session.pop("error", None),
-            "current_time": current_time
+            "is_authenticated": True
         }
     )
