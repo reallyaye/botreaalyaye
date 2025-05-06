@@ -1,12 +1,76 @@
 {% extends "base.html" %}
 {% block title %}Тренировки{% endblock %}
 {% block content %}
-    <h1>Тренировки для {{ username }} (ID: {{ user_id }})</h1>
-    <p>Здесь будет список ваших тренировок. Пока только заглушка:</p>
-    <ul>
-        <li>Тренировка 1: Бег (30 мин)</li>
-        <li>Тренировка 2: Приседания (20 повторений)</li>
-        <li>Тренировка 3: Планка (1 мин)</li>
-    </ul>
-    <p>Добавьте функционал для записи тренировок позже!</p>
+    <div class="welcome-section">
+        <h1 class="welcome-title">
+            <i class="fas fa-dumbbell"></i> Тренировки для {{ username }} 
+        </h1>
+        {% if success %}
+            <p class="success">{{ success }}</p>
+        {% endif %}
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+    </div>
+    <div class="activity-section">
+        <h2 class="section-title"><i class="fas fa-plus-circle"></i> {% if edit_workout %}Редактировать тренировку{% else %}Добавить тренировку{% endif %}</h2>
+        <form method="post" action="{% if edit_workout %}/workouts/update/{{ edit_workout.id }}{% else %}/workouts/add{% endif %}" class="add-workout-form">
+            <div class="form-group">
+                <label for="activity">
+                    <i class="fas fa-running"></i> Вид активности:
+                </label>
+                <input type="text" id="activity" name="activity" value="{% if edit_workout %}{{ edit_workout.activity }}{% endif %}" placeholder="Например: танцы, плавание" required />
+            </div>
+            <div class="form-group">
+                <label for="intensity">
+                    <i class="fas fa-bolt"></i> Интенсивность:
+                </label>
+                <select id="intensity" name="intensity" required>
+                    <option value="low" {% if edit_workout and edit_workout.intensity == "low" %}selected{% endif %}>Низкая</option>
+                    <option value="medium" {% if edit_workout and edit_workout.intensity == "medium" %}selected{% endif %}>Средняя</option>
+                    <option value="high" {% if edit_workout and edit_workout.intensity == "high" %}selected{% endif %}>Высокая</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="duration">
+                    <i class="fas fa-clock"></i> Длительность (в минутах):
+                </label>
+                <input type="number" id="duration" name="duration" step="1" min="0" value="{% if edit_workout %}{{ edit_workout.duration }}{% endif %}" placeholder="Например: 30" required />
+            </div>
+            <div class="form-group">
+                <label for="comment">
+                    <i class="fas fa-comment"></i> Комментарий:
+                </label>
+                <textarea id="comment" name="comment" placeholder="Например: Чувствовал себя отлично!" rows="3">{% if edit_workout %}{{ edit_workout.comment }}{% endif %}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {% if edit_workout %}Сохранить{% else %}Добавить{% endif %}</button>
+            {% if edit_workout %}
+                <a href="/workouts" class="btn btn-secondary"><i class="fas fa-times"></i> Отмена</a>
+            {% endif %}
+        </form>
+    </div>
+    <div class="activity-section">
+        <h2 class="section-title"><i class="fas fa-list"></i> Ваши тренировки</h2>
+        {% if workouts %}
+            <ul class="activity-list">
+                {% for workout in workouts %}
+                    <li class="activity-item">
+                        <span class="workout-date">{{ workout.created_at }}</span>: 
+                        Активность: <span class="workout-value">{{ workout.activity }}</span>, 
+                        Интенсивность: <span class="workout-value">{{ workout.intensity|capitalize }}</span>, 
+                        Длительность: <span class="workout-value">{{ workout.duration }} мин</span>
+                        {% if workout.comment %}
+                            <br>Комментарий: <span class="workout-comment">{{ workout.comment }}</span>
+                        {% endif %}
+                        <a href="/workouts/edit/{{ workout.id }}" class="btn btn-primary btn-small"><i class="fas fa-edit"></i> Редактировать</a>
+                        <form method="post" action="/workouts/delete/{{ workout.id }}" class="delete-form">
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Удалить</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-activity">У вас пока нет тренировок. Добавьте первую тренировку!</p>
+        {% endif %}
+    </div>
 {% endblock %}

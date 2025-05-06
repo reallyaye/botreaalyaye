@@ -1,84 +1,112 @@
 {% extends "base.html" %}
 {% block title %}Профиль{% endblock %}
 {% block content %}
-    <h1>Профиль пользователя {{ username }} (ID: {{ user_id }})</h1>
-    {% if success %}
-        <p class="success">{{ success }}</p>
-    {% endif %}
-    {% if error %}
-        <p class="error">{{ error }}</p>
-    {% endif %}
+    <div class="welcome-section">
+        <h1 class="welcome-title">
+            <i class="fas fa-user-circle"></i> Профиль пользователя {{ username }} 
+        </h1>
+        {% if avatar_url %}
+            <div class="avatar-container">
+                <img src="/static/avatars/{{ avatar_url }}" alt="Аватар" class="profile-avatar">
+            </div>
+        {% endif %}
+        {% if success %}
+            <p class="success">{{ success }}</p>
+        {% endif %}
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+    </div>
     <div class="profile-container">
-        <div>
-            <h2>Ваши данные:</h2>
+        <div class="profile-card">
+            <h2 class="section-title"><i class="fas fa-edit"></i> Ваши данные</h2>
             <form method="post" action="/profile/update" enctype="multipart/form-data">
-                <label>
-                    Имя:<br />
-                    <input type="text" name="name" value="{{ name }}" required />
-                </label>
-                <label>
-                    Возраст:<br />
-                    <input type="number" name="age" value="{{ age }}" min="1" max="120" required />
-                </label>
-                <label>
-                    Рост (см):<br />
-                    <input type="number" step="0.1" name="height" value="{{ height }}" min="1" required />
-                </label>
-                <label>
-                    Вес (кг):<br />
-                    <input type="number" step="0.1" name="weight" value="{{ weight }}" min="1" required />
-                </label>
-                <label>
-                    Цель:<br />
-                    <select name="goal" required>
+                <div class="form-group">
+                    <label for="name">
+                        <i class="fas fa-user"></i> Имя:
+                    </label>
+                    <input type="text" id="name" name="name" value="{{ name }}" required />
+                </div>
+                <div class="form-group">
+                    <label for="age">
+                        <i class="fas fa-calendar-alt"></i> Возраст:
+                    </label>
+                    <input type="number" id="age" name="age" value="{{ age }}" min="1" max="120" required />
+                </div>
+                <div class="form-group">
+                    <label for="height">
+                        <i class="fas fa-ruler-vertical"></i> Рост (см):
+                    </label>
+                    <input type="number" id="height" step="0.1" name="height" value="{{ height }}" min="1" required />
+                </div>
+                <div class="form-group">
+                    <label for="weight">
+                        <i class="fas fa-weight"></i> Вес (кг):
+                    </label>
+                    <input type="number" id="weight" step="0.1" name="weight" value="{{ weight }}" min="1" required />
+                </div>
+                <div class="form-group">
+                    <label for="goal">
+                        <i class="fas fa-bullseye"></i> Цель:
+                    </label>
+                    <select id="goal" name="goal" required>
                         <option value="lose" {% if goal == "lose" %}selected{% endif %}>Сбросить вес</option>
                         <option value="gain" {% if goal == "gain" %}selected{% endif %}>Набрать массу</option>
                         <option value="maintain" {% if goal == "maintain" %}selected{% endif %}>Поддерживать форму</option>
                     </select>
-                </label>
-                <label>
-                    Уровень активности:<br />
-                    <select name="activity_level" required>
+                </div>
+                <div class="form-group">
+                    <label for="activity_level">
+                        <i class="fas fa-running"></i> Уровень активности:
+                    </label>
+                    <select id="activity_level" name="activity_level" required>
                         <option value="sedentary" {% if activity_level == "sedentary" %}selected{% endif %}>Сидячий</option>
                         <option value="light" {% if activity_level == "light" %}selected{% endif %}>Легкая активность</option>
                         <option value="moderate" {% if activity_level == "moderate" %}selected{% endif %}>Средняя активность</option>
                         <option value="active" {% if activity_level == "active" %}selected{% endif %}>Высокая активность</option>
                     </select>
-                </label>
-                <label>
-                    Предпочитаемые тренировки (через запятую):<br />
-                    <input type="text" name="workout_types" value="{{ workout_types }}" placeholder="Бег, Силовые, Йога" />
-                </label>
-                <label>
-                    Аватар:<br />
-                    <input type="file" name="avatar" accept="image/*" />
-                </label>
-                <button type="submit">Сохранить</button>
+                </div>
+                <div class="form-group">
+                    <label for="workout_types">
+                        <i class="fas fa-dumbbell"></i> Предпочитаемые тренировки (через запятую):
+                    </label>
+                    <input type="text" id="workout_types" name="workout_types" value="{{ workout_types }}" placeholder="Бег, Силовые, Йога" />
+                </div>
+                <div class="form-group">
+                    <label for="avatar">
+                        <i class="fas fa-image"></i> Аватар:
+                    </label>
+                    <input type="file" id="avatar" name="avatar" accept="image/*" />
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Сохранить</button>
             </form>
         </div>
-        <div>
-            <h2>Ваш прогресс:</h2>
+        <div class="profile-card">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Ваш прогресс</h2>
             {% if progress > 0 %}
-                <div class="progress-bar" data-progress="{{ progress }}">
-                    {{ progress|round }}%
+                <div class="progress-bar-container">
+                    <div class="progress-bar" data-progress="{{ progress }}">
+                        <span class="progress-text">{{ progress|round }}%</span>
+                    </div>
                 </div>
-                <p>Прогресс к цели: {{ "Достигнута" if progress == 100 else "В процессе" }}</p>
+                <p class="progress-status">Прогресс к цели: <span>{{ "Достигнута" if progress == 100 else "В процессе" }}</span></p>
             {% else %}
-                <p>Заполните вес, рост и возраст для отображения прогресса.</p>
+                <p class="no-progress">Заполните вес, рост и возраст для отображения прогресса.</p>
             {% endif %}
-            <h2>История изменений:</h2>
+            <h2 class="section-title"><i class="fas fa-history"></i> История изменений</h2>
             {% if history %}
-                <ul>
+                <ul class="history-list">
                     {% for entry in history[:5] %}
-                        <li>{{ entry[0] }}: Имя={{ entry[1] or "Не указано" }}, Вес={{ entry[4] or "Не указан" }} кг, Цель={{ entry[5] or "Не указана" }}</li>
+                        <li class="history-item">
+                            <span class="history-date">{{ entry[0] }}</span>: 
+                            Имя=<span class="history-value">{{ entry[1] or "Не указано" }}</span>, 
+                            Вес=<span class="history-value">{{ entry[4] or "Не указан" }} кг</span>, 
+                            Цель=<span class="history-value">{{ entry[5] or "Не указана" }}</span>
+                        </li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <p>История отсутствует.</p>
-            {% endif %}
-            {% if avatar_url %}
-                <h2>Ваш аватар:</h2>
-                <img src="/static/avatars/{{ avatar_url }}" alt="Аватар">
+                <p class="no-history">История отсутствует.</p>
             {% endif %}
         </div>
     </div>

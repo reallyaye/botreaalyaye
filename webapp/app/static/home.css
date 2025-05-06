@@ -1,28 +1,38 @@
+/* Анимация для плавного появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Стили для главной страницы */
 .welcome-section {
     max-width: 800px;
     margin: 0 auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
-
-.welcome-section:hover {
-    transform: translateY(-5px);
+    padding: 30px;
+    background: linear-gradient(135deg, #0288d1 0%, #4fc3f7 100%);
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    color: white;
+    animation: fadeIn 1s ease-out forwards;
 }
 
 .welcome-title {
-    font-size: 2em;
-    color: #333;
+    font-size: 2.5em;
     text-align: center;
     margin-bottom: 20px;
+    font-weight: 600;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .welcome-title i {
-    color: #4CAF50;
     margin-right: 10px;
+    color: #ffffff;
 }
 
 .auth-actions {
@@ -30,24 +40,30 @@
 }
 
 .auth-actions p {
-    font-size: 1.1em;
-    color: #666;
-    margin-bottom: 15px;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    font-weight: 300;
 }
 
 .auth-buttons {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 20px;
+}
+
+.start-training {
+    text-align: center;
+    margin-top: 20px;
 }
 
 .btn {
     display: inline-block;
-    padding: 12px 25px;
+    padding: 12px 30px;
     font-size: 1.1em;
-    border-radius: 5px;
+    border-radius: 25px;
     text-decoration: none;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn i {
@@ -55,13 +71,14 @@
 }
 
 .btn-primary {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #ffffff;
+    color: #0288d1;
 }
 
 .btn-primary:hover {
-    background-color: #45a049;
-    transform: scale(1.05);
+    background-color: #f0f0f0;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary {
@@ -71,25 +88,30 @@
 
 .btn-secondary:hover {
     background-color: #555;
-    transform: scale(1.05);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .activity-section {
-    margin-top: 30px;
-    padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 40px;
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 1s ease-out forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
 }
 
 .section-title {
-    font-size: 1.5em;
-    color: #333;
-    margin-bottom: 15px;
+    font-size: 1.8em;
+    color: #0288d1;
+    margin-bottom: 20px;
+    font-weight: 600;
 }
 
 .section-title i {
-    color: #4CAF50;
+    color: #0288d1;
     margin-right: 10px;
 }
 
@@ -99,23 +121,121 @@
 }
 
 .activity-item {
-    background-color: #ffffff;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease;
+    background-color: #f5f5f5;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-size: 1.1em;
+    color: #333;
 }
 
 .activity-item:hover {
-    transform: translateX(5px);
+    transform: translateX(10px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .no-activity {
-    font-size: 1.1em;
+    font-size: 1.2em;
     color: #666;
     text-align: center;
-    padding: 15px;
+    padding: 20px;
     background-color: #f9f9f9;
-    border-radius: 5px;
+    border-radius: 10px;
+}
+
+.stats-section {
+    margin-top: 40px;
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 1s ease-out forwards;
+    animation-delay: 0.4s;
+    opacity: 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.stat-card {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stat-card i {
+    font-size: 2em;
+    color: #0288d1;
+    margin-bottom: 15px;
+}
+
+.stat-card p {
+    font-size: 1.1em;
+    color: #333;
+}
+
+.stat-value {
+    font-weight: 600;
+    color: #0288d1;
+}
+
+.calculator-section {
+    margin-top: 40px;
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 1s ease-out forwards;
+    animation-delay: 0.6s;
+    opacity: 0;
+}
+
+.calories-result {
+    text-align: center;
+    font-size: 1.3em;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #e3f2fd;
+    border-radius: 10px;
+    color: #0288d1;
+}
+
+.quote-section {
+    margin-top: 40px;
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 1s ease-out forwards;
+    animation-delay: 0.8s;
+    opacity: 0;
+}
+
+.quote-card {
+    text-align: center;
+}
+
+.quote-card p {
+    font-size: 1.3em;
+    color: #333;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.quote-author {
+    font-size: 1.1em;
+    color: #666;
 }

@@ -1,7 +1,62 @@
 {% extends "base.html" %}
-{% block title %}Панель пользователя{% endblock %}
+{% block title %}Панель{% endblock %}
 {% block content %}
-    <h1>Добро пожаловать, {{ username }}!</h1>
-    <p>Сегодня: {{ current_time }}</p>
-    <p>Здесь будет ваша персональная панель.</p>
+    <div class="welcome-section">
+        <h1 class="welcome-title">
+            <i class="fas fa-tachometer-alt"></i> Панель управления
+        </h1>
+        <p>Добро пожаловать, {{ username }}!</p>
+        {% if success %}
+            <p class="success">{{ success }}</p>
+        {% endif %}
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+    </div>
+    <div class="stats-section">
+        <h2 class="section-title"><i class="fas fa-chart-line"></i> Ваша активность за последние 7 дней</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-trophy"></i>
+                <p>Тренировок: <span class="stat-value">{{ weekly_stats.total_workouts }}</span></p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <p>Время: <span class="stat-value">{{ weekly_stats.total_minutes }} мин</span></p>
+            </div>
+        </div>
+        {% if weekly_stats.top_activities %}
+            <h3 class="section-subtitle">Самые частые активности:</h3>
+            <ul class="activity-list">
+                {% for activity in weekly_stats.top_activities %}
+                    <li class="activity-item">
+                        {{ activity.activity }}: <span class="stat-value">{{ activity.count }} раз</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-activity">У вас пока нет активности за последние 7 дней.</p>
+        {% endif %}
+        <div class="motivation-block">
+            <h3 class="section-subtitle"><i class="fas fa-bullhorn"></i> Мотивация</h3>
+            <p>{{ motivation_message }}</p>
+        </div>
+        <div class="tips-block">
+            <h3 class="section-subtitle"><i class="fas fa-lightbulb"></i> Советы для вас</h3>
+            <ul class="tip-list">
+                {% for tip in tips %}
+                    <li class="tip-item">{{ tip }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="resources-block">
+            <h3 class="section-subtitle"><i class="fas fa-book"></i> Полезные источники</h3>
+            <div class="resource-links">
+                <a href="https://www.healthline.com/health/fitness-exercise" target="_blank" class="resource-link"><i class="fas fa-link"></i> Healthline Fitness</a>
+                <a href="https://www.bodybuilding.com/" target="_blank" class="resource-link"><i class="fas fa-link"></i> Bodybuilding.com</a>
+                <a href="https://www.yogajournal.com/" target="_blank" class="resource-link"><i class="fas fa-link"></i> Yoga Journal</a>
+                <a href="https://www.runnersworld.com/" target="_blank" class="resource-link"><i class="fas fa-link"></i> Runner's World</a>
+            </div>
+        </div>
+    </div>
 {% endblock %}

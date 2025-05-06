@@ -1,0 +1,106 @@
+/* Адаптивные стили для страницы тренировок */
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 20px;
+    }
+
+    .welcome-title {
+        font-size: 1.8em;
+    }
+
+    .activity-section {
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .section-title {
+        font-size: 1.4em;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        padding-left: 35px;
+        font-size: 1em;
+    }
+
+    .form-group textarea {
+        min-height: 60px;
+    }
+
+    .btn-primary,
+    .btn-danger,
+    .btn-secondary {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    .btn-small {
+        padding: 6px 10px;
+        font-size: 0.8em;
+    }
+
+    .delete-form {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .workout-comment {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-section {
+        padding: 15px;
+    }
+
+    .welcome-title {
+        font-size: 1.5em;
+    }
+
+    .activity-section {
+        padding: 15px;
+    }
+
+    .section-title {
+        font-size: 1.2em;
+    }
+
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 8px 10px;
+        padding-left: 30px;
+        font-size: 0.9em;
+    }
+
+    .form-group textarea {
+        min-height: 50px;
+    }
+
+    .btn-primary,
+    .btn-danger,
+    .btn-secondary {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    .btn-small {
+        padding: 5px 8px;
+        font-size: 0.7em;
+    }
+
+    .workout-comment {
+        font-size: 0.8em;
+    }
+}

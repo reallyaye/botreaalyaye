@@ -1,0 +1,80 @@
+/* Общие адаптивные стили */
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+    }
+
+    main {
+        padding: 10px;
+    }
+
+    nav {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    nav a, nav form, nav button {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 5px 0;
+        font-size: 1.1em;
+        min-height: 48px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
+
+    form {
+        max-width: 100%;
+    }
+
+    input, select, button[type="submit"] {
+        padding: 12px;
+        font-size: 1.1em;
+    }
+
+    label {
+        margin-bottom: 10px;
+    }
+
+    .error, .success {
+        font-size: 1em;
+    }
+
+    p a {
+        font-size: 1.1em;
+        padding: 10px 15px;
+    }
+
+    ul li {
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.3em;
+    }
+
+    h2 {
+        font-size: 1.1em;
+    }
+
+    input, select, button[type="submit"] {
+        padding: 10px;
+        font-size: 1em;
+    }
+
+    .error, .success {
+        font-size: 0.9em;
+    }
+
+    ul li {
+        font-size: 1em;
+    }
+}

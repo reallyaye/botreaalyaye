@@ -5,17 +5,19 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
     line-height: 1.6;
     padding: 10px;
-    background-color: #f9f9f9;
+    background: linear-gradient(135deg, #e0f7fa 0%, #b2dfdb 100%);
+    color: #333;
 }
 
 header {
-    background-color: #4CAF50;
+    background-color: #0288d1;
     padding: 10px 0;
     margin-bottom: 15px;
-    border-radius: 5px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 nav {
@@ -34,17 +36,18 @@ nav a, nav form {
     text-align: center;
     border-radius: 5px;
     margin: 5px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 nav a.active, nav a:hover {
-    background-color: #45a049;
+    background-color: #0277bd;
+    transform: scale(1.05);
 }
 
 nav button {
     background-color: #ffffff;
-    color: #4CAF50;
-    border: 1px solid #4CAF50;
+    color: #0288d1;
+    border: 1px solid #0288d1;
     padding: 12px 20px;
     cursor: pointer;
     font-size: 1em;
@@ -52,12 +55,12 @@ nav button {
     margin: 5px;
     min-height: 48px;
     min-width: 80px;
-    transition: background-color 0.3s ease, transform 0.1s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 nav button:hover {
     background-color: #e0e0e0;
-    color: #388E3C;
+    color: #0277bd;
     transform: scale(1.05);
 }
 
@@ -74,21 +77,22 @@ main {
 footer {
     text-align: center;
     padding: 10px;
-    background-color: #4CAF50;
+    background-color: #0288d1;
     color: white;
     margin-top: 15px;
-    border-radius: 5px;
+    border-radius: 10px;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Стили для ссылок */
 p a {
-    color: #4CAF50;
+    color: #0288d1;
     text-decoration: none;
     padding: 8px 12px;
     display: inline-block;
     border-radius: 5px;
     font-size: 1em;
-    transition: background-color 0.3s ease, transform 0.1s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 p a:hover {

@@ -1,18 +1,23 @@
-# webapp/app/services/db.py
 import os
 from pathlib import Path
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import Column, Integer, String, select, Float, DateTime
+from sqlalchemy import Column, Integer, String, select, Float, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from passlib.context import CryptContext
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
-load_dotenv(Path(__file__).parent.parent.parent / ".env")
+# Загружаем .env автоматически из корня проекта
+load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 APP_URL = os.getenv("WEBAPP_URL")
+print(f"DATABASE_URL: {DATABASE_URL}")  # Отладочный вывод
+print(f"TELEGRAM_TOKEN: {TELEGRAM_TOKEN}")  # Отладочный вывод
+print(f"APP_URL: {APP_URL}")  # Отладочный вывод
+
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL не задана в .env")
 if not TELEGRAM_TOKEN:
@@ -40,6 +45,16 @@ class User(Base):
     telegram_id = Column(String, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
+
+class Workout(Base):
+    __tablename__ = "workouts"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    activity = Column(String, nullable=False)
+    intensity = Column(String, nullable=False)
+    duration = Column(Float, nullable=False)  # В минутах
+    comment = Column(String, nullable=True)
+    created_at = Column(DateTime, server_default=func.now())
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -104,3 +119,163 @@ async def get_profile_history(user_id: int):
             .order_by(User.updated_at.desc())
         )
         return result.fetchall()
+
+async def add_workout(user_id: int, activity: str, intensity: str, duration: float, comment: str = None) -> None:
+    async with AsyncSessionLocal() as session:
+        workout = Workout(user_id=user_id, activity=activity, intensity=intensity, duration=duration, comment=comment)
+        session.add(workout)
+        await session.commit()
+
+async def get_user_workouts(user_id: int, limit: int = 5):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(Workout.activity)
+            .where(Workout.user_id == user_id)
+            .order_by(Workout.created_at.desc())
+            .limit(limit)
+        )
+        return [row.activity for row in result.fetchall()]
+
+async def get_all_user_workouts(user_id: int):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(Workout.id, Workout.activity, Workout.intensity, Workout.duration, Workout.comment, Workout.created_at)
+            .where(Workout.user_id == user_id)
+            .order_by(Workout.created_at.desc())
+        )
+        return result.fetchall()
+
+async def get_workout_by_id(workout_id: int):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(Workout)
+            .where(Workout.id == workout_id)
+        )
+        return result.scalars().first()
+
+async def update_workout(workout_id: int, activity: str, intensity: str, duration: float, comment: str = None):
+    async with AsyncSessionLocal() as session:
+        workout = await get_workout_by_id(workout_id)
+        if workout:
+            workout.activity = activity
+            workout.intensity = intensity
+            workout.duration = duration
+            workout.comment = comment
+            session.add(workout)
+            await session.commit()
+
+async def delete_workout(workout_id: int):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Workout).where(Workout.id == workout_id))
+        workout = result.scalars().first()
+        if workout:
+            await session.delete(workout)
+            await session.commit()
+
+async def get_user_stats(user_id: int):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(
+                func.count().label("total_workouts"),
+                func.sum(Workout.duration).label("total_minutes")
+            )
+            .where(Workout.user_id == user_id)
+        )
+        stats = result.first()
+        return {
+            "total_workouts": stats.total_workouts or 0,
+            "total_minutes": stats.total_minutes or 0
+        }
+
+async def get_weekly_stats(user_id: int):
+    async with AsyncSessionLocal() as session:
+        # Получаем дату начала недели (7 дней назад от текущей даты)
+        start_date = datetime.utcnow() - timedelta(days=7)
+        
+        # Общая статистика за последние 7 дней
+        result = await session.execute(
+            select(
+                func.count().label("total_workouts"),
+                func.sum(Workout.duration).label("total_minutes")
+            )
+            .where(Workout.user_id == user_id)
+            .where(Workout.created_at >= start_date)
+        )
+        stats = result.first()
+
+        # Самые частые активности за последние 7 дней
+        activities_result = await session.execute(
+            select(Workout.activity, func.count().label("activity_count"))
+            .where(Workout.user_id == user_id)
+            .where(Workout.created_at >= start_date)
+            .group_by(Workout.activity)
+            .order_by(func.count().desc())
+            .limit(3)
+        )
+        top_activities = [{"activity": row.activity, "count": row.activity_count} for row in activities_result.fetchall()]
+
+        return {
+            "total_workouts": stats.total_workouts or 0,
+            "total_minutes": stats.total_minutes or 0,
+            "top_activities": top_activities
+        }
+
+async def get_monthly_stats(user_id: int):
+    async with AsyncSessionLocal() as session:
+        # Получаем дату начала месяца (30 дней назад от текущей даты)
+        start_date = datetime.utcnow() - timedelta(days=30)
+        
+        # Общая статистика за последние 30 дней
+        result = await session.execute(
+            select(
+                func.count().label("total_workouts"),
+                func.sum(Workout.duration).label("total_minutes")
+            )
+            .where(Workout.user_id == user_id)
+            .where(Workout.created_at >= start_date)
+        )
+        stats = result.first()
+
+        # Разбивка по активностям за последние 30 дней
+        activities_result = await session.execute(
+            select(Workout.activity, func.sum(Workout.duration).label("total_duration"))
+            .where(Workout.user_id == user_id)
+            .where(Workout.created_at >= start_date)
+            .group_by(Workout.activity)
+        )
+        activity_breakdown = [{"activity": row.activity, "duration": row.total_duration or 0} for row in activities_result.fetchall()]
+
+        return {
+            "total_workouts": stats.total_workouts or 0,
+            "total_minutes": stats.total_minutes or 0,
+            "activity_breakdown": activity_breakdown
+        }
+
+async def get_monthly_activity_trend(user_id: int):
+    async with AsyncSessionLocal() as session:
+        # Получаем данные за последние 30 дней
+        start_date = datetime.utcnow() - timedelta(days=30)
+        end_date = datetime.utcnow()
+        
+        # Получаем данные о тренировках
+        result = await session.execute(
+            select(
+                func.strftime('%Y-%m-%d', Workout.created_at).label('date'),
+                func.count().label("workout_count")
+            )
+            .where(Workout.user_id == user_id)
+            .where(Workout.created_at >= start_date)
+            .group_by(func.strftime('%Y-%m-%d', Workout.created_at))
+            .order_by(func.strftime('%Y-%m-%d', Workout.created_at))
+        )
+        trend_data = {row.date: row.workout_count for row in result.fetchall()}
+
+        # Создаём список всех дней за последние 30 дней
+        trend = []
+        current_date = start_date
+        while current_date <= end_date:
+            date_str = current_date.strftime('%Y-%m-%d')
+            trend.append({"date": date_str, "count": trend_data.get(date_str, 0)})
+            current_date += timedelta(days=1)
+
+        return trend

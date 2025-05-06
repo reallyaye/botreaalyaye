@@ -1,0 +1,123 @@
+/* Адаптивные стили для страницы профиля */
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 20px;
+    }
+
+    .welcome-title {
+        font-size: 1.8em;
+    }
+
+    .profile-avatar {
+        max-width: 120px;
+    }
+
+    .profile-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .profile-card {
+        min-width: 100%;
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .section-title {
+        font-size: 1.4em;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 10px 12px;
+        padding-left: 35px;
+        font-size: 1em;
+    }
+
+    .btn-primary {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    .progress-bar-container {
+        margin-bottom: 10px;
+    }
+
+    .progress-bar {
+        height: 25px;
+    }
+
+    .progress-text {
+        right: 10px;
+    }
+
+    .progress-status {
+        font-size: 1em;
+    }
+
+    .history-item {
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-section {
+        padding: 15px;
+    }
+
+    .welcome-title {
+        font-size: 1.5em;
+    }
+
+    .profile-avatar {
+        max-width: 100px;
+    }
+
+    .profile-card {
+        padding: 15px;
+    }
+
+    .section-title {
+        font-size: 1.2em;
+    }
+
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 8px 10px;
+        padding-left: 30px;
+        font-size: 0.9em;
+    }
+
+    .btn-primary {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    .progress-bar {
+        height: 20px;
+    }
+
+    .progress-text {
+        font-size: 0.9em;
+    }
+
+    .progress-status {
+        font-size: 0.9em;
+    }
+
+    .history-item {
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        font-size: 0.8em;
+    }
+}

@@ -1,4 +1,4 @@
-/* Адаптивные стили для страницы статистики */
+/* Адаптивные стили для страницы панели */
 @media (max-width: 768px) {
     .welcome-section {
         padding: 20px;
@@ -29,25 +29,35 @@
         font-size: 1.2em;
     }
 
-    .filter-buttons {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 15px;
+    .motivation-block {
+        padding: 10px;
+        margin-top: 15px;
     }
 
-    .filter-buttons .btn {
-        padding: 8px 15px;
-        font-size: 1em;
+    .motivation-block p {
+        font-size: 1.1em;
     }
 
-    .achievement-list {
-        padding: 0;
+    .tips-block {
+        margin-top: 15px;
     }
 
-    .achievement-item {
+    .tip-item {
         font-size: 1em;
         padding: 8px 12px;
+    }
+
+    .resources-block {
+        margin-top: 15px;
+    }
+
+    .resource-links {
+        gap: 10px;
+    }
+
+    .resource-link {
+        padding: 6px 12px;
+        font-size: 0.9em;
     }
 }
 
@@ -76,13 +86,21 @@
         font-size: 1.1em;
     }
 
-    .filter-buttons .btn {
-        padding: 6px 12px;
-        font-size: 0.9em;
+    .motivation-block {
+        padding: 8px;
     }
 
-    .achievement-item {
+    .motivation-block p {
+        font-size: 1em;
+    }
+
+    .tip-item {
         font-size: 0.9em;
         padding: 6px 10px;
+    }
+
+    .resource-link {
+        padding: 5px 10px;
+        font-size: 0.8em;
     }
 }

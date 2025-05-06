@@ -1,47 +1,91 @@
-# webapp/app/routers/dashboard.py
 from fastapi import APIRouter, Request, Depends
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-import os
-from pathlib import Path
-from dotenv import load_dotenv
-from webapp.app.services.db import get_user_by_id, User
-from datetime import datetime
-
-load_dotenv(Path(__file__).parent.parent.parent / ".env")
+from sqlalchemy import func, select
+from starlette.responses import RedirectResponse as StarletteRedirectResponse
+from webapp.app.services.db import AsyncSessionLocal, Workout, get_user_by_id, get_weekly_stats, User
+from datetime import datetime, timedelta
 
 router = APIRouter()
 templates = Jinja2Templates(directory="webapp/app/templates")
 
-# 1) Функция проверки сессии
+# Функция проверки сессии
 async def get_current_user(request: Request):
     uid = request.session.get("user_id")
     if not uid:
-        return RedirectResponse("/login", status_code=302)
+        return StarletteRedirectResponse("/login", status_code=302)
     user = await get_user_by_id(uid)
     if not user:
-        request.session.clear()  # Очищаем сессию, если пользователь не найден
-        return RedirectResponse("/login", status_code=302)
+        request.session.clear()
+        return StarletteRedirectResponse("/login", status_code=302)
     return user
 
-# 2) Эндпоинт dashboard с зависимостью
 @router.get("/", response_class=HTMLResponse)
-async def dashboard(
-    request: Request,
-    user: User = Depends(get_current_user)
-):
-    if isinstance(user, RedirectResponse):
-        return user  # Если get_current_user вернул редирект, возвращаем его
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+async def dashboard(request: Request, user: User = Depends(get_current_user)):
+    if isinstance(user, StarletteRedirectResponse):
+        return user
+    
+    # Получаем статистику за последние 7 дней
+    weekly_stats = await get_weekly_stats(user.id)
+
+    # Получаем статистику за предыдущую неделю для сравнения
+    start_date_prev = datetime.utcnow() - timedelta(days=14)
+    end_date_prev = datetime.utcnow() - timedelta(days=7)
+    prev_week_stats = await get_weekly_stats(user.id)
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(
+                func.count().label("total_workouts"),
+                func.sum(Workout.duration).label("total_minutes")
+            )
+            .where(Workout.user_id == user.id)
+            .where(Workout.created_at >= start_date_prev)
+            .where(Workout.created_at < end_date_prev)
+        )
+        prev_stats = result.first()
+        prev_week_stats = {
+            "total_workouts": prev_stats.total_workouts or 0,
+            "total_minutes": prev_stats.total_minutes or 0
+        }
+
+    # Формируем мотивационное сообщение с учётом прогресса
+    motivation_message = "Начните тренироваться, чтобы достичь своих целей!"
+    if weekly_stats["total_workouts"] > 0:
+        if weekly_stats["total_workouts"] > prev_week_stats["total_workouts"]:
+            motivation_message = f"Отличный прогресс, {user.username}! Вы провели {weekly_stats['total_workouts']} тренировок на этой неделе, это больше, чем на прошлой (всего {prev_week_stats['total_workouts']})!"
+        else:
+            motivation_message = f"Хорошая работа, {user.username}! Вы провели {weekly_stats['total_workouts']} тренировок на этой неделе. Продолжайте в том же духе!"
+
+    # Генерируем несколько советов на основе активности
+    tips = ["Не забывайте пить воду во время тренировок и делать разминку перед началом!"]
+    if weekly_stats["top_activities"]:
+        top_activity = weekly_stats["top_activities"][0]["activity"].lower()
+        if "бег" in top_activity:
+            tips.append("Попробуйте интервальный бег, чтобы улучшить выносливость.")
+            tips.append("Носите удобные кроссовки, чтобы избежать травм при беге.")
+        elif "йога" in top_activity:
+            tips.append("Добавьте дыхательные упражнения в свою йогу для большего расслабления.")
+            tips.append("Практикуйте йогу утром, чтобы зарядиться энергией на весь день.")
+        elif "приседания" in top_activity:
+            tips.append("Попробуйте приседания с утяжелением, чтобы усилить эффект от тренировок.")
+            tips.append("Следите за техникой: держите спину прямо во время приседаний.")
+        elif "планка" in top_activity:
+            tips.append("Увеличьте время удержания планки на 10 секунд каждую неделю для прогресса.")
+            tips.append("Попробуйте боковую планку для разнообразия.")
+    else:
+        tips.append("Попробуйте разные виды активности, чтобы найти то, что вам нравится.")
+        tips.append("Ставьте небольшие цели, например, 3 тренировки в неделю.")
+
     return templates.TemplateResponse(
         "dashboard.html",
         {
             "request": request,
-            "user_id": user.id,
             "username": user.username,
             "is_authenticated": True,
+            "weekly_stats": weekly_stats,
+            "motivation_message": motivation_message,
+            "tips": tips,
             "success": request.session.pop("success", None),
-            "error": request.session.pop("error", None),
-            "current_time": current_time
+            "error": request.session.pop("error", None)
         }
     )

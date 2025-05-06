@@ -24,8 +24,77 @@
                     </ul>
                 {% else %}
                     <p class="no-activity">У вас пока нет активности. Начните тренировку прямо сейчас!</p>
+                    <div class="start-training">
+                        <a href="/workouts" class="btn btn-primary"><i class="fas fa-dumbbell"></i> Начать тренировку</a>
+                    </div>
                 {% endif %}
             </div>
+            <div class="stats-section">
+                <h2 class="section-title"><i class="fas fa-chart-line"></i> Ваши достижения</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <p>Тренировок завершено: <span class="stat-value">{{ stats.total_workouts }}</span></p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-fire"></i>
+                        <p>Калорий сожжено: <span class="stat-value">{{ stats.total_calories }}</span></p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <p>Времени на тренировки: <span class="stat-value">{{ stats.total_minutes }} мин</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="calculator-section">
+                <h2 class="section-title"><i class="fas fa-calculator"></i> Калькулятор калорий</h2>
+                {% if calories_result %}
+                    <div class="calories-result success">
+                        Вы сожгли {{ calories_result|round(2) }} калорий!
+                    </div>
+                {% endif %}
+                {% if error %}
+                    <div class="error">{{ error }}</div>
+                {% endif %}
+                <form method="post" action="/calculate-calories">
+                    <div class="form-group">
+                        <label for="activity">
+                            <i class="fas fa-running"></i> Вид активности:
+                        </label>
+                        <input type="text" id="activity" name="activity" placeholder="Например: танцы, плавание" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="intensity">
+                            <i class="fas fa-bolt"></i> Интенсивность:
+                        </label>
+                        <select id="intensity" name="intensity" required>
+                            <option value="low">Низкая</option>
+                            <option value="medium">Средняя</option>
+                            <option value="high">Высокая</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">
+                            <i class="fas fa-clock"></i> Длительность (в минутах):
+                        </label>
+                        <input type="number" id="duration" name="duration" step="1" min="1" placeholder="Например: 30" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="weight">
+                            <i class="fas fa-weight"></i> Ваш вес (кг, если не указан, используется 70 кг):
+                        </label>
+                        <input type="number" id="weight" name="weight" step="0.1" min="1" value="{{ user_weight if user_weight else 70 }}" placeholder="Например: 70" />
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-calculator"></i> Рассчитать</button>
+                </form>
+            </div>
         {% endif %}
+        <div class="quote-section">
+            <h2 class="section-title"><i class="fas fa-quote-left"></i> Мотивация дня</h2>
+            <div class="quote-card">
+                <p>"Движение — это жизнь. Начни двигаться сегодня, чтобы стать лучше завтра!"</p>
+                <p class="quote-author">— Неизвестный автор</p>
+            </div>
+        </div>
     </div>
 {% endblock %}

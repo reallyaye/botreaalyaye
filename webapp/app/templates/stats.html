@@ -1,33 +1,47 @@
 {% extends "base.html" %}
 {% block title %}Статистика{% endblock %}
 {% block content %}
-    <h1>Статистика для {{ username }} (ID: {{ user_id }})</h1>
-    <p>Здесь отображается ваша статистика. Пока простой график:</p>
-    <div class="chart-container">
-        <canvas id="chart-canvas"></canvas>
+    <div class="welcome-section">
+        <h1 class="welcome-title">
+            <i class="fas fa-chart-bar"></i> Статистика для {{ username }}
+        </h1>
     </div>
-    <script>
-        const ctx = document.getElementById('chart-canvas').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Неделя 1', 'Неделя 2', 'Неделя 3'],
-                datasets: [{
-                    label: 'Минут тренировок',
-                    data: [120, 150, 180],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: { beginAtZero: true }
-                },
-                maintainAspectRatio: false
-            }
-        });
-    </script>
-    <p>Добавьте реальные данные и больше графиков позже!</p>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="stats-section">
+        <h2 class="section-title"><i class="fas fa-history"></i> Общая статистика</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-trophy"></i>
+                <p>Всего тренировок: <span class="stat-value">{{ all_time_stats.total_workouts }}</span></p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <p>Общее время: <span class="stat-value">{{ all_time_stats.total_minutes }} мин</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="stats-section">
+        <h2 class="section-title"><i class="fas fa-calendar-week"></i> Статистика за последний месяц</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-trophy"></i>
+                <p>Тренировок: <span class="stat-value">{{ monthly_stats.total_workouts }}</span></p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <p>Время: <span class="stat-value">{{ monthly_stats.total_minutes }} мин</span></p>
+            </div>
+        </div>
+        {% if monthly_stats.activity_breakdown %}
+            <h3 class="section-subtitle">Разбивка по активностям:</h3>
+            <ul class="activity-list">
+                {% for activity in monthly_stats.activity_breakdown %}
+                    <li class="activity-item">
+                        {{ activity.activity }}: <span class="stat-value">{{ activity.duration }} мин</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-activity">У вас пока нет активности за последний месяц.</p>
+        {% endif %}
+    </div>
 {% endblock %}

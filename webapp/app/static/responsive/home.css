@@ -1,0 +1,118 @@
+/* Адаптивные стили для главной страницы */
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 20px;
+    }
+
+    .welcome-title {
+        font-size: 1.8em;
+    }
+
+    .auth-buttons {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    .activity-section {
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .section-title {
+        font-size: 1.4em;
+    }
+
+    .activity-item {
+        padding: 10px 15px;
+        margin-bottom: 10px;
+    }
+
+    .stats-section {
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .stats-grid {
+        gap: 15px;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .calculator-section {
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .calories-result {
+        font-size: 1.1em;
+        padding: 10px;
+    }
+
+    .quote-section {
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .quote-card p {
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-section {
+        padding: 15px;
+    }
+
+    .welcome-title {
+        font-size: 1.5em;
+    }
+
+    .section-title {
+        font-size: 1.2em;
+    }
+
+    .activity-item {
+        padding: 8px 12px;
+        margin-bottom: 8px;
+    }
+
+    .no-activity {
+        font-size: 1em;
+    }
+
+    .stats-section {
+        padding: 15px;
+    }
+
+    .stat-card {
+        padding: 12px;
+    }
+
+    .stat-card p {
+        font-size: 0.9em;
+    }
+
+    .calculator-section {
+        padding: 15px;
+    }
+
+    .calories-result {
+        font-size: 1em;
+        padding: 8px;
+    }
+
+    .quote-section {
+        padding: 15px;
+    }
+
+    .quote-card p {
+        font-size: 1em;
+    }
+}
