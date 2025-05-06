@@ -1,0 +1,117 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+header {
+    background-color: #4CAF50;
+    padding: 10px 0;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+nav {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+nav a, nav form {
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    font-size: 1em;
+    min-width: 80px;
+    text-align: center;
+    border-radius: 5px;
+    margin: 5px;
+    transition: background-color 0.3s ease;
+}
+
+nav a.active, nav a:hover {
+    background-color: #45a049;
+}
+
+nav button {
+    background-color: #ffffff;
+    color: #4CAF50;
+    border: 1px solid #4CAF50;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 1em;
+    border-radius: 5px;
+    margin: 5px;
+    min-height: 48px;
+    min-width: 80px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+nav button:hover {
+    background-color: #e0e0e0;
+    color: #388E3C;
+    transform: scale(1.05);
+}
+
+nav button:active {
+    transform: scale(0.95);
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+/* Стили для ссылок */
+p a {
+    color: #4CAF50;
+    text-decoration: none;
+    padding: 8px 12px;
+    display: inline-block;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+p a:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.05);
+}
+
+p a:active {
+    transform: scale(0.95);
+}
+
+/* Стили для заголовков */
+h1, h2 {
+    margin-bottom: 15px;
+}
+
+/* Стили для списков (home.html, workouts.html, profile.html) */
+ul {
+    padding-left: 20px;
+}
+
+ul li {
+    margin-bottom: 10px;
+    font-size: 1em;
+    word-break: break-all;
+}

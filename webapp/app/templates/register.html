@@ -1,22 +1,20 @@
 {% extends "base.html" %}
-
 {% block title %}Регистрация{% endblock %}
-
 {% block content %}
-  <h1>Регистрация</h1>
-  {% if error %}
-    <div class="error">{{ error }}</div>
-  {% endif %}
-  <form method="post" action="/register">
-    <label>
-      <i class="fa fa-user"></i> Логин:<br />
-      <input type="text" name="username" required />
-    </label><br />
-    <label>
-      <i class="fa fa-lock"></i> Пароль:<br />
-      <input type="password" name="password" required />
-    </label><br />
-    <button type="submit">Зарегистрироваться</button>
-  </form>
-  <p>Уже есть аккаунт? <a href="/login">Войти</a></p>
+    <h1>Регистрация</h1>
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+    <form method="post" action="/register">
+        <label>
+            <i class="fa fa-user"></i> Логин:<br />
+            <input type="text" name="username" required />
+        </label>
+        <label>
+            <i class="fa fa-lock"></i> Пароль:<br />
+            <input type="password" name="password" required />
+        </label>
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+    <p>Уже есть аккаунт? <a href="/login">Войти</a></p>
 {% endblock %}

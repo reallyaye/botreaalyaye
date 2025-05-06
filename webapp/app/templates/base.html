@@ -1,35 +1,41 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>{% block title %}Моё фитнес-приложение{% endblock %}</title>
-  <link rel="stylesheet" href="/static/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Моё фитнес-приложение{% endblock %}</title>
+    <link rel="stylesheet" href="/static/base.css">
+    <link rel="stylesheet" href="/static/forms.css">
+    <link rel="stylesheet" href="/static/profile.css">
+    <link rel="stylesheet" href="/static/stats.css">
+    <link rel="stylesheet" href="/static/home.css">
+    <link rel="stylesheet" href="/static/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="/" {% if request.url.path == "/" %}class="active"{% endif %}>Главная</a>
-      {% if is_authenticated %}
-        <a href="/profile/" {% if request.url.path == "/profile/" %}class="active"{% endif %}>Профиль</a>
-        <a href="/dashboard/" {% if request.url.path == "/dashboard/" %}class="active"{% endif %}>Панель</a>
-        <a href="/workouts/" {% if request.url.path == "/workouts/" %}class="active"{% endif %}>Тренировки</a>
-        <a href="/stats/" {% if request.url.path == "/stats/" %}class="active"{% endif %}>Статистика</a>
-        <form action="/logout" method="post" style="display:inline">
-          <button type="submit">Выйти</button>
-        </form>
-      {% else %}
-        <a href="/login" {% if request.url.path == "/login" %}class="active"{% endif %}>Войти</a>
-        <a href="/register" {% if request.url.path == "/register" %}class="active"{% endif %}>Регистрация</a>
-      {% endif %}
-    </nav>
-  </header>
-  <main>
-    {% block content %}{% endblock %}
-  </main>
-  <footer>
-    <p>© 2025 Моё фитнес-приложение</p>
-  </footer>
+    <header>
+        <nav>
+            <a href="/" {% if request.url.path == "/" %}class="active"{% endif %}>Главная</a>
+            {% if is_authenticated %}
+                <a href="/profile/" {% if request.url.path == "/profile/" %}class="active"{% endif %}>Профиль</a>
+                <a href="/dashboard/" {% if request.url.path == "/dashboard/" %}class="active"{% endif %}>Панель</a>
+                <a href="/workouts/" {% if request.url.path == "/workouts/" %}class="active"{% endif %}>Тренировки</a>
+                <a href="/stats/" {% if request.url.path == "/stats/" %}class="active"{% endif %}>Статистика</a>
+                <form action="/logout" method="post" style="display:inline">
+                    <button type="submit">Выйти</button>
+                </form>
+            {% else %}
+                <a href="/login" {% if request.url.path == "/login" %}class="active"{% endif %}>Войти</a>
+                <a href="/register" {% if request.url.path == "/register" %}class="active"{% endif %}>Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>© 2025 Моё фитнес-приложение</p>
+    </footer>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93b6db3dbc04bcf5',t:'MTc0NjUxNzUwOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

@@ -1,0 +1,11 @@
+/* Стили для stats.html */
+.chart-container {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.chart-container canvas {
+    width: 100%;
+    max-width: 600px;
+    height: 400px;
+}

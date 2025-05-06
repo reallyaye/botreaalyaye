@@ -1,15 +1,31 @@
 {% extends "base.html" %}
 {% block title %}Главная{% endblock %}
 {% block content %}
-  <h1>Добро пожаловать в фитнес-приложение!</h1>
-  <p>Это приложение поможет вам следить за тренировками и достигать ваших целей.</p>
-  <h2>Советы для успешных тренировок:</h2>
-  <ul>
-    {% for tip in tips %}
-      <li>{{ tip }}</li>
-    {% endfor %}
-  </ul>
-  {% if not is_authenticated %}
-    <p>Чтобы начать, <a href="/login">войдите</a> или <a href="/register">зарегистрируйтесь</a>.</p>
-  {% endif %}
+    <div class="welcome-section">
+        <h1 class="welcome-title">
+            <i class="fas fa-heartbeat"></i> Добро пожаловать{% if username %}, {{ username }}{% endif %}!
+        </h1>
+        {% if not is_authenticated %}
+            <div class="auth-actions">
+                <p>Начните свой путь к здоровью прямо сейчас!</p>
+                <div class="auth-buttons">
+                    <a href="/login" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Войти</a>
+                    <a href="/register" class="btn btn-secondary"><i class="fas fa-user-plus"></i> Зарегистрироваться</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="activity-section">
+                <h2 class="section-title"><i class="fas fa-running"></i> Ваши последние действия</h2>
+                {% if recent_activities %}
+                    <ul class="activity-list">
+                        {% for activity in recent_activities %}
+                            <li class="activity-item">{{ activity }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="no-activity">У вас пока нет активности. Начните тренировку прямо сейчас!</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -1,32 +1,33 @@
 {% extends "base.html" %}
 {% block title %}Статистика{% endblock %}
 {% block content %}
-  <h1>Статистика для {{ username }} (ID: {{ user_id }})</h1>
-  <p>Здесь отображается ваша статистика. Пока простой график:</p>
-  <div id="chart-canvas" style="width: 600px; height: 400px;"></div>
-  <script>
-    // Простой график (замените на реальные данные)
-    const ctx = document.getElementById('chart-canvas').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Неделя 1', 'Неделя 2', 'Неделя 3'],
-        datasets: [{
-          label: 'Минут тренировок',
-          data: [120, 150, 180],
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
-    });
-  </script>
-  <p>Добавьте реальные данные и больше графиков позже!</p>
-  <!-- Подключение Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <h1>Статистика для {{ username }} (ID: {{ user_id }})</h1>
+    <p>Здесь отображается ваша статистика. Пока простой график:</p>
+    <div class="chart-container">
+        <canvas id="chart-canvas"></canvas>
+    </div>
+    <script>
+        const ctx = document.getElementById('chart-canvas').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Неделя 1', 'Неделя 2', 'Неделя 3'],
+                datasets: [{
+                    label: 'Минут тренировок',
+                    data: [120, 150, 180],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                },
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+    <p>Добавьте реальные данные и больше графиков позже!</p>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
