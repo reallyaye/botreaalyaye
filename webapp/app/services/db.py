@@ -67,6 +67,15 @@ class Schedule(Base):
     reminder_sent = Column(Boolean, default=False)
     created_at = Column(DateTime, server_default=func.now())
 
+class Goal(Base):
+    __tablename__ = "goals"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    goal_type = Column(String, nullable=False)  # Например, "calories", "workouts", "duration"
+    target_value = Column(Float, nullable=False)  # Целевое значение (например, 5000 калорий)
+    deadline = Column(DateTime, nullable=False)  # Дедлайн для достижения цели
+    created_at = Column(DateTime, server_default=func.now())
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
@@ -421,4 +430,62 @@ async def mark_reminder_sent(schedule_id: int):
         if schedule:
             schedule.reminder_sent = True
             session.add(schedule)
+            await session.commit()
+
+async def add_goal(user_id: int, goal_type: str, target_value: float, deadline: datetime) -> None:
+    async with AsyncSessionLocal() as session:
+        goal = Goal(
+            user_id=user_id,
+            goal_type=goal_type,
+            target_value=target_value,
+            deadline=deadline
+        )
+        session.add(goal)
+        await session.commit()
+
+async def get_user_goals(user_id: int):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(Goal)
+            .where(Goal.user_id == user_id)
+            .where(Goal.deadline >= datetime.utcnow())
+            .order_by(Goal.created_at)
+        )
+        goals = result.scalars().all()
+        # Для каждой цели рассчитываем текущий прогресс
+        for goal in goals:
+            if goal.goal_type == "calories":
+                result = await session.execute(
+                    select(func.sum(Workout.calories_burned).label("current_value"))
+                    .where(Workout.user_id == user_id)
+                    .where(Workout.created_at >= goal.created_at)
+                    .where(Workout.created_at <= goal.deadline)
+                )
+            elif goal.goal_type == "workouts":
+                result = await session.execute(
+                    select(func.count().label("current_value"))
+                    .where(Workout.user_id == user_id)
+                    .where(Workout.created_at >= goal.created_at)
+                    .where(Workout.created_at <= goal.deadline)
+                )
+            elif goal.goal_type == "duration":
+                result = await session.execute(
+                    select(func.sum(Workout.duration).label("current_value"))
+                    .where(Workout.user_id == user_id)
+                    .where(Workout.created_at >= goal.created_at)
+                    .where(Workout.created_at <= goal.deadline)
+                )
+            else:
+                continue
+            current_value = result.first().current_value or 0
+            goal.current_value = current_value
+            goal.progress = (current_value / goal.target_value * 100) if goal.target_value > 0 else 0
+        return goals
+
+async def delete_goal(goal_id: int):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Goal).where(Goal.id == goal_id))
+        goal = result.scalars().first()
+        if goal:
+            await session.delete(goal)
             await session.commit()

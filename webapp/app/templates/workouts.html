@@ -59,7 +59,8 @@
                         <span class="workout-date">{{ workout.created_at }}</span>: 
                         Активность: <span class="workout-value">{{ workout.activity }}</span>, 
                         Интенсивность: <span class="workout-value">{{ workout.intensity|capitalize }}</span>, 
-                        Длительность: <span class="workout-value">{{ workout.duration }} мин</span>
+                        Длительность: <span class="workout-value">{{ workout.duration }} мин</span>,
+                        Калорий сожжено: <span class="workout-value">{{ workout.calories_burned|round(2) }}</span>
                         {% if workout.comment %}
                             <br>Комментарий: <span class="workout-comment">{{ workout.comment }}</span>
                         {% endif %}

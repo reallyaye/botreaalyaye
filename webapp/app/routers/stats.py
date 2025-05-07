@@ -22,6 +22,10 @@ async def get_current_user(request: Request):
 
 @router.get("/", response_class=HTMLResponse)
 async def stats(request: Request, user: User = Depends(get_current_user), period: str = "all"):
+    # Проверяем, является ли user перенаправлением
+    if isinstance(user, StarletteRedirectResponse):
+        return user
+
     # Генерируем CSRF-токен
     if "csrf_token" not in request.session:
         request.session["csrf_token"] = secrets.token_hex(16)

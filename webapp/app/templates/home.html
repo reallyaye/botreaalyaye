@@ -46,6 +46,41 @@
                     </div>
                 </div>
             </div>
+            <div class="goals-section">
+                <h2 class="section-title"><i class="fas fa-flag-checkered"></i> Ваши цели</h2>
+                {% if goals %}
+                    <div class="goals-grid">
+                        {% for goal in goals %}
+                            <div class="goal-card">
+                                <p>
+                                    Цель: 
+                                    {% if goal.goal_type == "calories" %}
+                                        Сжечь {{ goal.target_value }} калорий
+                                    {% elif goal.goal_type == "workouts" %}
+                                        Провести {{ goal.target_value }} тренировок
+                                    {% elif goal.goal_type == "duration" %}
+                                        Тренироваться {{ goal.target_value }} минут
+                                    {% endif %}
+                                    к {{ goal.deadline|datetimeformat }}
+                                </p>
+                                <p>Прогресс: <span class="stat-value">{{ goal.current_value|round(2) }} / {{ goal.target_value }}</span></p>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="--progress: {{ goal.progress }}%"></div>
+                                    <span class="progress-text">{{ goal.progress|round(1) }}%</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="start-training">
+                        <a href="/goals/add" class="btn btn-primary" aria-label="Добавить новую цель"><i class="fas fa-plus-circle"></i> Добавить новую цель</a>
+                    </div>
+                {% else %}
+                    <p class="no-activity">У вас пока нет целей. Установите первую цель!</p>
+                    <div class="start-training">
+                        <a href="/goals/add" class="btn btn-primary" aria-label="Установить цель"><i class="fas fa-flag-checkered"></i> Установить цель</a>
+                    </div>
+                {% endif %}
+            </div>
             <div class="calculator-section">
                 <h2 class="section-title"><i class="fas fa-calculator"></i> Калькулятор калорий</h2>
                 {% if calories_result %}

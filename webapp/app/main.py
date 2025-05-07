@@ -16,7 +16,7 @@ from aiogram.filters import Command
 from sqlalchemy import select, func
 import aiohttp
 import secrets
-from webapp.app.services.db import init_db, User, get_user_by_id, get_user_workouts, get_user_stats, AsyncSessionLocal
+from webapp.app.services.db import init_db, User, get_user_by_id, get_user_workouts, get_user_stats, get_user_goals, AsyncSessionLocal
 
 # корень каталога webapp/app
 BASE_DIR = Path(__file__).resolve().parent
@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR.parent.parent / ".env")
 
 # инициализируем нашу БД
-from webapp.app.routers import auth, dashboard, workouts, stats, profile
+from webapp.app.routers import auth, dashboard, workouts, stats, profile, goals
 
 app = FastAPI()
 
@@ -84,7 +84,7 @@ async def on_shutdown():
 # Обработчик команды /start
 @router.message(Command(commands=["start"]))
 async def send_welcome(message: types.Message):
-    await message.reply("Привет! Используй /link <username> для связки с профилем.")
+    await message.reply("Привет! Используй /link <username> для связки с профиля.")
 
 # Обработчик команды /link
 @router.message(Command(commands=["link"]))
@@ -134,6 +134,7 @@ async def root(request: Request):
     stats = {"total_workouts": 0, "total_calories": 0, "total_minutes": 0}
     recent_activities = []
     user_weight = None
+    goals = []
     calories_result = request.session.pop("calories_result", None)
     error = request.session.pop("error", None)
 
@@ -153,6 +154,9 @@ async def root(request: Request):
                 # Получаем последние действия
                 recent_activities = await get_user_workouts(user_id, limit=5)
                 print(f"Последние действия: {recent_activities}")  # Отладочный вывод
+                # Получаем цели пользователя
+                goals = await get_user_goals(user_id)
+                print(f"Цели: {goals}")  # Отладочный вывод
 
     print("Рендеринг шаблона home.html")  # Отладочный вывод
     return templates.TemplateResponse(
@@ -164,6 +168,7 @@ async def root(request: Request):
             "recent_activities": recent_activities,
             "stats": stats if stats else {"total_workouts": 0, "total_calories": 0, "total_minutes": 0},
             "user_weight": user_weight,
+            "goals": goals,
             "calories_result": calories_result,
             "error": error,
             "current_year": datetime.now().year,
@@ -255,3 +260,4 @@ app.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
 app.include_router(workouts.router, prefix="/workouts", tags=["workouts"])
 app.include_router(stats.router, prefix="/stats", tags=["stats"])
 app.include_router(profile.router, prefix="/profile", tags=["profile"])
+app.include_router(goals.router, prefix="/goals", tags=["goals"])
