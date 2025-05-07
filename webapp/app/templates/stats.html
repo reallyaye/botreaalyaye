@@ -9,39 +9,198 @@
     <div class="stats-section">
         <h2 class="section-title"><i class="fas fa-history"></i> Общая статистика</h2>
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card{% if all_time_stats.total_workouts > 0 %} active{% endif %}">
                 <i class="fas fa-trophy"></i>
                 <p>Всего тренировок: <span class="stat-value">{{ all_time_stats.total_workouts }}</span></p>
             </div>
-            <div class="stat-card">
+            <div class="stat-card{% if all_time_stats.total_minutes > 0 %} active{% endif %}">
                 <i class="fas fa-clock"></i>
                 <p>Общее время: <span class="stat-value">{{ all_time_stats.total_minutes }} мин</span></p>
+            </div>
+            <div class="stat-card{% if all_time_stats.total_calories > 0 %} active{% endif %}">
+                <i class="fas fa-fire"></i>
+                <p>Калорий сожжено: <span class="stat-value">{{ all_time_stats.total_calories|round(2) }}</span></p>
             </div>
         </div>
     </div>
     <div class="stats-section">
-        <h2 class="section-title"><i class="fas fa-calendar-week"></i> Статистика за последний месяц</h2>
+        <h2 class="section-title"><i class="fas fa-calendar-week"></i> Статистика {{ period_label }}</h2>
+        <form method="get" action="/stats/" class="filter-buttons">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" name="period" value="all" class="btn btn-primary{% if period == 'all' %} active{% endif %}">За всё время</button>
+            <button type="submit" name="period" value="month" class="btn btn-primary{% if period == 'month' %} active{% endif %}">За месяц</button>
+            <button type="submit" name="period" value="week" class="btn btn-primary{% if period == 'week' %} active{% endif %}">За неделю</button>
+        </form>
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card{% if selected_stats.total_workouts > 0 %} active{% endif %}">
                 <i class="fas fa-trophy"></i>
-                <p>Тренировок: <span class="stat-value">{{ monthly_stats.total_workouts }}</span></p>
+                <p>Тренировок: <span class="stat-value">{{ selected_stats.total_workouts }}</span></p>
             </div>
-            <div class="stat-card">
+            <div class="stat-card{% if selected_stats.total_minutes > 0 %} active{% endif %}">
                 <i class="fas fa-clock"></i>
-                <p>Время: <span class="stat-value">{{ monthly_stats.total_minutes }} мин</span></p>
+                <p>Время: <span class="stat-value">{{ selected_stats.total_minutes }} мин</span></p>
+            </div>
+            <div class="stat-card{% if selected_stats.total_calories > 0 %} active{% endif %}">
+                <i class="fas fa-fire"></i>
+                <p>Калорий сожжено: <span class="stat-value">{{ selected_stats.total_calories|round(2) }}</span></p>
             </div>
         </div>
-        {% if monthly_stats.activity_breakdown %}
+        {% if activity_breakdown and activity_breakdown|length > 0 %}
             <h3 class="section-subtitle">Разбивка по активностям:</h3>
+            <div class="chart-container">
+                <canvas id="activityBreakdownChart" aria-label="Круговая диаграмма разбивки по активностям"></canvas>
+            </div>
             <ul class="activity-list">
-                {% for activity in monthly_stats.activity_breakdown %}
+                {% for activity in activity_breakdown %}
                     <li class="activity-item">
                         {{ activity.activity }}: <span class="stat-value">{{ activity.duration }} мин</span>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p class="no-activity">У вас пока нет активности за последний месяц.</p>
+            <p class="no-activity">У вас пока нет активности {{ period_label }}.</p>
         {% endif %}
     </div>
+    <div class="stats-section">
+        <h2 class="section-title"><i class="fas fa-chart-line"></i> Тренды активности (за последний месяц)</h2>
+        {% if monthly_trend and monthly_trend|length > 0 %}
+            <div class="chart-container">
+                <canvas id="monthlyTrendChart" aria-label="Линейный график трендов активности за последний месяц"></canvas>
+            </div>
+        {% else %}
+            <p class="no-activity">У вас пока нет данных для трендов.</p>
+        {% endif %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Круговая диаграмма для activity_breakdown
+        {% if activity_breakdown and activity_breakdown|length > 0 %}
+        try {
+            const activityBreakdownCtx = document.getElementById('activityBreakdownChart').getContext('2d');
+            const totalDuration = [{% for activity in activity_breakdown %}{{ activity.duration }},{% endfor %}].reduce((a, b) => a + b, 0);
+            const activityBreakdownChart = new Chart(activityBreakdownCtx, {
+                type: 'pie',
+                data: {
+                    labels: [{% for activity in activity_breakdown %}'{{ activity.activity }}',{% endfor %}],
+                    datasets: [{
+                        label: 'Время (мин)',
+                        data: [{% for activity in activity_breakdown %}{{ activity.duration }},{% endfor %}],
+                        backgroundColor: [
+                            'rgba(2, 136, 209, 0.8)',
+                            'rgba(79, 195, 247, 0.8)',
+                            'rgba(128, 222, 234, 0.8)',
+                            'rgba(38, 166, 154, 0.8)',
+                            'rgba(77, 182, 172, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(2, 136, 209, 1)',
+                            'rgba(79, 195, 247, 1)',
+                            'rgba(128, 222, 234, 1)',
+                            'rgba(38, 166, 154, 1)',
+                            'rgba(77, 182, 172, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Разбивка по активностям {{ period_label }}'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    let value = context.raw || 0;
+                                    let percentage = ((value / totalDuration) * 100).toFixed(1);
+                                    return `${label}: ${value} мин (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Ошибка при создании круговой диаграммы:', error);
+        }
+        {% endif %}
+
+        // Линейный график для monthly_trend
+        {% if monthly_trend and monthly_trend|length > 0 %}
+        try {
+            const monthlyTrendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+            const monthlyTrendChart = new Chart(monthlyTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: [{% for trend in monthly_trend %}'{{ trend.date }}',{% endfor %}],
+                    datasets: [{
+                        label: 'Количество тренировок',
+                        data: [{% for trend in monthly_trend %}{{ trend.count }},{% endfor %}],
+                        fill: false,
+                        borderColor: 'rgba(2, 136, 209, 1)',
+                        backgroundColor: 'rgba(2, 136, 209, 0.2)',
+                        pointBackgroundColor: 'rgba(2, 136, 209, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(2, 136, 209, 1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Дата'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Количество тренировок'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Тренды активности (за последний месяц)'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Ошибка при создании линейного графика:', error);
+        }
+        {% endif %}
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 500px; /* Для круговой диаграммы */
+        }
+        .chart-container:last-child {
+            max-width: 800px; /* Для линейного графика */
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                max-width: 100%;
+            }
+        }
+    </style>
 {% endblock %}

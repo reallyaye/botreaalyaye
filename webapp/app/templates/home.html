@@ -9,8 +9,8 @@
             <div class="auth-actions">
                 <p>Начните свой путь к здоровью прямо сейчас!</p>
                 <div class="auth-buttons">
-                    <a href="/login" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Войти</a>
-                    <a href="/register" class="btn btn-secondary"><i class="fas fa-user-plus"></i> Зарегистрироваться</a>
+                    <a href="/login" class="btn btn-primary" aria-label="Войти в аккаунт"><i class="fas fa-sign-in-alt"></i> Войти</a>
+                    <a href="/register" class="btn btn-secondary" aria-label="Зарегистрироваться"><i class="fas fa-user-plus"></i> Зарегистрироваться</a>
                 </div>
             </div>
         {% else %}
@@ -25,22 +25,22 @@
                 {% else %}
                     <p class="no-activity">У вас пока нет активности. Начните тренировку прямо сейчас!</p>
                     <div class="start-training">
-                        <a href="/workouts" class="btn btn-primary"><i class="fas fa-dumbbell"></i> Начать тренировку</a>
+                        <a href="/workouts" class="btn btn-primary" aria-label="Начать тренировку"><i class="fas fa-dumbbell"></i> Начать тренировку</a>
                     </div>
                 {% endif %}
             </div>
             <div class="stats-section">
                 <h2 class="section-title"><i class="fas fa-chart-line"></i> Ваши достижения</h2>
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-card{% if stats.total_workouts > 0 %} active{% endif %}">
                         <i class="fas fa-trophy"></i>
                         <p>Тренировок завершено: <span class="stat-value">{{ stats.total_workouts }}</span></p>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card{% if stats.total_calories > 0 %} active{% endif %}">
                         <i class="fas fa-fire"></i>
-                        <p>Калорий сожжено: <span class="stat-value">{{ stats.total_calories }}</span></p>
+                        <p>Калорий сожжено: <span class="stat-value">{{ stats.total_calories|round(2) }}</span></p>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card{% if stats.total_minutes > 0 %} active{% endif %}">
                         <i class="fas fa-clock"></i>
                         <p>Времени на тренировки: <span class="stat-value">{{ stats.total_minutes }} мин</span></p>
                     </div>
@@ -56,7 +56,8 @@
                 {% if error %}
                     <div class="error">{{ error }}</div>
                 {% endif %}
-                <form method="post" action="/calculate-calories">
+                <form method="post" action="/calculate-calories" onsubmit="return validateForm()">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <div class="form-group">
                         <label for="activity">
                             <i class="fas fa-running"></i> Вид активности:
@@ -92,9 +93,40 @@
         <div class="quote-section">
             <h2 class="section-title"><i class="fas fa-quote-left"></i> Мотивация дня</h2>
             <div class="quote-card">
-                <p>"Движение — это жизнь. Начни двигаться сегодня, чтобы стать лучше завтра!"</p>
-                <p class="quote-author">— Неизвестный автор</p>
+                <p id="quote-text">"Движение — это жизнь. Начни двигаться сегодня, чтобы стать лучше завтра!"</p>
+                <p class="quote-author" id="quote-author">— Неизвестный автор</p>
             </div>
         </div>
     </div>
+    <script>
+        // Динамическая мотивационная цитата
+        const quotes = [
+            { text: "Движение — это жизнь. Начни двигаться сегодня, чтобы стать лучше завтра!", author: "Неизвестный автор" },
+            { text: "Твоё тело может всё, это твой разум должен поверить в это!", author: "Неизвестный автор" },
+            { text: "Не жди идеального момента, начни сейчас и сделай его идеальным!", author: "Неизвестный автор" }
+        ];
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        document.getElementById("quote-text").textContent = randomQuote.text;
+        document.getElementById("quote-author").textContent = randomQuote.author;
+
+        // Валидация формы калькулятора калорий
+        function validateForm() {
+            const activity = document.getElementById("activity").value;
+            const duration = document.getElementById("duration").value;
+            const weight = document.getElementById("weight").value;
+            if (activity.trim().length < 2) {
+                alert("Вид активности должен содержать минимум 2 символа");
+                return false;
+            }
+            if (parseFloat(duration) <= 0) {
+                alert("Длительность должна быть больше 0");
+                return false;
+            }
+            if (parseFloat(weight) <= 0) {
+                alert("Вес должен быть больше 0");
+                return false;
+            }
+            return true;
+        }
+    </script>
 {% endblock %}

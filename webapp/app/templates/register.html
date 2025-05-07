@@ -5,16 +5,37 @@
     {% if error %}
         <div class="error">{{ error }}</div>
     {% endif %}
-    <form method="post" action="/register">
-        <label>
+    <form method="post" action="/register" onsubmit="return validateForm()">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label for="username">
             <i class="fa fa-user"></i> Логин:<br />
-            <input type="text" name="username" required />
+            <input type="text" id="username" name="username" required aria-required="true" />
         </label>
-        <label>
+        <label for="password">
             <i class="fa fa-lock"></i> Пароль:<br />
-            <input type="password" name="password" required />
+            <input type="password" id="password" name="password" required aria-required="true" />
         </label>
         <button type="submit">Зарегистрироваться</button>
     </form>
     <p>Уже есть аккаунт? <a href="/login">Войти</a></p>
+    <script>
+        function validateForm() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const usernameRegex = /^[a-zA-Z0-9]+$/;
+            if (username.length < 3) {
+                alert("Логин должен содержать минимум 3 символа");
+                return false;
+            }
+            if (!usernameRegex.test(username)) {
+                alert("Логин должен содержать только буквы и цифры");
+                return false;
+            }
+            if (password.length < 6) {
+                alert("Пароль должен содержать минимум 6 символов");
+                return false;
+            }
+            return true;
+        }
+    </script>
 {% endblock %}

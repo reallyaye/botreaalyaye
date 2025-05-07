@@ -171,6 +171,11 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.stat-card.active {
+    background-color: #e3f2fd; /* Цвет для активных карточек */
+    border: 2px solid #0288d1;
+}
+
 .stat-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -211,6 +216,7 @@
     background-color: #e3f2fd;
     border-radius: 10px;
     color: #0288d1;
+    animation: fadeIn 0.5s ease-out forwards;
 }
 
 .quote-section {
@@ -238,4 +244,45 @@
 .quote-author {
     font-size: 1.1em;
     color: #666;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 20px;
+    }
+    .welcome-title {
+        font-size: 2em;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr; /* Одна колонка на мобильных */
+        gap: 15px;
+    }
+    .stat-card {
+        padding: 15px;
+    }
+    .section-title {
+        font-size: 1.5em;
+    }
+    .form-group input,
+    .form-group select {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-title {
+        font-size: 1.5em;
+    }
+    .stat-card {
+        padding: 12px;
+    }
+    .section-title {
+        font-size: 1.2em;
+    }
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
 }

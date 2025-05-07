@@ -3,26 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Фитнес-приложение для отслеживания тренировок и статистики.">
+    <meta name="keywords" content="фитнес, тренировки, здоровье, статистика">
+    <meta property="og:title" content="{% block og_title %}Моё фитнес-приложение{% endblock %}">
+    <meta property="og:description" content="Фитнес-приложение для отслеживания тренировок и статистики.">
+    <meta property="og:type" content="website">
     <title>{% block title %}Моё фитнес-приложение{% endblock %}</title>
     <link rel="stylesheet" href="/static/base.css">
-    <link rel="stylesheet" href="/static/forms.css">
-    <link rel="stylesheet" href="/static/profile.css">
-    <link rel="stylesheet" href="/static/stats.css">
-    <link rel="stylesheet" href="/static/home.css">
-    <link rel="stylesheet" href="/static/workouts.css">
-    <link rel="stylesheet" href="/static/dashboard.css">
     <link rel="stylesheet" href="/static/responsive/common.css">
-    <link rel="stylesheet" href="/static/responsive/home.css">
-    <link rel="stylesheet" href="/static/responsive/profile.css">
-    <link rel="stylesheet" href="/static/responsive/workouts.css">
-    <link rel="stylesheet" href="/static/responsive/dashboard.css">
-    <link rel="stylesheet" href="/static/responsive/stats.css">
+    {% block styles %}
+        {% if request.url.path == "/login" or request.url.path == "/register" %}
+            <link rel="stylesheet" href="/static/forms.css">
+        {% elif request.url.path == "/profile/" %}
+            <link rel="stylesheet" href="/static/profile.css">
+            <link rel="stylesheet" href="/static/responsive/profile.css">
+        {% elif request.url.path == "/dashboard/" %}
+            <link rel="stylesheet" href="/static/dashboard.css">
+            <link rel="stylesheet" href="/static/responsive/dashboard.css">
+        {% elif request.url.path == "/workouts/" %}
+            <link rel="stylesheet" href="/static/workouts.css">
+            <link rel="stylesheet" href="/static/responsive/workouts.css">
+        {% elif request.url.path == "/stats/" %}
+            <link rel="stylesheet" href="/static/stats.css">
+            <link rel="stylesheet" href="/static/responsive/stats.css">
+        {% elif request.url.path == "/" %}
+            <link rel="stylesheet" href="/static/home.css">
+            <link rel="stylesheet" href="/static/responsive/home.css">
+        {% endif %}
+    {% endblock %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <nav>
+        <nav aria-label="Главное меню">
             <a href="/" {% if request.url.path == "/" %}class="active"{% endif %}>Главная</a>
             {% if is_authenticated %}
                 <a href="/profile/" {% if request.url.path == "/profile/" %}class="active"{% endif %}>Профиль</a>
@@ -30,6 +44,7 @@
                 <a href="/workouts/" {% if request.url.path == "/workouts/" %}class="active"{% endif %}>Тренировки</a>
                 <a href="/stats/" {% if request.url.path == "/stats/" %}class="active"{% endif %}>Статистика</a>
                 <form action="/logout" method="post" style="display:inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <button type="submit">Выйти</button>
                 </form>
             {% else %}
@@ -42,7 +57,7 @@
         {% block content %}{% endblock %}
     </main>
     <footer>
-        <p>© 2025 Моё фитнес-приложение</p>
+        <p>© {{ current_year }} Моё фитнес-приложение</p>
     </footer>
     <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93b6db3dbc04bcf5',t:'MTc0NjUxNzUwOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>

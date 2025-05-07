@@ -28,7 +28,7 @@ nav {
 }
 
 nav a, nav form {
-    color: white;
+    color: #f0f0f0; /* Более светлый оттенок для лучшей читаемости */
     text-decoration: none;
     padding: 12px 20px;
     font-size: 1em;

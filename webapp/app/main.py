@@ -15,6 +15,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import Command
 from sqlalchemy import select, func
 import aiohttp
+import secrets
 from webapp.app.services.db import init_db, User, get_user_by_id, get_user_workouts, get_user_stats, AsyncSessionLocal
 
 # корень каталога webapp/app
@@ -44,6 +45,17 @@ app.mount(
 
 # шаблоны
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+# Добавляем фильтр datetimeformat для форматирования даты
+def datetimeformat(value, format="%d.%m.%Y %H:%M"):
+    if isinstance(value, datetime):
+        return value.strftime(format)
+    return value
+
+# Регистрируем фильтр и добавляем отладочный вывод
+print("Регистрирую фильтр datetimeformat")  # Отладочный вывод
+templates.env.filters["datetimeformat"] = datetimeformat
+print("Фильтр datetimeformat зарегистрирован")  # Отладочный вывод
 
 # Telegram Bot (временно отключим webhook)
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -113,6 +125,9 @@ async def clear_session(request: Request):
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     print("Получен запрос к /")  # Отладочный вывод
+    # Генерируем CSRF-токен
+    if "csrf_token" not in request.session:
+        request.session["csrf_token"] = secrets.token_hex(16)
     is_authenticated = bool(request.session.get("user_id"))
     print(f"Пользователь авторизован: {is_authenticated}")  # Отладочный вывод
     user = None
@@ -147,10 +162,12 @@ async def root(request: Request):
             "is_authenticated": is_authenticated,
             "username": user.username if user else None,
             "recent_activities": recent_activities,
-            "stats": stats,
+            "stats": stats if stats else {"total_workouts": 0, "total_calories": 0, "total_minutes": 0},
             "user_weight": user_weight,
             "calories_result": calories_result,
-            "error": error
+            "error": error,
+            "current_year": datetime.now().year,
+            "csrf_token": request.session.get("csrf_token")
         }
     )
 
@@ -188,8 +205,11 @@ async def get_met_from_grok(activity: str, intensity: str) -> float:
                 return 3.0  # Значение по умолчанию, если ИИ вернул некорректный формат
 
 @app.post("/calculate-calories", response_class=HTMLResponse)
-async def calculate_calories(request: Request):
+async def calculate_calories(request: Request, csrf_token: str = Form(...)):
     print("Получен запрос к /calculate-calories")  # Отладочный вывод
+    if csrf_token != request.session.get("csrf_token"):
+        request.session["error"] = "Недействительный CSRF-токен."
+        return RedirectResponse("/", status_code=302)
     is_authenticated = bool(request.session.get("user_id"))
     if not is_authenticated:
         print("Пользователь не авторизован, перенаправляю на /login")  # Отладочный вывод
