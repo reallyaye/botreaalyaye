@@ -9,11 +9,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копируем код
 COPY . .
 
-# Делаем entrypoint исполняемым
-RUN chmod +x entrypoint.sh
-
-# Открываем порт (Railway пробросит свой $PORT автоматически)
+# Открываем порт
 EXPOSE 8000
 
-# По умолчанию запускаем наш entrypoint
-ENTRYPOINT ["./entrypoint.sh"]
+# Запускаем Uvicorn напрямую
+CMD ["sh", "-c", "uvicorn webapp.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
