@@ -74,6 +74,7 @@ class Goal(Base):
     goal_type = Column(String, nullable=False)  # Например, "calories", "workouts", "duration"
     target_value = Column(Float, nullable=False)  # Целевое значение (например, 5000 калорий)
     deadline = Column(DateTime, nullable=False)  # Дедлайн для достижения цели
+    achieved = Column(Boolean, default=False)  # Флаг достижения цели
     created_at = Column(DateTime, server_default=func.now())
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -449,6 +450,7 @@ async def get_user_goals(user_id: int):
             select(Goal)
             .where(Goal.user_id == user_id)
             .where(Goal.deadline >= datetime.utcnow())
+            .where(Goal.achieved == False)
             .order_by(Goal.created_at)
         )
         goals = result.scalars().all()
@@ -481,6 +483,49 @@ async def get_user_goals(user_id: int):
             goal.current_value = current_value
             goal.progress = (current_value / goal.target_value * 100) if goal.target_value > 0 else 0
         return goals
+
+async def check_achieved_goals():
+    async with AsyncSessionLocal() as session:
+        # Получаем все активные цели
+        result = await session.execute(
+            select(Goal, User)
+            .join(User, User.id == Goal.user_id)
+            .where(Goal.deadline >= datetime.utcnow())
+            .where(Goal.achieved == False)
+        )
+        goals = result.fetchall()
+        achieved_goals = []
+        for goal, user in goals:
+            if goal.goal_type == "calories":
+                result = await session.execute(
+                    select(func.sum(Workout.calories_burned).label("current_value"))
+                    .where(Workout.user_id == user.id)
+                    .where(Workout.created_at >= goal.created_at)
+                    .where(Workout.created_at <= goal.deadline)
+                )
+            elif goal.goal_type == "workouts":
+                result = await session.execute(
+                    select(func.count().label("current_value"))
+                    .where(Workout.user_id == user.id)
+                    .where(Workout.created_at >= goal.created_at)
+                    .where(Workout.created_at <= goal.deadline)
+                )
+            elif goal.goal_type == "duration":
+                result = await session.execute(
+                    select(func.sum(Workout.duration).label("current_value"))
+                    .where(Workout.user_id == user.id)
+                    .where(Workout.created_at >= goal.created_at)
+                    .where(Workout.created_at <= goal.deadline)
+                )
+            else:
+                continue
+            current_value = result.first().current_value or 0
+            if current_value >= goal.target_value:
+                goal.achieved = True
+                session.add(goal)
+                achieved_goals.append((goal, user))
+        await session.commit()
+        return achieved_goals
 
 async def delete_goal(goal_id: int):
     async with AsyncSessionLocal() as session:

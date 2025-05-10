@@ -13,10 +13,12 @@ from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import Command
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from sqlalchemy import select, func
 import aiohttp
 import secrets
-from webapp.app.services.db import init_db, User, get_user_by_id, get_user_workouts, get_user_stats, get_user_goals, AsyncSessionLocal
+import asyncio
+from webapp.app.services.db import init_db, User, get_user_by_id, get_user_workouts, get_user_stats, get_user_goals, check_achieved_goals, AsyncSessionLocal
 
 # корень каталога webapp/app
 BASE_DIR = Path(__file__).resolve().parent
@@ -57,7 +59,7 @@ print("Регистрирую фильтр datetimeformat")  # Отладочн�
 templates.env.filters["datetimeformat"] = datetimeformat
 print("Фильтр datetimeformat зарегистрирован")  # Отладочный вывод
 
-# Telegram Bot (временно отключим webhook)
+# Telegram Bot
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 APP_URL = os.getenv("WEBAPP_URL")
 WEBHOOK_PATH = "/telegram/webhook"
@@ -69,12 +71,41 @@ bot = Bot(token=BOT_TOKEN, session=session, default=DefaultBotProperties(parse_m
 storage = MemoryStorage()
 router = Router()
 
+# Создаём клавиатуру с кнопкой для открытия веб-приложения
+webapp_button = InlineKeyboardButton(text="Открыть веб-приложение", web_app=types.WebAppInfo(url=APP_URL))
+webapp_keyboard = InlineKeyboardMarkup(inline_keyboard=[[webapp_button]])
+
+# Фоновая задача для проверки достижения целей
+async def check_goals_task():
+    while True:
+        try:
+            achieved_goals = await check_achieved_goals()
+            for goal, user in achieved_goals:
+                if user.telegram_id:
+                    goal_description = ""
+                    if goal.goal_type == "calories":
+                        goal_description = f"Сжечь {goal.target_value} калорий"
+                    elif goal.goal_type == "workouts":
+                        goal_description = f"Провести {goal.target_value} тренировок"
+                    elif goal.goal_type == "duration":
+                        goal_description = f"Тренироваться {goal.target_value} минут"
+                    await bot.send_message(
+                        chat_id=user.telegram_id,
+                        text=f"🎉 Поздравляем, {user.username}!\nВы достигли цели: {goal_description}!",
+                        parse_mode=ParseMode.HTML
+                    )
+        except Exception as e:
+            print(f"Ошибка при проверке целей: {e}")
+        await asyncio.sleep(300)  # Проверяем каждые 5 минут
+
 @app.on_event("startup")
 async def on_startup():
     await init_db()
-    # Временно отключаем настройку webhook
-    # await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
-    # print(f"Webhook установлен: {WEBHOOK_URL}")
+    # Запускаем фоновую задачу для проверки целей
+    asyncio.create_task(check_goals_task())
+    # Устанавливаем вебхук
+    await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
+    print(f"Webhook установлен: {WEBHOOK_URL}")
 
 @app.on_event("shutdown")
 async def on_shutdown():
@@ -84,7 +115,10 @@ async def on_shutdown():
 # Обработчик команды /start
 @router.message(Command(commands=["start"]))
 async def send_welcome(message: types.Message):
-    await message.reply("Привет! Используй /link <username> для связки с профиля.")
+    await message.reply(
+        "Привет! Это твой фитнес-бот.\nИспользуй /link <username> для связки с профилем или нажми кнопку ниже, чтобы открыть веб-приложение.",
+        reply_markup=webapp_keyboard
+    )
 
 # Обработчик команды /link
 @router.message(Command(commands=["link"]))
@@ -99,13 +133,16 @@ async def link_profile(message: types.Message):
                 user.telegram_id = str(message.chat.id)
                 session.add(user)
                 await session.commit()
-                await message.reply(f"Профиль {username} успешно связан с вашим Telegram!")
+                await message.reply(
+                    f"Профиль {username} успешно связан с вашим Telegram!\nТеперь ты можешь открыть веб-приложение.",
+                    reply_markup=webapp_keyboard
+                )
             else:
                 await message.reply("Пользователь не найден.")
     else:
         await message.reply("Используйте: /link <username>")
 
-# Обработчик вебхука (временно отключим)
+# Обработчик вебхука
 @app.post(WEBHOOK_PATH)
 async def telegram_webhook(request: Request):
     update = types.Update(**await request.json())
