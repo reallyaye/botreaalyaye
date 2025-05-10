@@ -89,10 +89,10 @@
                     </div>
                 {% endif %}
                 {% if error %}
-                    <div class="error">{{ error }}</div>
+                    <div class="error" id="error-message">{{ error }}</div>
                 {% endif %}
-                <form method="post" action="/calculate-calories" onsubmit="return validateForm()">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <form method="post" action="/calculate-calories" id="calories-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token | default('') }}">
                     <div class="form-group">
                         <label for="activity">
                             <i class="fas fa-running"></i> Вид активности:
@@ -134,34 +134,38 @@
         </div>
     </div>
     <script>
-        // Динамическая мотивационная цитата
-        const quotes = [
-            { text: "Движение — это жизнь. Начни двигаться сегодня, чтобы стать лучше завтра!", author: "Неизвестный автор" },
-            { text: "Твоё тело может всё, это твой разум должен поверить в это!", author: "Неизвестный автор" },
-            { text: "Не жди идеального момента, начни сейчас и сделай его идеальным!", author: "Неизвестный автор" }
-        ];
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-        document.getElementById("quote-text").textContent = randomQuote.text;
-        document.getElementById("quote-author").textContent = randomQuote.author;
-
         // Валидация формы калькулятора калорий
         function validateForm() {
             const activity = document.getElementById("activity").value;
             const duration = document.getElementById("duration").value;
             const weight = document.getElementById("weight").value;
+            const errorMessage = document.getElementById("error-message") || document.createElement("div");
+            errorMessage.id = "error-message";
+            errorMessage.className = "error";
+            
             if (activity.trim().length < 2) {
-                alert("Вид активности должен содержать минимум 2 символа");
+                errorMessage.textContent = "Вид активности должен содержать минимум 2 символа";
+                document.querySelector(".calculator-section").prepend(errorMessage);
                 return false;
             }
             if (parseFloat(duration) <= 0) {
-                alert("Длительность должна быть больше 0");
+                errorMessage.textContent = "Длительность должна быть больше 0";
+                document.querySelector(".calculator-section").prepend(errorMessage);
                 return false;
             }
             if (parseFloat(weight) <= 0) {
-                alert("Вес должен быть больше 0");
+                errorMessage.textContent = "Вес должен быть больше 0";
+                document.querySelector(".calculator-section").prepend(errorMessage);
                 return false;
             }
             return true;
         }
+
+        // Обработчик отправки формы
+        document.getElementById("calories-form").addEventListener("submit", function(event) {
+            if (!validateForm()) {
+                event.preventDefault();
+            }
+        });
     </script>
 {% endblock %}
