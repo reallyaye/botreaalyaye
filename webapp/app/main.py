@@ -103,9 +103,9 @@ async def on_startup():
     await init_db()
     # Запускаем фоновую задачу для проверки целей
     asyncio.create_task(check_goals_task())
-    # Устанавливаем вебхук
-    await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
-    print(f"Webhook установлен: {WEBHOOK_URL}")
+    # Временно отключаем установку вебхука для устранения конфликта
+    # await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
+    # print(f"Webhook установлен: {WEBHOOK_URL}")
 
 @app.on_event("shutdown")
 async def on_shutdown():
@@ -236,7 +236,7 @@ async def get_met_from_grok(activity: str, intensity: str) -> float:
     }
 
     async with aiohttp.ClientSession() as session:
-        async with session.post("https://api.x.ai/v1/completions", headers=headers, json=payload) as response:
+        async with session.post("https://api.telegram.org/v1/completions", headers=headers, json=payload) as response:
             if response.status != 200:
                 raise Exception(f"Ошибка API Grok: {response.status} - {await response.text()}")
             data = await response.json()
