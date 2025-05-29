@@ -1,119 +1,339 @@
-{% extends "base.html" %}
-{% block title %}Профиль{% endblock %}
-{% block content %}
-    <div class="welcome-section">
-        <h1 class="welcome-title">
-            <i class="fas fa-user-circle"></i> Профиль пользователя {{ username }} 
-        </h1>
-        {% if avatar_url %}
-            <div class="avatar-container">
-                <img src="/static/avatars/{{ avatar_url }}" alt="Аватар" class="profile-avatar">
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOVIII Fitness - Профиль</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-container">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">N</div>
+        <span>NOVIII</span>
+      </a>
+      <nav class="nav">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link">Панель</a></li>
+          <li class="nav-item"><a href="workouts.html" class="nav-link">Тренировки</a></li>
+          <li class="nav-item"><a href="statistics.html" class="nav-link">Статистика</a></li>
+          <li class="nav-item"><a href="profile.html" class="nav-link active">Профиль</a></li>
+        </ul>
+      </nav>
+      <div class="user-actions">
+        <button class="icon-button">👤</button>
+        <button class="icon-button">🔔</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <!-- Profile Header -->
+      <div class="profile-header fade-in">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Александр" class="profile-avatar">
+        <div class="profile-info">
+          <h1 class="profile-name">Александр Петров</h1>
+          <div class="profile-stats">
+            <div class="profile-stat">
+              <div class="profile-stat-value">48</div>
+              <div class="profile-stat-label">Тренировок</div>
             </div>
-        {% endif %}
-        {% if success %}
-            <p class="success">{{ success }}</p>
-        {% endif %}
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
-    </div>
-    <div class="profile-container">
-        <div class="profile-card">
-            <h2 class="section-title"><i class="fas fa-edit"></i> Ваши данные</h2>
-            <form method="post" action="/profile/update" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="name">
-                        <i class="fas fa-user"></i> Имя:
-                    </label>
-                    <input type="text" id="name" name="name" value="{{ name }}" required />
-                </div>
-                <div class="form-group">
-                    <label for="age">
-                        <i class="fas fa-calendar-alt"></i> Возраст:
-                    </label>
-                    <input type="number" id="age" name="age" value="{{ age }}" min="1" max="120" required />
-                </div>
-                <div class="form-group">
-                    <label for="height">
-                        <i class="fas fa-ruler-vertical"></i> Рост (см):
-                    </label>
-                    <input type="number" id="height" step="0.1" name="height" value="{{ height }}" min="1" required />
-                </div>
-                <div class="form-group">
-                    <label for="weight">
-                        <i class="fas fa-weight"></i> Вес (кг):
-                    </label>
-                    <input type="number" id="weight" step="0.1" name="weight" value="{{ weight }}" min="1" required />
-                </div>
-                <div class="form-group">
-                    <label for="goal">
-                        <i class="fas fa-bullseye"></i> Цель:
-                    </label>
-                    <select id="goal" name="goal" required>
-                        <option value="lose" {% if goal == "lose" %}selected{% endif %}>Сбросить вес</option>
-                        <option value="gain" {% if goal == "gain" %}selected{% endif %}>Набрать массу</option>
-                        <option value="maintain" {% if goal == "maintain" %}selected{% endif %}>Поддерживать форму</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="activity_level">
-                        <i class="fas fa-running"></i> Уровень активности:
-                    </label>
-                    <select id="activity_level" name="activity_level" required>
-                        <option value="sedentary" {% if activity_level == "sedentary" %}selected{% endif %}>Сидячий</option>
-                        <option value="light" {% if activity_level == "light" %}selected{% endif %}>Легкая активность</option>
-                        <option value="moderate" {% if activity_level == "moderate" %}selected{% endif %}>Средняя активность</option>
-                        <option value="active" {% if activity_level == "active" %}selected{% endif %}>Высокая активность</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="workout_types">
-                        <i class="fas fa-dumbbell"></i> Предпочитаемые тренировки (через запятую):
-                    </label>
-                    <input type="text" id="workout_types" name="workout_types" value="{{ workout_types }}" placeholder="Бег, Силовые, Йога" />
-                </div>
-                <div class="form-group">
-                    <label for="avatar">
-                        <i class="fas fa-image"></i> Аватар:
-                    </label>
-                    <input type="file" id="avatar" name="avatar" accept="image/*" />
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Сохранить</button>
-            </form>
+            <div class="profile-stat">
+              <div class="profile-stat-value">1280</div>
+              <div class="profile-stat-label">Минут</div>
+            </div>
+            <div class="profile-stat">
+              <div class="profile-stat-value">15,400</div>
+              <div class="profile-stat-label">Калорий</div>
+            </div>
+          </div>
         </div>
-        <div class="profile-card">
-            <h2 class="section-title"><i class="fas fa-chart-line"></i> Ваш прогресс</h2>
-            {% if progress > 0 %}
-                <div class="progress-bar-container">
-                    <div class="progress-bar" data-progress="{{ progress }}">
-                        <span class="progress-text">{{ progress|round }}%</span>
-                    </div>
-                </div>
-                <p class="progress-status">Прогресс к цели: <span>{{ "Достигнута" if progress == 100 else "В процессе" }}</span></p>
-            {% else %}
-                <p class="no-progress">Заполните вес, рост и возраст для отображения прогресса.</p>
-            {% endif %}
-            <h2 class="section-title"><i class="fas fa-history"></i> История изменений</h2>
-            {% if history %}
-                <ul class="history-list">
-                    {% for entry in history[:5] %}
-                        <li class="history-item">
-                            <span class="history-date">{{ entry[0] }}</span>: 
-                            Имя=<span class="history-value">{{ entry[1] or "Не указано" }}</span>, 
-                            Вес=<span class="history-value">{{ entry[4] or "Не указан" }} кг</span>, 
-                            Цель=<span class="history-value">{{ entry[5] or "Не указана" }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="no-history">История отсутствует.</p>
-            {% endif %}
+      </div>
+
+      <!-- Profile Tabs -->
+      <div class="profile-tabs fade-in delay-1">
+        <div class="profile-tab active">Личные данные</div>
+        <div class="profile-tab">Цели</div>
+        <div class="profile-tab">Настройки</div>
+        <div class="profile-tab">Достижения</div>
+      </div>
+
+      <!-- Personal Info Section -->
+      <div class="row fade-in delay-1">
+        <div class="col">
+          <div class="card">
+            <h2 class="section-title">Личная информация</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+              <div>
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Имя</label>
+                <input type="text" value="Александр" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Фамилия</label>
+                <input type="text" value="Петров" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Email</label>
+                <input type="email" value="alex@example.com" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Телефон</label>
+                <input type="tel" value="+7 (999) 123-45-67" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Дата рождения</label>
+                <input type="date" value="1990-05-15" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Пол</label>
+                <select style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
+                  <option>Мужской</option>
+                  <option>Женский</option>
+                  <option>Другой</option>
+                </select>
+              </div>
+            </div>
+            
+            <button class="btn btn-primary" style="margin-top: 10px;">Сохранить изменения</button>
+          </div>
         </div>
+        
+        <div class="col">
+          <div class="card">
+            <h2 class="section-title">Физические параметры</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+              <div>
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Рост (см)</label>
+                <input type="number" value="182" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Вес (кг)</label>
+                <input type="number" value="78" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Целевой вес (кг)</label>
+                <input type="number" value="75" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Уровень активности</label>
+                <select style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
+                  <option>Низкий</option>
+                  <option selected>Средний</option>
+                  <option>Высокий</option>
+                  <option>Очень высокий</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="chart-container" style="margin-top: 20px;">
+              <h3 style="font-size: 16px; margin-bottom: 10px;">Динамика веса</h3>
+              <canvas id="weightChart" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Goals Section -->
+      <h2 class="section-title fade-in delay-2" style="margin-top: 30px;">Мои цели</h2>
+      
+      <div class="row fade-in delay-2">
+        <div class="col">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="font-size: 18px; font-weight: 600;">Снижение веса</h3>
+              <span style="color: var(--success); font-weight: 500;">В процессе</span>
+            </div>
+            
+            <div class="progress-container" style="margin-top: 15px;">
+              <div class="progress-header">
+                <div class="progress-label">Прогресс</div>
+                <div class="progress-value">3/5 кг</div>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 60%; background-color: var(--success);"></div>
+              </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 15px; color: var(--text-muted); font-size: 14px;">
+              <span>Начало: 15 апреля</span>
+              <span>Цель: 15 июня</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="font-size: 18px; font-weight: 600;">Регулярные тренировки</h3>
+              <span style="color: var(--primary); font-weight: 500;">На финише</span>
+            </div>
+            
+            <div class="progress-container" style="margin-top: 15px;">
+              <div class="progress-header">
+                <div class="progress-label">Прогресс</div>
+                <div class="progress-value">4/5 тренировок в неделю</div>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 80%; background-color: var(--primary);"></div>
+              </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 15px; color: var(--text-muted); font-size: 14px;">
+              <span>Начало: 1 мая</span>
+              <span>Цель: 31 мая</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col">
+          <div class="card" style="border: 1px dashed var(--border-light); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px;">
+            <div style="font-size: 24px; margin-bottom: 10px;">➕</div>
+            <h3 style="font-size: 16px; font-weight: 500; color: var(--primary);">Добавить новую цель</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferences Section -->
+      <h2 class="section-title fade-in delay-3" style="margin-top: 30px;">Предпочтения</h2>
+      
+      <div class="card fade-in delay-3">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+          <div>
+            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Уведомления</h3>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <span>Напоминания о тренировках</span>
+              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
+              </label>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <span>Еженедельные отчеты</span>
+              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
+              </label>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <span>Достижение целей</span>
+              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
+              </label>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Советы и рекомендации</span>
+              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                <input type="checkbox" style="opacity: 0; width: 0; height: 0;">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--text-muted); border-radius: 34px; transition: .4s;"></span>
+              </label>
+            </div>
+          </div>
+          
+          <div>
+            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Приватность</h3>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <span>Публичный профиль</span>
+              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                <input type="checkbox" style="opacity: 0; width: 0; height: 0;">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--text-muted); border-radius: 34px; transition: .4s;"></span>
+              </label>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <span>Делиться достижениями</span>
+              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
+              </label>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <span>Использовать данные для аналитики</span>
+              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
+              </label>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Персонализированные рекомендации</span>
+              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" style="margin-top: 30px;">Сохранить настройки</button>
+      </div>
     </div>
-    <script>
-        document.querySelectorAll('.progress-bar').forEach(bar => {
-            const progress = bar.getAttribute('data-progress');
-            bar.style.setProperty('--progress', progress + '%');
+  </main>
+
+  <script>
+    // Простая анимация для элементов при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      fadeElements.forEach(element => {
+        element.style.opacity = '1';
+        element.style.transform = 'translateY(0)';
+      });
+      
+      // Инициализация графика веса
+      initWeightChart();
+      
+      // Обработка вкладок
+      const tabs = document.querySelectorAll('.profile-tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          tabs.forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
         });
-    </script>
-{% endblock %}
+      });
+    });
+
+    // Инициализация графика веса
+    function initWeightChart() {
+      const weightCtx = document.getElementById('weightChart').getContext('2d');
+      const weightChart = new Chart(weightCtx, {
+        type: 'line',
+        data: {
+          labels: ['1 мая', '5 мая', '10 мая', '15 мая', '20 мая', '25 мая'],
+          datasets: [{
+            label: 'Вес (кг)',
+            data: [81, 80.5, 79.8, 79.2, 78.5, 78],
+            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+            borderColor: 'rgba(67, 97, 238, 1)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              min: 75,
+              max: 82
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,94 +1,227 @@
-{% extends "base.html" %}
-{% block title %}Тренировки{% endblock %}
-{% block content %}
-    <div class="welcome-section">
-        <h1 class="welcome-title">
-            <i class="fas fa-dumbbell"></i> Тренировки для {{ username }} 
-        </h1>
-        {% if success %}
-            <p class="success">{{ success }}</p>
-        {% endif %}
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOVIII Fitness - Тренировки</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-container">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">N</div>
+        <span>NOVIII</span>
+      </a>
+      <nav class="nav">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link">Панель</a></li>
+          <li class="nav-item"><a href="workouts.html" class="nav-link active">Тренировки</a></li>
+          <li class="nav-item"><a href="statistics.html" class="nav-link">Статистика</a></li>
+          <li class="nav-item"><a href="profile.html" class="nav-link">Профиль</a></li>
+        </ul>
+      </nav>
+      <div class="user-actions">
+        <button class="icon-button">👤</button>
+        <button class="icon-button">🔔</button>
+      </div>
     </div>
-    <div class="activity-section">
-        <h2 class="section-title"><i class="fas fa-plus-circle"></i> {% if edit_workout %}Редактировать тренировку{% else %}Добавить тренировку{% endif %}</h2>
-        <form method="post" action="{% if edit_workout %}/workouts/update/{{ edit_workout.id }}{% else %}/workouts/add{% endif %}" class="add-workout-form" onsubmit="return validateForm()">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-            <div class="form-group">
-                <label for="activity">
-                    <i class="fas fa-running"></i> Вид активности:
-                </label>
-                <input type="text" id="activity" name="activity" value="{% if edit_workout %}{{ edit_workout.activity }}{% endif %}" placeholder="Например: танцы, плавание" required />
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <!-- Welcome Card -->
+      <div class="welcome-card fade-in">
+        <h1 class="welcome-title">Тренировки</h1>
+        <p class="welcome-subtitle">Выберите программу тренировки или создайте свою</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="chart-header fade-in delay-1">
+        <h2 class="chart-title">Фильтры</h2>
+        <div class="chart-filters">
+          <button class="chart-filter active">Все</button>
+          <button class="chart-filter">Кардио</button>
+          <button class="chart-filter">Силовые</button>
+          <button class="chart-filter">Йога</button>
+          <button class="chart-filter">Растяжка</button>
+        </div>
+      </div>
+
+      <!-- Workouts Grid -->
+      <div class="workouts-grid fade-in delay-2">
+        <!-- Workout Card 1 -->
+        <div class="workout-card">
+          <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Бег" class="workout-image">
+          <div class="workout-content">
+            <h3 class="workout-title">Интервальный бег</h3>
+            <div class="workout-meta">
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">⏱️</span>
+                <span>30 мин</span>
+              </div>
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">🔥</span>
+                <span>Высокая</span>
+              </div>
             </div>
-            <div class="form-group">
-                <label for="intensity">
-                    <i class="fas fa-bolt"></i> Интенсивность:
-                </label>
-                <select id="intensity" name="intensity" required>
-                    <option value="low" {% if edit_workout and edit_workout.intensity == "low" %}selected{% endif %}>Низкая</option>
-                    <option value="medium" {% if edit_workout and edit_workout.intensity == "medium" %}selected{% endif %}>Средняя</option>
-                    <option value="high" {% if edit_workout and edit_workout.intensity == "high" %}selected{% endif %}>Высокая</option>
-                </select>
+            <p class="workout-description">Эффективная тренировка для сжигания калорий и улучшения выносливости.</p>
+            <div class="workout-actions">
+              <button class="btn btn-primary">Начать</button>
+              <button class="btn btn-outline">Подробнее</button>
             </div>
-            <div class="form-group">
-                <label for="duration">
-                    <i class="fas fa-clock"></i> Длительность (в минутах):
-                </label>
-                <input type="number" id="duration" name="duration" step="1" min="1" value="{% if edit_workout %}{{ edit_workout.duration }}{% endif %}" placeholder="Например: 30" required />
+          </div>
+        </div>
+
+        <!-- Workout Card 2 -->
+        <div class="workout-card">
+          <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Силовая тренировка" class="workout-image">
+          <div class="workout-content">
+            <h3 class="workout-title">Силовая тренировка</h3>
+            <div class="workout-meta">
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">⏱️</span>
+                <span>45 мин</span>
+              </div>
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">🔥</span>
+                <span>Средняя</span>
+              </div>
             </div>
-            <div class="form-group">
-                <label for="comment">
-                    <i class="fas fa-comment"></i> Комментарий:
-                </label>
-                <textarea id="comment" name="comment" placeholder="Например: Чувствовал себя отлично!" rows="3">{% if edit_workout %}{{ edit_workout.comment }}{% endif %}</textarea>
+            <p class="workout-description">Комплексная тренировка для развития силы и наращивания мышечной массы.</p>
+            <div class="workout-actions">
+              <button class="btn btn-primary">Начать</button>
+              <button class="btn btn-outline">Подробнее</button>
             </div>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {% if edit_workout %}Сохранить{% else %}Добавить{% endif %}</button>
-            {% if edit_workout %}
-                <a href="/workouts" class="btn btn-secondary"><i class="fas fa-times"></i> Отмена</a>
-            {% endif %}
-        </form>
+          </div>
+        </div>
+
+        <!-- Workout Card 3 -->
+        <div class="workout-card">
+          <img src="https://images.unsplash.com/photo-1599447421416-3414500d18a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Йога" class="workout-image">
+          <div class="workout-content">
+            <h3 class="workout-title">Йога для начинающих</h3>
+            <div class="workout-meta">
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">⏱️</span>
+                <span>20 мин</span>
+              </div>
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">🔥</span>
+                <span>Низкая</span>
+              </div>
+            </div>
+            <p class="workout-description">Идеальная тренировка для расслабления, улучшения гибкости и снятия стресса.</p>
+            <div class="workout-actions">
+              <button class="btn btn-primary">Начать</button>
+              <button class="btn btn-outline">Подробнее</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workout Card 4 -->
+        <div class="workout-card">
+          <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Растяжка" class="workout-image">
+          <div class="workout-content">
+            <h3 class="workout-title">Комплексная растяжка</h3>
+            <div class="workout-meta">
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">⏱️</span>
+                <span>15 мин</span>
+              </div>
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">🔥</span>
+                <span>Низкая</span>
+              </div>
+            </div>
+            <p class="workout-description">Улучшите гибкость и подвижность суставов с помощью этого комплекса упражнений.</p>
+            <div class="workout-actions">
+              <button class="btn btn-primary">Начать</button>
+              <button class="btn btn-outline">Подробнее</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workout Card 5 -->
+        <div class="workout-card">
+          <img src="https://images.unsplash.com/photo-1434596922112-19c563067271?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Плавание" class="workout-image">
+          <div class="workout-content">
+            <h3 class="workout-title">Плавание</h3>
+            <div class="workout-meta">
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">⏱️</span>
+                <span>40 мин</span>
+              </div>
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">🔥</span>
+                <span>Средняя</span>
+              </div>
+            </div>
+            <p class="workout-description">Отличная кардио-тренировка с минимальной нагрузкой на суставы.</p>
+            <div class="workout-actions">
+              <button class="btn btn-primary">Начать</button>
+              <button class="btn btn-outline">Подробнее</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workout Card 6 -->
+        <div class="workout-card">
+          <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="HIIT" class="workout-image">
+          <div class="workout-content">
+            <h3 class="workout-title">HIIT тренировка</h3>
+            <div class="workout-meta">
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">⏱️</span>
+                <span>25 мин</span>
+              </div>
+              <div class="workout-meta-item">
+                <span class="workout-meta-icon">🔥</span>
+                <span>Высокая</span>
+              </div>
+            </div>
+            <p class="workout-description">Интенсивная интервальная тренировка для максимального сжигания калорий.</p>
+            <div class="workout-actions">
+              <button class="btn btn-primary">Начать</button>
+              <button class="btn btn-outline">Подробнее</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create Custom Workout -->
+      <div class="motivation-card fade-in delay-3" style="background-color: rgba(67, 97, 238, 0.1); border-color: var(--primary);">
+        <div class="motivation-icon" style="background-color: rgba(67, 97, 238, 0.2);">✨</div>
+        <div class="motivation-content">
+          <h3 class="motivation-title" style="color: var(--primary);">Создайте свою тренировку</h3>
+          <p class="motivation-text">Не нашли подходящую программу? Создайте собственную тренировку, адаптированную под ваши цели и предпочтения.</p>
+          <button class="btn btn-primary" style="margin-top: 15px;">Создать тренировку</button>
+        </div>
+      </div>
     </div>
-    <div class="activity-section">
-        <h2 class="section-title"><i class="fas fa-list"></i> Ваши тренировки</h2>
-        {% if workouts %}
-            <ul class="activity-list">
-                {% for workout in workouts %}
-                    <li class="activity-item">
-                        <span class="workout-date">{{ workout.created_at }}</span>: 
-                        Активность: <span class="workout-value">{{ workout.activity }}</span>, 
-                        Интенсивность: <span class="workout-value">{{ workout.intensity|capitalize }}</span>, 
-                        Длительность: <span class="workout-value">{{ workout.duration }} мин</span>,
-                        Калорий сожжено: <span class="workout-value">{{ workout.calories_burned|round(2) }}</span>
-                        {% if workout.comment %}
-                            <br>Комментарий: <span class="workout-comment">{{ workout.comment }}</span>
-                        {% endif %}
-                        <a href="/workouts/edit/{{ workout.id }}" class="btn btn-primary btn-small" aria-label="Редактировать тренировку"><i class="fas fa-edit"></i> Редактировать</a>
-                        <form method="post" action="/workouts/delete/{{ workout.id }}" class="delete-form" onsubmit="return confirm('Вы уверены, что хотите удалить эту тренировку?');">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                            <button type="submit" class="btn btn-danger" aria-label="Удалить тренировку"><i class="fas fa-trash-alt"></i> Удалить</button>
-                        </form>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="no-activity">У вас пока нет тренировок. Добавьте первую тренировку!</p>
-        {% endif %}
-    </div>
-    <script>
-        function validateForm() {
-            const activity = document.getElementById("activity").value;
-            const duration = document.getElementById("duration").value;
-            if (activity.trim().length < 2) {
-                alert("Вид активности должен содержать минимум 2 символа");
-                return false;
-            }
-            if (parseFloat(duration) <= 0) {
-                alert("Длительность должна быть больше 0");
-                return false;
-            }
-            return true;
-        }
-    </script>
-{% endblock %}
+  </main>
+
+  <script>
+    // Простая анимация для элементов при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      fadeElements.forEach(element => {
+        element.style.opacity = '1';
+        element.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Обработка фильтров
+    const filterButtons = document.querySelectorAll('.chart-filter');
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
