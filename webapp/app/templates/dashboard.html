@@ -1,166 +1,242 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NOVIII Fitness - Панель управления</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVIII Fitness - Панель управления</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/unified_style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="container header-container">
-      <a href="index.html" class="logo">
-        <div class="logo-icon">N</div>
-        <span>NOVIII</span>
-      </a>
-      <nav class="nav">
-        <ul class="nav-list">
-          <li class="nav-item"><a href="index.html" class="nav-link active">Панель</a></li>
-          <li class="nav-item"><a href="workouts.html" class="nav-link">Тренировки</a></li>
-          <li class="nav-item"><a href="statistics.html" class="nav-link">Статистика</a></li>
-          <li class="nav-item"><a href="profile.html" class="nav-link">Профиль</a></li>
-        </ul>
-      </nav>
-      <div class="user-actions">
-        <button class="icon-button">👤</button>
-        <button class="icon-button">🔔</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="container">
-      <!-- Welcome Card -->
-      <div class="welcome-card fade-in">
-        <h1 class="welcome-title">Панель управления</h1>
-        <p class="welcome-subtitle">Добро пожаловать, Александр!</p>
-      </div>
-
-      <!-- Activity Section -->
-      <h2 class="section-title fade-in delay-1">
-        Ваша активность
-        <span class="section-subtitle">за последние 7 дней</span>
-      </h2>
-
-      <!-- Stats Cards -->
-      <div class="row fade-in delay-1">
-        <div class="col">
-          <div class="card stats-card">
-            <div class="stats-icon" style="background-color: rgba(67, 97, 238, 0.2);">🏆</div>
-            <div class="stats-content">
-              <div class="stats-label">Тренировок</div>
-              <div class="stats-value" style="color: var(--primary);">12</div>
+    {% extends "base.html" %}
+    
+    {% block title %}NOVIII Fitness - Панель управления{% endblock %}
+    
+    {% block content %}
+    <div class="fade-in">
+        <div class="row mb-4">
+            <div class="col">
+                <h1><i class="fas fa-heartbeat"></i> Добро пожаловать, {{ current_user.username }}!</h1>
             </div>
-          </div>
         </div>
-        <div class="col">
-          <div class="card stats-card">
-            <div class="stats-icon" style="background-color: rgba(76, 201, 240, 0.2);">⏱️</div>
-            <div class="stats-content">
-              <div class="stats-label">Время</div>
-              <div class="stats-value" style="color: var(--tertiary);">320 мин</div>
+        
+        <div class="row">
+            <div class="col-6 col-sm-12">
+                <div class="card">
+                    <h3><i class="fas fa-history"></i> Ваши последние действия</h3>
+                    {% if user_activities %}
+                        <ul class="activity-list">
+                            {% for activity in user_activities %}
+                                <li class="activity-item">
+                                    <div class="activity-icon">
+                                        {% if activity.type == 'workout' %}
+                                            <i class="fas fa-dumbbell"></i>
+                                        {% elif activity.type == 'goal' %}
+                                            <i class="fas fa-bullseye"></i>
+                                        {% else %}
+                                            <i class="fas fa-check-circle"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="activity-content">
+                                        <p class="activity-text">{{ activity.description }}</p>
+                                        <p class="activity-time text-muted">{{ activity.timestamp }}</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="empty-state">
+                            <p>У вас пока нет активности. Начните тренировку прямо сейчас!</p>
+                            <a href="{{ url_for('workouts') }}" class="btn btn-primary">
+                                <i class="fas fa-dumbbell"></i> Начать тренировку
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-          </div>
+            
+            <div class="col-6 col-sm-12">
+                <div class="card">
+                    <h3><i class="fas fa-trophy"></i> Ваши достижения</h3>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="stat-card">
+                                <div class="stat-card-icon">
+                                    <i class="fas fa-dumbbell"></i>
+                                </div>
+                                <div class="stat-card-value">{{ stats.workouts_completed|default(0) }}</div>
+                                <div class="stat-card-label">Тренировок завершено</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-card">
+                                <div class="stat-card-icon">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                                <div class="stat-card-value">{{ stats.calories_burned|default(0) }}</div>
+                                <div class="stat-card-label">Калорий сожжено</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-card">
+                                <div class="stat-card-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-card-value">{{ stats.workout_minutes|default(0) }}</div>
+                                <div class="stat-card-label">Минут на тренировки</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h4>Прогресс к цели</h4>
+                        {% if user_goals %}
+                            {% for goal in user_goals %}
+                                <div class="goal-item mb-2">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>{{ goal.name }}</span>
+                                        <span>{{ goal.progress }}%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ goal.progress }}%" aria-valuenow="{{ goal.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>У вас пока нет целей. <a href="{{ url_for('add_goal') }}">Добавить цель</a></p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <h3><i class="fas fa-quote-left"></i> Мотивация дня</h3>
+                    <blockquote class="blockquote">
+                        <p>"{{ motivation_quote.text }}"</p>
+                        <footer class="blockquote-footer">{{ motivation_quote.author|default('Неизвестный автор') }}</footer>
+                    </blockquote>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <!-- Progress Bar -->
-      <div class="progress-container fade-in delay-2">
-        <div class="progress-header">
-          <div class="progress-label">Прогресс к цели</div>
-          <div class="progress-value">75%</div>
+        
+        <div class="row mt-4">
+            <div class="col">
+                <div class="card">
+                    <h3><i class="fas fa-calculator"></i> Калькулятор калорий</h3>
+                    <div class="row">
+                        <div class="col-6 col-sm-12">
+                            <form id="calorieCalculator" class="mb-3">
+                                <div class="form-group">
+                                    <label for="weight" class="form-label">Вес (кг)</label>
+                                    <input type="number" class="form-control" id="weight" placeholder="Введите ваш вес">
+                                </div>
+                                <div class="form-group">
+                                    <label for="height" class="form-label">Рост (см)</label>
+                                    <input type="number" class="form-control" id="height" placeholder="Введите ваш рост">
+                                </div>
+                                <div class="form-group">
+                                    <label for="age" class="form-label">Возраст</label>
+                                    <input type="number" class="form-control" id="age" placeholder="Введите ваш возраст">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Пол</label>
+                                    <div>
+                                        <label class="radio-inline mr-3">
+                                            <input type="radio" name="gender" value="male" checked> Мужской
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="gender" value="female"> Женский
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="activity" class="form-label">Уровень активности</label>
+                                    <select class="form-control" id="activity">
+                                        <option value="1.2">Минимальная активность</option>
+                                        <option value="1.375">Легкая активность</option>
+                                        <option value="1.55" selected>Умеренная активность</option>
+                                        <option value="1.725">Высокая активность</option>
+                                        <option value="1.9">Экстремальная активность</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Рассчитать</button>
+                            </form>
+                        </div>
+                        <div class="col-6 col-sm-12">
+                            <div id="calorieResult" class="text-center" style="display: none;">
+                                <h4>Ваша дневная норма калорий:</h4>
+                                <div class="calorie-result-value">0</div>
+                                <div class="row mt-3">
+                                    <div class="col-4">
+                                        <div class="calorie-goal">
+                                            <h5>Снижение веса</h5>
+                                            <div class="calorie-goal-value weight-loss">0</div>
+                                            <small class="text-muted">ккал/день</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="calorie-goal">
+                                            <h5>Поддержание</h5>
+                                            <div class="calorie-goal-value maintenance">0</div>
+                                            <small class="text-muted">ккал/день</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="calorie-goal">
+                                            <h5>Набор массы</h5>
+                                            <div class="calorie-goal-value weight-gain">0</div>
+                                            <small class="text-muted">ккал/день</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" style="width: 75%;"></div>
-        </div>
-      </div>
-
-      <!-- Activities List -->
-      <h2 class="section-title fade-in delay-2">Самые частые активности</h2>
-      <ul class="activity-list fade-in delay-2">
-        <li class="activity-item">
-          <div class="activity-icon" style="background-color: rgba(67, 97, 238, 0.2);">🏃‍♂️</div>
-          <div class="activity-name">Бег</div>
-          <div class="activity-count" style="color: var(--primary);">5 раз</div>
-        </li>
-        <li class="activity-item">
-          <div class="activity-icon" style="background-color: rgba(58, 12, 163, 0.2);">💪</div>
-          <div class="activity-name">Силовая тренировка</div>
-          <div class="activity-count" style="color: var(--secondary);">4 раза</div>
-        </li>
-        <li class="activity-item">
-          <div class="activity-icon" style="background-color: rgba(76, 201, 240, 0.2);">🧘‍♀️</div>
-          <div class="activity-name">Йога</div>
-          <div class="activity-count" style="color: var(--tertiary);">3 раза</div>
-        </li>
-      </ul>
-
-      <!-- Motivation Card -->
-      <div class="motivation-card fade-in delay-3">
-        <div class="motivation-icon">🔥</div>
-        <div class="motivation-content">
-          <h3 class="motivation-title">Мотивация</h3>
-          <p class="motivation-text">Отличная работа! Вы на 25% опережаете свой график тренировок. Продолжайте в том же духе, чтобы достичь своей цели к концу месяца!</p>
-        </div>
-      </div>
-
-      <!-- Tips Section -->
-      <h2 class="section-title fade-in delay-3">Советы для вас</h2>
-      <div class="tips-list fade-in delay-3">
-        <div class="tip-card">
-          <div class="tip-icon">💧</div>
-          <div class="tip-text">Увеличьте потребление воды для лучшего восстановления</div>
-        </div>
-        <div class="tip-card">
-          <div class="tip-icon">🤸‍♀️</div>
-          <div class="tip-text">Попробуйте добавить 10 минут растяжки после тренировки</div>
-        </div>
-        <div class="tip-card">
-          <div class="tip-icon">📊</div>
-          <div class="tip-text">Для достижения цели рекомендуется 3-4 силовые тренировки в неделю</div>
-        </div>
-      </div>
-
-      <!-- Resources Section -->
-      <h2 class="section-title fade-in delay-3">Полезные источники</h2>
-      <div class="resources-grid fade-in delay-3">
-        <button class="resource-button" style="border-color: var(--primary);">
-          <span class="resource-icon">🌐</span>
-          <span class="resource-name" style="color: var(--primary);">Healthline Fitness</span>
-          <span class="resource-arrow">→</span>
-        </button>
-        <button class="resource-button" style="border-color: var(--secondary);">
-          <span class="resource-icon">💪</span>
-          <span class="resource-name" style="color: var(--secondary);">Bodybuilding.com</span>
-          <span class="resource-arrow">→</span>
-        </button>
-        <button class="resource-button" style="border-color: var(--tertiary);">
-          <span class="resource-icon">🧘‍♀️</span>
-          <span class="resource-name" style="color: var(--tertiary);">Yoga Journal</span>
-          <span class="resource-arrow">→</span>
-        </button>
-        <button class="resource-button" style="border-color: var(--success);">
-          <span class="resource-icon">🏃‍♂️</span>
-          <span class="resource-name" style="color: var(--success);">Runner's World</span>
-          <span class="resource-arrow">→</span>
-        </button>
-      </div>
     </div>
-  </main>
-
-  <script>
-    // Простая анимация для элементов при загрузке страницы
-    document.addEventListener('DOMContentLoaded', function() {
-      const fadeElements = document.querySelectorAll('.fade-in');
-      fadeElements.forEach(element => {
-        element.style.opacity = '1';
-        element.style.transform = 'translateY(0)';
-      });
-    });
-  </script>
+    {% endblock %}
+    
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calorieForm = document.getElementById('calorieCalculator');
+            const calorieResult = document.getElementById('calorieResult');
+            
+            calorieForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const weight = parseFloat(document.getElementById('weight').value);
+                const height = parseFloat(document.getElementById('height').value);
+                const age = parseInt(document.getElementById('age').value);
+                const gender = document.querySelector('input[name="gender"]:checked').value;
+                const activity = parseFloat(document.getElementById('activity').value);
+                
+                if (isNaN(weight) || isNaN(height) || isNaN(age)) {
+                    alert('Пожалуйста, заполните все поля корректно');
+                    return;
+                }
+                
+                let bmr;
+                if (gender === 'male') {
+                    bmr = 88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age);
+                } else {
+                    bmr = 447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age);
+                }
+                
+                const maintenance = Math.round(bmr * activity);
+                const weightLoss = Math.round(maintenance * 0.8);
+                const weightGain = Math.round(maintenance * 1.15);
+                
+                document.querySelector('.calorie-result-value').textContent = maintenance;
+                document.querySelector('.calorie-goal-value.weight-loss').textContent = weightLoss;
+                document.querySelector('.calorie-goal-value.maintenance').textContent = maintenance;
+                document.querySelector('.calorie-goal-value.weight-gain').textContent = weightGain;
+                
+                calorieResult.style.display = 'block';
+            });
+        });
+    </script>
+    {% endblock %}
 </body>
 </html>

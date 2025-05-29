@@ -3,62 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Фитнес-приложение для отслеживания тренировок и статистики.">
-    <meta name="keywords" content="фитнес, тренировки, здоровье, статистика">
-    <meta property="og:title" content="{% block og_title %}Моё фитнес-приложение{% endblock %}">
-    <meta property="og:description" content="Фитнес-приложение для отслеживания тренировок и статистики.">
-    <meta property="og:type" content="website">
-    <title>{% block title %}Моё фитнес-приложение{% endblock %}</title>
-    <link rel="stylesheet" href="/static/base.css">
-    <link rel="stylesheet" href="/static/responsive/common.css">
-    {% block styles %}
-        {% if request.url.path == "/login" or request.url.path == "/register" %}
-            <link rel="stylesheet" href="/static/forms.css">
-        {% elif request.url.path == "/profile/" %}
-            <link rel="stylesheet" href="/static/profile.css">
-            <link rel="stylesheet" href="/static/responsive/profile.css">
-        {% elif request.url.path == "/dashboard/" %}
-            <link rel="stylesheet" href="/static/dashboard.css">
-            <link rel="stylesheet" href="/static/responsive/dashboard.css">
-        {% elif request.url.path == "/workouts/" %}
-            <link rel="stylesheet" href="/static/workouts.css">
-            <link rel="stylesheet" href="/static/responsive/workouts.css">
-        {% elif request.url.path == "/stats/" %}
-            <link rel="stylesheet" href="/static/stats.css">
-            <link rel="stylesheet" href="/static/responsive/stats.css">
-        {% elif request.url.path == "/" %}
-            <link rel="stylesheet" href="/static/home.css">
-            <link rel="stylesheet" href="/static/responsive/home.css">
-        {% endif %}
-    {% endblock %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>{% block title %}NOVIII Fitness{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/unified_style.css') }}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header>
-        <nav aria-label="Главное меню">
-            <a href="/" {% if request.url.path == "/" %}class="active"{% endif %}>Главная</a>
-            {% if is_authenticated %}
-                <a href="/profile/" {% if request.url.path == "/profile/" %}class="active"{% endif %}>Профиль</a>
-                <a href="/dashboard/" {% if request.url.path == "/dashboard/" %}class="active"{% endif %}>Панель</a>
-                <a href="/workouts/" {% if request.url.path == "/workouts/" %}class="active"{% endif %}>Тренировки</a>
-                <a href="/stats/" {% if request.url.path == "/stats/" %}class="active"{% endif %}>Статистика</a>
-                <form action="/logout" method="post" style="display:inline">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <button type="submit">Выйти</button>
-                </form>
-            {% else %}
-                <a href="/login" {% if request.url.path == "/login" %}class="active"{% endif %}>Войти</a>
-                <a href="/register" {% if request.url.path == "/register" %}class="active"{% endif %}>Регистрация</a>
+    <nav class="navbar">
+        <div class="container navbar-container">
+            <a href="{{ url_for('index') }}" class="navbar-brand">
+                <span>N</span> NOVIII
+            </a>
+            <ul class="navbar-nav">
+                {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">Панель</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('workouts') }}" class="nav-link {% if request.endpoint == 'workouts' %}active{% endif %}">Тренировки</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('stats') }}" class="nav-link {% if request.endpoint == 'stats' %}active{% endif %}">Статистика</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('profile') }}" class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}">Профиль</a>
+                </li>
+                <li class="nav-item">
+                    <form action="{{ url_for('logout') }}" method="post">
+                        <button type="submit" class="btn btn-sm btn-danger">Выйти</button>
+                    </form>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('login') }}" class="nav-link {% if request.endpoint == 'login' %}active{% endif %}">Войти</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('register') }}" class="nav-link {% if request.endpoint == 'register' %}active{% endif %}">Регистрация</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
             {% endif %}
-        </nav>
-    </header>
-    <main>
+        {% endwith %}
+
         {% block content %}{% endblock %}
     </main>
-    <footer>
-        <p>© {{ current_year }} Моё фитнес-приложение</p>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-4 col-sm-12">
+                    <h4>NOVIII Fitness</h4>
+                    <p>Ваш персональный помощник для достижения фитнес-целей</p>
+                </div>
+                <div class="col-4 col-sm-12">
+                    <h4>Ссылки</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">О нас</a></li>
+                        <li><a href="#" class="footer-link">Контакты</a></li>
+                        <li><a href="#" class="footer-link">Политика конфиденциальности</a></li>
+                    </ul>
+                </div>
+                <div class="col-4 col-sm-12">
+                    <h4>Контакты</h4>
+                    <p><i class="fas fa-envelope"></i> info@noviii-fitness.com</p>
+                    <p><i class="fas fa-phone"></i> +7 (999) 123-45-67</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 NOVIII Fitness. Все права защищены.</p>
+            </div>
+        </div>
     </footer>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93b6db3dbc04bcf5',t:'MTc0NjUxNzUwOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

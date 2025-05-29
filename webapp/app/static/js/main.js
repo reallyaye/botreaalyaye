@@ -1,181 +1,305 @@
 /**
- * NOVIII Fitness Bot & WebApp - Main JavaScript
+ * NOVIII Fitness Bot & WebApp - Основной JavaScript
+ * Содержит общие функции и инициализацию для всего приложения
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Анимация появления элементов
-  const fadeElements = document.querySelectorAll('.fade-in');
-  fadeElements.forEach((element, index) => {
-    setTimeout(() => {
-      element.style.opacity = '1';
-      element.style.transform = 'translateY(0)';
-    }, 100 * index);
-  });
-
-  // Обработка фильтров
-  const filterButtons = document.querySelectorAll('.chart-filter');
-  filterButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const parent = this.parentElement;
-      parent.querySelectorAll('.chart-filter').forEach(btn => btn.classList.remove('active'));
-      this.classList.add('active');
-    });
-  });
-
-  // Обработка вкладок
-  const tabs = document.querySelectorAll('.profile-tab');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-      tabs.forEach(t => t.classList.remove('active'));
-      this.classList.add('active');
-    });
-  });
-
-  // Мобильное меню
-  const menuToggle = document.createElement('button');
-  menuToggle.className = 'menu-toggle';
-  menuToggle.innerHTML = '☰';
-  menuToggle.style.display = 'none';
-  menuToggle.style.background = 'none';
-  menuToggle.style.border = 'none';
-  menuToggle.style.fontSize = '24px';
-  menuToggle.style.cursor = 'pointer';
-  menuToggle.style.color = 'var(--primary)';
-  
-  const headerContainer = document.querySelector('.header-container');
-  const navList = document.querySelector('.nav-list');
-  
-  if (headerContainer && navList) {
-    headerContainer.insertBefore(menuToggle, headerContainer.firstChild);
+    // Инициализация всплывающих подсказок
+    initTooltips();
     
-    menuToggle.addEventListener('click', function() {
-      navList.style.display = navList.style.display === 'flex' ? 'none' : 'flex';
-    });
+    // Инициализация анимаций появления элементов
+    initAnimations();
     
-    // Адаптивное меню
-    function handleResize() {
-      if (window.innerWidth <= 768) {
-        menuToggle.style.display = 'block';
-        navList.style.display = 'none';
-        navList.style.position = 'absolute';
-        navList.style.top = '60px';
-        navList.style.left = '0';
-        navList.style.width = '100%';
-        navList.style.flexDirection = 'column';
-        navList.style.backgroundColor = 'var(--card-bg)';
-        navList.style.boxShadow = 'var(--shadow-md)';
-        navList.style.zIndex = '100';
-        navList.style.padding = '10px 0';
-      } else {
-        menuToggle.style.display = 'none';
-        navList.style.display = 'flex';
-        navList.style.position = 'static';
-        navList.style.flexDirection = 'row';
-        navList.style.width = 'auto';
-        navList.style.boxShadow = 'none';
-        navList.style.padding = '0';
-      }
-    }
+    // Обработка мобильного меню
+    initMobileMenu();
     
-    window.addEventListener('resize', handleResize);
-    handleResize();
-  }
-
-  // Инициализация графиков, если они есть на странице
-  if (typeof Chart !== 'undefined') {
-    // График активности
-    const activityChart = document.getElementById('activityChart');
-    if (activityChart) {
-      const activityCtx = activityChart.getContext('2d');
-      new Chart(activityCtx, {
-        type: 'bar',
-        data: {
-          labels: ['1 мая', '5 мая', '10 мая', '15 мая', '20 мая', '25 мая', '30 мая'],
-          datasets: [{
-            label: 'Тренировки (мин)',
-            data: [45, 60, 30, 90, 40, 75, 60],
-            backgroundColor: 'rgba(67, 97, 238, 0.7)',
-            borderColor: 'rgba(67, 97, 238, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
+    // Обработка темной темы
+    initThemeToggle();
+    
+    // Инициализация графиков, если они есть на странице
+    if (typeof Chart !== 'undefined') {
+        initCharts();
     }
-
-    // График распределения тренировок
-    const distributionChart = document.getElementById('distributionChart');
-    if (distributionChart) {
-      const distributionCtx = distributionChart.getContext('2d');
-      new Chart(distributionCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Бег', 'Силовые', 'Йога', 'Плавание', 'HIIT'],
-          datasets: [{
-            data: [30, 25, 15, 20, 10],
-            backgroundColor: [
-              'rgba(67, 97, 238, 0.7)',
-              'rgba(58, 12, 163, 0.7)',
-              'rgba(76, 201, 240, 0.7)',
-              'rgba(77, 204, 189, 0.7)',
-              'rgba(247, 37, 133, 0.7)'
-            ],
-            borderColor: [
-              'rgba(67, 97, 238, 1)',
-              'rgba(58, 12, 163, 1)',
-              'rgba(76, 201, 240, 1)',
-              'rgba(77, 204, 189, 1)',
-              'rgba(247, 37, 133, 1)'
-            ],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }
-      });
-    }
-
-    // График веса
-    const weightChart = document.getElementById('weightChart');
-    if (weightChart) {
-      const weightCtx = weightChart.getContext('2d');
-      new Chart(weightCtx, {
-        type: 'line',
-        data: {
-          labels: ['1 мая', '5 мая', '10 мая', '15 мая', '20 мая', '25 мая'],
-          datasets: [{
-            label: 'Вес (кг)',
-            data: [81, 80.5, 79.8, 79.2, 78.5, 78],
-            backgroundColor: 'rgba(67, 97, 238, 0.1)',
-            borderColor: 'rgba(67, 97, 238, 1)',
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              min: 75,
-              max: 82
-            }
-          }
-        }
-      });
-    }
-  }
 });
+
+/**
+ * Инициализация всплывающих подсказок
+ */
+function initTooltips() {
+    const tooltipElements = document.querySelectorAll('[data-tooltip]');
+    
+    tooltipElements.forEach(element => {
+        element.addEventListener('mouseenter', function() {
+            const tooltipText = this.getAttribute('data-tooltip');
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = tooltipText;
+            
+            document.body.appendChild(tooltip);
+            
+            const rect = this.getBoundingClientRect();
+            tooltip.style.top = rect.bottom + window.scrollY + 10 + 'px';
+            tooltip.style.left = rect.left + window.scrollX + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+            
+            setTimeout(() => {
+                tooltip.classList.add('show');
+            }, 10);
+            
+            this.addEventListener('mouseleave', function onMouseLeave() {
+                tooltip.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(tooltip);
+                }, 300);
+                this.removeEventListener('mouseleave', onMouseLeave);
+            });
+        });
+    });
+}
+
+/**
+ * Инициализация анимаций появления элементов
+ */
+function initAnimations() {
+    const animatedElements = document.querySelectorAll('.fade-in, .slide-in');
+    
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        animatedElements.forEach(element => {
+            observer.observe(element);
+        });
+    } else {
+        // Fallback для браузеров без поддержки IntersectionObserver
+        animatedElements.forEach(element => {
+            element.classList.add('visible');
+        });
+    }
+}
+
+/**
+ * Инициализация мобильного меню
+ */
+function initMobileMenu() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navbarNav = document.querySelector('.navbar-nav');
+    
+    if (menuToggle && navbarNav) {
+        menuToggle.addEventListener('click', function() {
+            navbarNav.classList.toggle('show');
+            this.classList.toggle('active');
+        });
+    }
+}
+
+/**
+ * Инициализация переключателя темы
+ */
+function initThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    
+    if (themeToggle) {
+        // Установка начального состояния
+        document.body.classList.add(currentTheme);
+        themeToggle.checked = currentTheme === 'dark';
+        
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.remove('light');
+                document.body.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                document.body.classList.add('light');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    }
+}
+
+/**
+ * Инициализация графиков
+ */
+function initCharts() {
+    // Общие настройки для всех графиков
+    Chart.defaults.font.family = "'Roboto', sans-serif";
+    Chart.defaults.color = '#343A40';
+    
+    // Цветовая схема для графиков
+    const chartColors = {
+        primary: '#4361EE',
+        secondary: '#3A0CA3',
+        accent: '#4CC9F0',
+        success: '#28A745',
+        warning: '#FFC107',
+        danger: '#DC3545',
+        info: '#17A2B8'
+    };
+}
+
+/**
+ * Отображение уведомления
+ * @param {string} message - Текст уведомления
+ * @param {string} type - Тип уведомления (success, error, warning, info)
+ * @param {number} duration - Длительность отображения в миллисекундах
+ */
+function showNotification(message, type = 'info', duration = 3000) {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-icon">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+        </div>
+        <div class="notification-content">
+            <p>${message}</p>
+        </div>
+        <button class="notification-close">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    const closeButton = notification.querySelector('.notification-close');
+    closeButton.addEventListener('click', () => {
+        closeNotification(notification);
+    });
+    
+    if (duration > 0) {
+        setTimeout(() => {
+            closeNotification(notification);
+        }, duration);
+    }
+}
+
+/**
+ * Закрытие уведомления
+ * @param {HTMLElement} notification - Элемент уведомления
+ */
+function closeNotification(notification) {
+    notification.classList.remove('show');
+    setTimeout(() => {
+        document.body.removeChild(notification);
+    }, 300);
+}
+
+/**
+ * Отправка AJAX запроса
+ * @param {string} url - URL для запроса
+ * @param {string} method - Метод запроса (GET, POST, PUT, DELETE)
+ * @param {Object} data - Данные для отправки
+ * @param {Function} callback - Функция обратного вызова при успешном запросе
+ * @param {Function} errorCallback - Функция обратного вызова при ошибке
+ */
+function sendAjaxRequest(url, method, data, callback, errorCallback) {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    
+    xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+                const response = JSON.parse(xhr.responseText);
+                callback(response);
+            } catch (e) {
+                callback(xhr.responseText);
+            }
+        } else {
+            if (errorCallback) {
+                errorCallback(xhr.status, xhr.responseText);
+            } else {
+                showNotification('Произошла ошибка при выполнении запроса', 'error');
+            }
+        }
+    };
+    
+    xhr.onerror = function() {
+        if (errorCallback) {
+            errorCallback(0, 'Сетевая ошибка');
+        } else {
+            showNotification('Сетевая ошибка', 'error');
+        }
+    };
+    
+    xhr.send(JSON.stringify(data));
+}
+
+/**
+ * Валидация формы
+ * @param {HTMLFormElement} form - Форма для валидации
+ * @returns {boolean} - Результат валидации
+ */
+function validateForm(form) {
+    const inputs = form.querySelectorAll('input, select, textarea');
+    let isValid = true;
+    
+    inputs.forEach(input => {
+        if (input.hasAttribute('required') && !input.value.trim()) {
+            markInvalid(input, 'Это поле обязательно для заполнения');
+            isValid = false;
+        } else if (input.type === 'email' && input.value.trim() && !validateEmail(input.value)) {
+            markInvalid(input, 'Введите корректный email');
+            isValid = false;
+        } else if (input.type === 'password' && input.dataset.minLength && input.value.length < parseInt(input.dataset.minLength)) {
+            markInvalid(input, `Пароль должен содержать не менее ${input.dataset.minLength} символов`);
+            isValid = false;
+        } else {
+            clearInvalid(input);
+        }
+    });
+    
+    return isValid;
+}
+
+/**
+ * Валидация email
+ * @param {string} email - Email для валидации
+ * @returns {boolean} - Результат валидации
+ */
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+/**
+ * Отметка поля как невалидного
+ * @param {HTMLElement} input - Поле ввода
+ * @param {string} message - Сообщение об ошибке
+ */
+function markInvalid(input, message) {
+    input.classList.add('is-invalid');
+    
+    let errorElement = input.nextElementSibling;
+    if (!errorElement || !errorElement.classList.contains('error-message')) {
+        errorElement = document.createElement('div');
+        errorElement.className = 'error-message';
+        input.parentNode.insertBefore(errorElement, input.nextSibling);
+    }
+    
+    errorElement.textContent = message;
+}
+
+/**
+ * Очистка отметки о невалидности поля
+ * @param {HTMLElement} input - Поле ввода
+ */
+function clearInvalid(input) {
+    input.classList.remove('is-invalid');
+    
+    const errorElement = input.nextElementSibling;
+    if (errorElement && errorElement.classList.contains('error-message')) {
+        errorElement.parentNode.removeChild(errorElement);
+    }
+}

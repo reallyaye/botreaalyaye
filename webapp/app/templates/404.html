@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVIII Fitness - Страница не найдена</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/unified_style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="error-container fade-in">
+        <div class="error-content">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h1>404</h1>
+            <h2>Страница не найдена</h2>
+            <p>Упс! Кажется, вы пытаетесь найти страницу, которая не существует.</p>
+            <p>Возможно, страница была перемещена или удалена, или вы ввели неверный адрес.</p>
+            <div class="error-actions">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> На главную
+                </a>
+                <a href="{{ url_for('dashboard') if current_user.is_authenticated else url_for('login') }}" class="btn btn-secondary">
+                    <i class="fas fa-{{ 'tachometer-alt' if current_user.is_authenticated else 'sign-in-alt' }}"></i> 
+                    {{ 'Панель управления' if current_user.is_authenticated else 'Войти' }}
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

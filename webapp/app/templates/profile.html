@@ -1,339 +1,302 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NOVIII Fitness - Профиль</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVIII Fitness - Профиль</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/unified_style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="container header-container">
-      <a href="index.html" class="logo">
-        <div class="logo-icon">N</div>
-        <span>NOVIII</span>
-      </a>
-      <nav class="nav">
-        <ul class="nav-list">
-          <li class="nav-item"><a href="index.html" class="nav-link">Панель</a></li>
-          <li class="nav-item"><a href="workouts.html" class="nav-link">Тренировки</a></li>
-          <li class="nav-item"><a href="statistics.html" class="nav-link">Статистика</a></li>
-          <li class="nav-item"><a href="profile.html" class="nav-link active">Профиль</a></li>
-        </ul>
-      </nav>
-      <div class="user-actions">
-        <button class="icon-button">👤</button>
-        <button class="icon-button">🔔</button>
-      </div>
+    {% extends "base.html" %}
+    
+    {% block title %}NOVIII Fitness - Профиль{% endblock %}
+    
+    {% block content %}
+    <div class="fade-in">
+        <div class="row mb-4">
+            <div class="col">
+                <h1><i class="fas fa-user"></i> Профиль</h1>
+                <p class="lead">Управляйте своими данными и настройками</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-4 col-sm-12">
+                <div class="card">
+                    <div class="profile-header">
+                        <img src="{{ url_for('static', filename='avatars/' + current_user.avatar) if current_user.avatar else url_for('static', filename='avatars/default.png') }}" alt="Аватар пользователя" class="profile-avatar">
+                        <div class="profile-info">
+                            <h3 class="profile-name">{{ current_user.username }}</h3>
+                            <p class="text-muted">Участник с {{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
+                            <div class="profile-stats">
+                                <div class="profile-stat">
+                                    <div class="profile-stat-value">{{ stats.workouts_completed|default(0) }}</div>
+                                    <div class="profile-stat-label">Тренировок</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-value">{{ stats.achievements|default(0) }}</div>
+                                    <div class="profile-stat-label">Достижений</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-actions mt-3">
+                        <button class="btn btn-primary" id="editProfileBtn">
+                            <i class="fas fa-edit"></i> Редактировать профиль
+                        </button>
+                        <button class="btn btn-secondary" id="changePasswordBtn">
+                            <i class="fas fa-key"></i> Сменить пароль
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <h3><i class="fas fa-trophy"></i> Достижения</h3>
+                    <div class="achievements-list">
+                        {% if achievements %}
+                            {% for achievement in achievements %}
+                                <div class="achievement-item {% if achievement.unlocked %}unlocked{% else %}locked{% endif %}">
+                                    <div class="achievement-icon">
+                                        <i class="fas {{ achievement.icon }}"></i>
+                                    </div>
+                                    <div class="achievement-info">
+                                        <h4>{{ achievement.name }}</h4>
+                                        <p>{{ achievement.description }}</p>
+                                        {% if achievement.unlocked %}
+                                            <span class="badge badge-success">Разблокировано</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Заблокировано</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>У вас пока нет достижений. Начните тренироваться, чтобы разблокировать их!</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-8 col-sm-12">
+                <div class="card" id="profileForm">
+                    <h3><i class="fas fa-user-edit"></i> Редактирование профиля</h3>
+                    <form action="{{ url_for('update_profile') }}" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="username" class="form-label">Имя пользователя</label>
+                                    <input type="text" class="form-control" id="username" name="username" value="{{ current_user.username }}">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="avatar" class="form-label">Аватар</label>
+                            <input type="file" class="form-control" id="avatar" name="avatar">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="weight" class="form-label">Вес (кг)</label>
+                                    <input type="number" step="0.1" class="form-control" id="weight" name="weight" value="{{ user_data.weight|default('') }}">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="height" class="form-label">Рост (см)</label>
+                                    <input type="number" class="form-control" id="height" name="height" value="{{ user_data.height|default('') }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="age" class="form-label">Возраст</label>
+                                    <input type="number" class="form-control" id="age" name="age" value="{{ user_data.age|default('') }}">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="form-label">Пол</label>
+                                    <div>
+                                        <label class="radio-inline mr-3">
+                                            <input type="radio" name="gender" value="male" {% if user_data.gender == 'male' %}checked{% endif %}> Мужской
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="gender" value="female" {% if user_data.gender == 'female' %}checked{% endif %}> Женский
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="activity_level" class="form-label">Уровень активности</label>
+                            <select class="form-control" id="activity_level" name="activity_level">
+                                <option value="1.2" {% if user_data.activity_level == 1.2 %}selected{% endif %}>Минимальная активность</option>
+                                <option value="1.375" {% if user_data.activity_level == 1.375 %}selected{% endif %}>Легкая активность</option>
+                                <option value="1.55" {% if user_data.activity_level == 1.55 %}selected{% endif %}>Умеренная активность</option>
+                                <option value="1.725" {% if user_data.activity_level == 1.725 %}selected{% endif %}>Высокая активность</option>
+                                <option value="1.9" {% if user_data.activity_level == 1.9 %}selected{% endif %}>Экстремальная активность</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </form>
+                </div>
+                
+                <div class="card mt-4" id="passwordForm" style="display: none;">
+                    <h3><i class="fas fa-key"></i> Смена пароля</h3>
+                    <form action="{{ url_for('change_password') }}" method="post">
+                        <div class="form-group">
+                            <label for="current_password" class="form-label">Текущий пароль</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="new_password" class="form-label">Новый пароль</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm_password" class="form-label">Подтверждение пароля</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Сменить пароль</button>
+                        <button type="button" class="btn btn-secondary" id="cancelPasswordBtn">Отмена</button>
+                    </form>
+                </div>
+                
+                <div class="card mt-4">
+                    <h3><i class="fas fa-bullseye"></i> Цели</h3>
+                    <div class="goals-list">
+                        {% if user_goals %}
+                            {% for goal in user_goals %}
+                                <div class="goal-item mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <h4>{{ goal.name }}</h4>
+                                        <span>{{ goal.progress }}%</span>
+                                    </div>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ goal.progress }}%" aria-valuenow="{{ goal.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <p>{{ goal.description }}</p>
+                                    <div class="goal-actions">
+                                        <a href="{{ url_for('edit_goal', goal_id=goal.id) }}" class="btn btn-sm btn-secondary">
+                                            <i class="fas fa-edit"></i> Редактировать
+                                        </a>
+                                        <form action="{{ url_for('delete_goal', goal_id=goal.id) }}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i> Удалить
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>У вас пока нет целей.</p>
+                        {% endif %}
+                        
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('add_goal') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Добавить цель
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <h3><i class="fas fa-cog"></i> Настройки</h3>
+                    <form action="{{ url_for('update_settings') }}" method="post">
+                        <div class="form-group">
+                            <label class="form-label">Уведомления</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="email_notifications" name="email_notifications" {% if user_settings.email_notifications %}checked{% endif %}>
+                                <label class="form-check-label" for="email_notifications">
+                                    Получать уведомления по email
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="push_notifications" name="push_notifications" {% if user_settings.push_notifications %}checked{% endif %}>
+                                <label class="form-check-label" for="push_notifications">
+                                    Получать push-уведомления
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="language" class="form-label">Язык</label>
+                            <select class="form-control" id="language" name="language">
+                                <option value="ru" {% if user_settings.language == 'ru' %}selected{% endif %}>Русский</option>
+                                <option value="en" {% if user_settings.language == 'en' %}selected{% endif %}>English</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="theme" class="form-label">Тема</label>
+                            <select class="form-control" id="theme" name="theme">
+                                <option value="light" {% if user_settings.theme == 'light' %}selected{% endif %}>Светлая</option>
+                                <option value="dark" {% if user_settings.theme == 'dark' %}selected{% endif %}>Темная</option>
+                                <option value="auto" {% if user_settings.theme == 'auto' %}selected{% endif %}>Системная</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Сохранить настройки</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  </header>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="container">
-      <!-- Profile Header -->
-      <div class="profile-header fade-in">
-        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Александр" class="profile-avatar">
-        <div class="profile-info">
-          <h1 class="profile-name">Александр Петров</h1>
-          <div class="profile-stats">
-            <div class="profile-stat">
-              <div class="profile-stat-value">48</div>
-              <div class="profile-stat-label">Тренировок</div>
-            </div>
-            <div class="profile-stat">
-              <div class="profile-stat-value">1280</div>
-              <div class="profile-stat-label">Минут</div>
-            </div>
-            <div class="profile-stat">
-              <div class="profile-stat-value">15,400</div>
-              <div class="profile-stat-label">Калорий</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Profile Tabs -->
-      <div class="profile-tabs fade-in delay-1">
-        <div class="profile-tab active">Личные данные</div>
-        <div class="profile-tab">Цели</div>
-        <div class="profile-tab">Настройки</div>
-        <div class="profile-tab">Достижения</div>
-      </div>
-
-      <!-- Personal Info Section -->
-      <div class="row fade-in delay-1">
-        <div class="col">
-          <div class="card">
-            <h2 class="section-title">Личная информация</h2>
+    {% endblock %}
+    
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
+            const profileForm = document.getElementById('profileForm');
+            const passwordForm = document.getElementById('passwordForm');
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-              <div>
-                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Имя</label>
-                <input type="text" value="Александр" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
-              </div>
-              <div>
-                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Фамилия</label>
-                <input type="text" value="Петров" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
-              </div>
-              <div>
-                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Email</label>
-                <input type="email" value="alex@example.com" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
-              </div>
-              <div>
-                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Телефон</label>
-                <input type="tel" value="+7 (999) 123-45-67" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
-              </div>
-              <div>
-                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Дата рождения</label>
-                <input type="date" value="1990-05-15" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
-              </div>
-              <div>
-                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Пол</label>
-                <select style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
-                  <option>Мужской</option>
-                  <option>Женский</option>
-                  <option>Другой</option>
-                </select>
-              </div>
-            </div>
+            changePasswordBtn.addEventListener('click', function() {
+                profileForm.style.display = 'none';
+                passwordForm.style.display = 'block';
+            });
             
-            <button class="btn btn-primary" style="margin-top: 10px;">Сохранить изменения</button>
-          </div>
-        </div>
-        
-        <div class="col">
-          <div class="card">
-            <h2 class="section-title">Физические параметры</h2>
+            editProfileBtn.addEventListener('click', function() {
+                passwordForm.style.display = 'none';
+                profileForm.style.display = 'block';
+            });
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-              <div>
-                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Рост (см)</label>
-                <input type="number" value="182" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
-              </div>
-              <div>
-                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Вес (кг)</label>
-                <input type="number" value="78" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
-              </div>
-              <div>
-                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Целевой вес (кг)</label>
-                <input type="number" value="75" style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
-              </div>
-              <div>
-                <label style="display: block; margin-bottom: 5px; color: var(--text-muted);">Уровень активности</label>
-                <select style="width: 100%; padding: 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 15px;">
-                  <option>Низкий</option>
-                  <option selected>Средний</option>
-                  <option>Высокий</option>
-                  <option>Очень высокий</option>
-                </select>
-              </div>
-            </div>
+            cancelPasswordBtn.addEventListener('click', function() {
+                passwordForm.style.display = 'none';
+                profileForm.style.display = 'block';
+            });
             
-            <div class="chart-container" style="margin-top: 20px;">
-              <h3 style="font-size: 16px; margin-bottom: 10px;">Динамика веса</h3>
-              <canvas id="weightChart" height="200"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Goals Section -->
-      <h2 class="section-title fade-in delay-2" style="margin-top: 30px;">Мои цели</h2>
-      
-      <div class="row fade-in delay-2">
-        <div class="col">
-          <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <h3 style="font-size: 18px; font-weight: 600;">Снижение веса</h3>
-              <span style="color: var(--success); font-weight: 500;">В процессе</span>
-            </div>
+            // Валидация формы смены пароля
+            const newPasswordInput = document.getElementById('new_password');
+            const confirmPasswordInput = document.getElementById('confirm_password');
             
-            <div class="progress-container" style="margin-top: 15px;">
-              <div class="progress-header">
-                <div class="progress-label">Прогресс</div>
-                <div class="progress-value">3/5 кг</div>
-              </div>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width: 60%; background-color: var(--success);"></div>
-              </div>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; margin-top: 15px; color: var(--text-muted); font-size: 14px;">
-              <span>Начало: 15 апреля</span>
-              <span>Цель: 15 июня</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col">
-          <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <h3 style="font-size: 18px; font-weight: 600;">Регулярные тренировки</h3>
-              <span style="color: var(--primary); font-weight: 500;">На финише</span>
-            </div>
-            
-            <div class="progress-container" style="margin-top: 15px;">
-              <div class="progress-header">
-                <div class="progress-label">Прогресс</div>
-                <div class="progress-value">4/5 тренировок в неделю</div>
-              </div>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width: 80%; background-color: var(--primary);"></div>
-              </div>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; margin-top: 15px; color: var(--text-muted); font-size: 14px;">
-              <span>Начало: 1 мая</span>
-              <span>Цель: 31 мая</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col">
-          <div class="card" style="border: 1px dashed var(--border-light); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px;">
-            <div style="font-size: 24px; margin-bottom: 10px;">➕</div>
-            <h3 style="font-size: 16px; font-weight: 500; color: var(--primary);">Добавить новую цель</h3>
-          </div>
-        </div>
-      </div>
-
-      <!-- Preferences Section -->
-      <h2 class="section-title fade-in delay-3" style="margin-top: 30px;">Предпочтения</h2>
-      
-      <div class="card fade-in delay-3">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-          <div>
-            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Уведомления</h3>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-              <span>Напоминания о тренировках</span>
-              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
-              </label>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-              <span>Еженедельные отчеты</span>
-              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
-              </label>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-              <span>Достижение целей</span>
-              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
-              </label>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span>Советы и рекомендации</span>
-              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                <input type="checkbox" style="opacity: 0; width: 0; height: 0;">
-                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--text-muted); border-radius: 34px; transition: .4s;"></span>
-              </label>
-            </div>
-          </div>
-          
-          <div>
-            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Приватность</h3>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-              <span>Публичный профиль</span>
-              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                <input type="checkbox" style="opacity: 0; width: 0; height: 0;">
-                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--text-muted); border-radius: 34px; transition: .4s;"></span>
-              </label>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-              <span>Делиться достижениями</span>
-              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
-              </label>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-              <span>Использовать данные для аналитики</span>
-              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
-              </label>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span>Персонализированные рекомендации</span>
-              <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
-                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); border-radius: 34px; transition: .4s;"></span>
-              </label>
-            </div>
-          </div>
-        </div>
-        
-        <button class="btn btn-primary" style="margin-top: 30px;">Сохранить настройки</button>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    // Простая анимация для элементов при загрузке страницы
-    document.addEventListener('DOMContentLoaded', function() {
-      const fadeElements = document.querySelectorAll('.fade-in');
-      fadeElements.forEach(element => {
-        element.style.opacity = '1';
-        element.style.transform = 'translateY(0)';
-      });
-      
-      // Инициализация графика веса
-      initWeightChart();
-      
-      // Обработка вкладок
-      const tabs = document.querySelectorAll('.profile-tab');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          tabs.forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
+            confirmPasswordInput.addEventListener('input', function() {
+                if (newPasswordInput.value !== confirmPasswordInput.value) {
+                    confirmPasswordInput.setCustomValidity('Пароли не совпадают');
+                } else {
+                    confirmPasswordInput.setCustomValidity('');
+                }
+            });
         });
-      });
-    });
-
-    // Инициализация графика веса
-    function initWeightChart() {
-      const weightCtx = document.getElementById('weightChart').getContext('2d');
-      const weightChart = new Chart(weightCtx, {
-        type: 'line',
-        data: {
-          labels: ['1 мая', '5 мая', '10 мая', '15 мая', '20 мая', '25 мая'],
-          datasets: [{
-            label: 'Вес (кг)',
-            data: [81, 80.5, 79.8, 79.2, 78.5, 78],
-            backgroundColor: 'rgba(67, 97, 238, 0.1)',
-            borderColor: 'rgba(67, 97, 238, 1)',
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              min: 75,
-              max: 82
-            }
-          }
-        }
-      });
-    }
-  </script>
+    </script>
+    {% endblock %}
 </body>
 </html>
