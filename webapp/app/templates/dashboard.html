@@ -1,62 +1,166 @@
-{% extends "base.html" %}
-{% block title %}Панель{% endblock %}
-{% block content %}
-    <div class="welcome-section">
-        <h1 class="welcome-title">
-            <i class="fas fa-tachometer-alt"></i> Панель управления
-        </h1>
-        <p>Добро пожаловать, {{ username }}!</p>
-        {% if success %}
-            <p class="success">{{ success }}</p>
-        {% endif %}
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOVIII Fitness - Панель управления</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-container">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">N</div>
+        <span>NOVIII</span>
+      </a>
+      <nav class="nav">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link active">Панель</a></li>
+          <li class="nav-item"><a href="workouts.html" class="nav-link">Тренировки</a></li>
+          <li class="nav-item"><a href="statistics.html" class="nav-link">Статистика</a></li>
+          <li class="nav-item"><a href="profile.html" class="nav-link">Профиль</a></li>
+        </ul>
+      </nav>
+      <div class="user-actions">
+        <button class="icon-button">👤</button>
+        <button class="icon-button">🔔</button>
+      </div>
     </div>
-    <div class="stats-section">
-        <h2 class="section-title"><i class="fas fa-chart-line"></i> Ваша активность за последние 7 дней</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-trophy"></i>
-                <p>Тренировок: <span class="stat-value">{{ weekly_stats.total_workouts }}</span></p>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <!-- Welcome Card -->
+      <div class="welcome-card fade-in">
+        <h1 class="welcome-title">Панель управления</h1>
+        <p class="welcome-subtitle">Добро пожаловать, Александр!</p>
+      </div>
+
+      <!-- Activity Section -->
+      <h2 class="section-title fade-in delay-1">
+        Ваша активность
+        <span class="section-subtitle">за последние 7 дней</span>
+      </h2>
+
+      <!-- Stats Cards -->
+      <div class="row fade-in delay-1">
+        <div class="col">
+          <div class="card stats-card">
+            <div class="stats-icon" style="background-color: rgba(67, 97, 238, 0.2);">🏆</div>
+            <div class="stats-content">
+              <div class="stats-label">Тренировок</div>
+              <div class="stats-value" style="color: var(--primary);">12</div>
             </div>
-            <div class="stat-card">
-                <i class="fas fa-clock"></i>
-                <p>Время: <span class="stat-value">{{ weekly_stats.total_minutes }} мин</span></p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card stats-card">
+            <div class="stats-icon" style="background-color: rgba(76, 201, 240, 0.2);">⏱️</div>
+            <div class="stats-content">
+              <div class="stats-label">Время</div>
+              <div class="stats-value" style="color: var(--tertiary);">320 мин</div>
             </div>
+          </div>
         </div>
-        {% if weekly_stats.top_activities %}
-            <h3 class="section-subtitle">Самые частые активности:</h3>
-            <ul class="activity-list">
-                {% for activity in weekly_stats.top_activities %}
-                    <li class="activity-item">
-                        {{ activity.activity }}: <span class="stat-value">{{ activity.count }} раз</span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="no-activity">У вас пока нет активности за последние 7 дней.</p>
-        {% endif %}
-        <div class="motivation-block">
-            <h3 class="section-subtitle"><i class="fas fa-bullhorn"></i> Мотивация</h3>
-            <p>{{ motivation_message }}</p>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-container fade-in delay-2">
+        <div class="progress-header">
+          <div class="progress-label">Прогресс к цели</div>
+          <div class="progress-value">75%</div>
         </div>
-        <div class="tips-block">
-            <h3 class="section-subtitle"><i class="fas fa-lightbulb"></i> Советы для вас</h3>
-            <ul class="tip-list">
-                {% for tip in tips %}
-                    <li class="tip-item">{{ tip }}</li>
-                {% endfor %}
-            </ul>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width: 75%;"></div>
         </div>
-        <div class="resources-block">
-            <h3 class="section-subtitle"><i class="fas fa-book"></i> Полезные источники</h3>
-            <div class="resource-links">
-                <a href="https://www.healthline.com/health/fitness-exercise" target="_blank" class="resource-link"><i class="fas fa-link"></i> Healthline Fitness</a>
-                <a href="https://www.bodybuilding.com/" target="_blank" class="resource-link"><i class="fas fa-link"></i> Bodybuilding.com</a>
-                <a href="https://www.yogajournal.com/" target="_blank" class="resource-link"><i class="fas fa-link"></i> Yoga Journal</a>
-                <a href="https://www.runnersworld.com/" target="_blank" class="resource-link"><i class="fas fa-link"></i> Runner's World</a>
-            </div>
+      </div>
+
+      <!-- Activities List -->
+      <h2 class="section-title fade-in delay-2">Самые частые активности</h2>
+      <ul class="activity-list fade-in delay-2">
+        <li class="activity-item">
+          <div class="activity-icon" style="background-color: rgba(67, 97, 238, 0.2);">🏃‍♂️</div>
+          <div class="activity-name">Бег</div>
+          <div class="activity-count" style="color: var(--primary);">5 раз</div>
+        </li>
+        <li class="activity-item">
+          <div class="activity-icon" style="background-color: rgba(58, 12, 163, 0.2);">💪</div>
+          <div class="activity-name">Силовая тренировка</div>
+          <div class="activity-count" style="color: var(--secondary);">4 раза</div>
+        </li>
+        <li class="activity-item">
+          <div class="activity-icon" style="background-color: rgba(76, 201, 240, 0.2);">🧘‍♀️</div>
+          <div class="activity-name">Йога</div>
+          <div class="activity-count" style="color: var(--tertiary);">3 раза</div>
+        </li>
+      </ul>
+
+      <!-- Motivation Card -->
+      <div class="motivation-card fade-in delay-3">
+        <div class="motivation-icon">🔥</div>
+        <div class="motivation-content">
+          <h3 class="motivation-title">Мотивация</h3>
+          <p class="motivation-text">Отличная работа! Вы на 25% опережаете свой график тренировок. Продолжайте в том же духе, чтобы достичь своей цели к концу месяца!</p>
         </div>
+      </div>
+
+      <!-- Tips Section -->
+      <h2 class="section-title fade-in delay-3">Советы для вас</h2>
+      <div class="tips-list fade-in delay-3">
+        <div class="tip-card">
+          <div class="tip-icon">💧</div>
+          <div class="tip-text">Увеличьте потребление воды для лучшего восстановления</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">🤸‍♀️</div>
+          <div class="tip-text">Попробуйте добавить 10 минут растяжки после тренировки</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">📊</div>
+          <div class="tip-text">Для достижения цели рекомендуется 3-4 силовые тренировки в неделю</div>
+        </div>
+      </div>
+
+      <!-- Resources Section -->
+      <h2 class="section-title fade-in delay-3">Полезные источники</h2>
+      <div class="resources-grid fade-in delay-3">
+        <button class="resource-button" style="border-color: var(--primary);">
+          <span class="resource-icon">🌐</span>
+          <span class="resource-name" style="color: var(--primary);">Healthline Fitness</span>
+          <span class="resource-arrow">→</span>
+        </button>
+        <button class="resource-button" style="border-color: var(--secondary);">
+          <span class="resource-icon">💪</span>
+          <span class="resource-name" style="color: var(--secondary);">Bodybuilding.com</span>
+          <span class="resource-arrow">→</span>
+        </button>
+        <button class="resource-button" style="border-color: var(--tertiary);">
+          <span class="resource-icon">🧘‍♀️</span>
+          <span class="resource-name" style="color: var(--tertiary);">Yoga Journal</span>
+          <span class="resource-arrow">→</span>
+        </button>
+        <button class="resource-button" style="border-color: var(--success);">
+          <span class="resource-icon">🏃‍♂️</span>
+          <span class="resource-name" style="color: var(--success);">Runner's World</span>
+          <span class="resource-arrow">→</span>
+        </button>
+      </div>
     </div>
-{% endblock %}
+  </main>
+
+  <script>
+    // Простая анимация для элементов при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      fadeElements.forEach(element => {
+        element.style.opacity = '1';
+        element.style.transform = 'translateY(0)';
+      });
+    });
+  </script>
+</body>
+</html>
