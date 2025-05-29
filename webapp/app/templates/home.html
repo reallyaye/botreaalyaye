@@ -1,171 +1,179 @@
-{% extends "base.html" %}
-{% block title %}Главная{% endblock %}
-{% block content %}
-    <div class="welcome-section">
-        <h1 class="welcome-title">
-            <i class="fas fa-heartbeat"></i> Добро пожаловать{% if username %}, {{ username }}{% endif %}!
-        </h1>
-        {% if not is_authenticated %}
-            <div class="auth-actions">
-                <p>Начните свой путь к здоровью прямо сейчас!</p>
-                <div class="auth-buttons">
-                    <a href="/login" class="btn btn-primary" aria-label="Войти в аккаунт"><i class="fas fa-sign-in-alt"></i> Войти</a>
-                    <a href="/register" class="btn btn-secondary" aria-label="Зарегистрироваться"><i class="fas fa-user-plus"></i> Зарегистрироваться</a>
-                </div>
-            </div>
-        {% else %}
-            <div class="activity-section">
-                <h2 class="section-title"><i class="fas fa-running"></i> Ваши последние действия</h2>
-                {% if recent_activities %}
-                    <ul class="activity-list">
-                        {% for activity in recent_activities %}
-                            <li class="activity-item">{{ activity }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p class="no-activity">У вас пока нет активности. Начните тренировку прямо сейчас!</p>
-                    <div class="start-training">
-                        <a href="/workouts" class="btn btn-primary" aria-label="Начать тренировку"><i class="fas fa-dumbbell"></i> Начать тренировку</a>
-                    </div>
-                {% endif %}
-            </div>
-            <div class="stats-section">
-                <h2 class="section-title"><i class="fas fa-chart-line"></i> Ваши достижения</h2>
-                <div class="stats-grid">
-                    <div class="stat-card{% if stats.total_workouts > 0 %} active{% endif %}">
-                        <i class="fas fa-trophy"></i>
-                        <p>Тренировок завершено: <span class="stat-value">{{ stats.total_workouts }}</span></p>
-                    </div>
-                    <div class="stat-card{% if stats.total_calories > 0 %} active{% endif %}">
-                        <i class="fas fa-fire"></i>
-                        <p>Калорий сожжено: <span class="stat-value">{{ stats.total_calories|round(2) }}</span></p>
-                    </div>
-                    <div class="stat-card{% if stats.total_minutes > 0 %} active{% endif %}">
-                        <i class="fas fa-clock"></i>
-                        <p>Времени на тренировки: <span class="stat-value">{{ stats.total_minutes }} мин</span></p>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVIII Fitness - Главная</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/unified_style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    {% extends "base.html" %}
+    
+    {% block title %}NOVIII Fitness - Главная{% endblock %}
+    
+    {% block content %}
+    <div class="fade-in">
+        <div class="hero-section">
+            <div class="row">
+                <div class="col-6 col-sm-12">
+                    <h1 class="hero-title">Достигайте своих фитнес-целей с NOVIII</h1>
+                    <p class="hero-text">Персональный фитнес-помощник, который поможет вам тренироваться эффективнее, отслеживать прогресс и достигать результатов.</p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Начать бесплатно</a>
+                        <a href="#features" class="btn btn-secondary btn-lg">Узнать больше</a>
                     </div>
                 </div>
+                <div class="col-6 col-sm-12">
+                    <img src="{{ url_for('static', filename='img/hero-image.jpg') }}" alt="NOVIII Fitness" class="hero-image">
+                </div>
             </div>
-            <div class="goals-section">
-                <h2 class="section-title"><i class="fas fa-flag-checkered"></i> Ваши цели</h2>
-                {% if goals %}
-                    <div class="goals-grid">
-                        {% for goal in goals %}
-                            <div class="goal-card">
-                                <p>
-                                    Цель: 
-                                    {% if goal.goal_type == "calories" %}
-                                        Сжечь {{ goal.target_value }} калорий
-                                    {% elif goal.goal_type == "workouts" %}
-                                        Провести {{ goal.target_value }} тренировок
-                                    {% elif goal.goal_type == "duration" %}
-                                        Тренироваться {{ goal.target_value }} минут
-                                    {% endif %}
-                                    к {{ goal.deadline|datetimeformat }}
-                                </p>
-                                <p>Прогресс: <span class="stat-value">{{ goal.current_value|round(2) }} / {{ goal.target_value }}</span></p>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar" style="--progress: {{ goal.progress }}%"></div>
-                                    <span class="progress-text">{{ goal.progress|round(1) }}%</span>
+        </div>
+        
+        <div class="section" id="features">
+            <h2 class="section-title text-center">Возможности NOVIII Fitness</h2>
+            <div class="row">
+                <div class="col-4 col-sm-12">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <h3>Персональные тренировки</h3>
+                        <p>Выбирайте из множества готовых программ тренировок или создавайте свои собственные.</p>
+                    </div>
+                </div>
+                <div class="col-4 col-sm-12">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Отслеживание прогресса</h3>
+                        <p>Наблюдайте за своими достижениями с помощью детальной статистики и графиков.</p>
+                    </div>
+                </div>
+                <div class="col-4 col-sm-12">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h3>Постановка целей</h3>
+                        <p>Ставьте цели и отслеживайте прогресс на пути к их достижению.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section bg-light">
+            <h2 class="section-title text-center">Как это работает</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Создайте аккаунт</h3>
+                        <p>Зарегистрируйтесь и заполните свой профиль для персонализации тренировок.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Выберите программу</h3>
+                        <p>Выберите подходящую программу тренировок из нашей библиотеки.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Тренируйтесь</h3>
+                        <p>Следуйте инструкциям и выполняйте упражнения в своем темпе.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Отслеживайте прогресс</h3>
+                        <p>Анализируйте свои результаты и корректируйте тренировки для достижения целей.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title text-center">Отзывы пользователей</h2>
+            <div class="testimonials">
+                <div class="row">
+                    <div class="col-4 col-sm-12">
+                        <div class="testimonial-card">
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="testimonial-text">"NOVIII помог мне наконец-то начать регулярно заниматься спортом. Удобный интерфейс и разнообразие тренировок - именно то, что мне было нужно!"</p>
+                            <div class="testimonial-author">
+                                <img src="{{ url_for('static', filename='img/testimonials/user1.jpg') }}" alt="Анна М." class="testimonial-avatar">
+                                <div class="testimonial-info">
+                                    <h4>Анна М.</h4>
+                                    <p>Пользователь с 2024 года</p>
                                 </div>
                             </div>
-                        {% endfor %}
+                        </div>
                     </div>
-                    <div class="start-training">
-                        <a href="/goals/add" class="btn btn-primary" aria-label="Добавить новую цель"><i class="fas fa-plus-circle"></i> Добавить новую цель</a>
+                    <div class="col-4 col-sm-12">
+                        <div class="testimonial-card">
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="testimonial-text">"За 3 месяца использования NOVIII я сбросил 8 кг и значительно улучшил свою физическую форму. Отличное приложение для тех, кто серьезно относится к тренировкам."</p>
+                            <div class="testimonial-author">
+                                <img src="{{ url_for('static', filename='img/testimonials/user2.jpg') }}" alt="Дмитрий К." class="testimonial-avatar">
+                                <div class="testimonial-info">
+                                    <h4>Дмитрий К.</h4>
+                                    <p>Пользователь с 2023 года</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                {% else %}
-                    <p class="no-activity">У вас пока нет целей. Установите первую цель!</p>
-                    <div class="start-training">
-                        <a href="/goals/add" class="btn btn-primary" aria-label="Установить цель"><i class="fas fa-flag-checkered"></i> Установить цель</a>
+                    <div class="col-4 col-sm-12">
+                        <div class="testimonial-card">
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <p class="testimonial-text">"Мне особенно нравится возможность отслеживать свой прогресс и видеть результаты в графиках. Это очень мотивирует продолжать тренировки!"</p>
+                            <div class="testimonial-author">
+                                <img src="{{ url_for('static', filename='img/testimonials/user3.jpg') }}" alt="Елена В." class="testimonial-avatar">
+                                <div class="testimonial-info">
+                                    <h4>Елена В.</h4>
+                                    <p>Пользователь с 2024 года</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                {% endif %}
+                </div>
             </div>
-            <div class="calculator-section">
-                <h2 class="section-title"><i class="fas fa-calculator"></i> Калькулятор калорий</h2>
-                {% if calories_result %}
-                    <div class="calories-result success">
-                        Вы сожгли {{ calories_result|round(2) }} калорий!
-                    </div>
-                {% endif %}
-                {% if error %}
-                    <div class="error" id="error-message">{{ error }}</div>
-                {% endif %}
-                <form method="post" action="/calculate-calories" id="calories-form">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token | default('') }}">
-                    <div class="form-group">
-                        <label for="activity">
-                            <i class="fas fa-running"></i> Вид активности:
-                        </label>
-                        <input type="text" id="activity" name="activity" placeholder="Например: танцы, плавание" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="intensity">
-                            <i class="fas fa-bolt"></i> Интенсивность:
-                        </label>
-                        <select id="intensity" name="intensity" required>
-                            <option value="low">Низкая</option>
-                            <option value="medium">Средняя</option>
-                            <option value="high">Высокая</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="duration">
-                            <i class="fas fa-clock"></i> Длительность (в минутах):
-                        </label>
-                        <input type="number" id="duration" name="duration" step="1" min="1" placeholder="Например: 30" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="weight">
-                            <i class="fas fa-weight"></i> Ваш вес (кг, если не указан, используется 70 кг):
-                        </label>
-                        <input type="number" id="weight" name="weight" step="0.1" min="1" value="{{ user_weight if user_weight else 70 }}" placeholder="Например: 70" />
-                    </div>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-calculator"></i> Рассчитать</button>
-                </form>
-            </div>
-        {% endif %}
-        <div class="quote-section">
-            <h2 class="section-title"><i class="fas fa-quote-left"></i> Мотивация дня</h2>
-            <div class="quote-card">
-                <p id="quote-text">"Движение — это жизнь. Начни двигаться сегодня, чтобы стать лучше завтра!"</p>
-                <p class="quote-author" id="quote-author">— Неизвестный автор</p>
+        </div>
+        
+        <div class="section bg-primary text-white cta-section">
+            <div class="row">
+                <div class="col-8 col-sm-12">
+                    <h2>Готовы начать свой путь к лучшей версии себя?</h2>
+                    <p>Присоединяйтесь к тысячам пользователей, которые уже достигают своих фитнес-целей с NOVIII.</p>
+                </div>
+                <div class="col-4 col-sm-12 text-right">
+                    <a href="{{ url_for('register') }}" class="btn btn-lg btn-light">Начать бесплатно</a>
+                </div>
             </div>
         </div>
     </div>
-    <script>
-        // Валидация формы калькулятора калорий
-        function validateForm() {
-            const activity = document.getElementById("activity").value;
-            const duration = document.getElementById("duration").value;
-            const weight = document.getElementById("weight").value;
-            const errorMessage = document.getElementById("error-message") || document.createElement("div");
-            errorMessage.id = "error-message";
-            errorMessage.className = "error";
-            
-            if (activity.trim().length < 2) {
-                errorMessage.textContent = "Вид активности должен содержать минимум 2 символа";
-                document.querySelector(".calculator-section").prepend(errorMessage);
-                return false;
-            }
-            if (parseFloat(duration) <= 0) {
-                errorMessage.textContent = "Длительность должна быть больше 0";
-                document.querySelector(".calculator-section").prepend(errorMessage);
-                return false;
-            }
-            if (parseFloat(weight) <= 0) {
-                errorMessage.textContent = "Вес должен быть больше 0";
-                document.querySelector(".calculator-section").prepend(errorMessage);
-                return false;
-            }
-            return true;
-        }
-
-        // Обработчик отправки формы
-        document.getElementById("calories-form").addEventListener("submit", function(event) {
-            if (!validateForm()) {
-                event.preventDefault();
-            }
-        });
-    </script>
-{% endblock %}
+    {% endblock %}
+</body>
+</html>

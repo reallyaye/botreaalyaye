@@ -1,300 +1,233 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NOVIII Fitness - Статистика</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVIII Fitness - Статистика</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/unified_style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="container header-container">
-      <a href="index.html" class="logo">
-        <div class="logo-icon">N</div>
-        <span>NOVIII</span>
-      </a>
-      <nav class="nav">
-        <ul class="nav-list">
-          <li class="nav-item"><a href="index.html" class="nav-link">Панель</a></li>
-          <li class="nav-item"><a href="workouts.html" class="nav-link">Тренировки</a></li>
-          <li class="nav-item"><a href="statistics.html" class="nav-link active">Статистика</a></li>
-          <li class="nav-item"><a href="profile.html" class="nav-link">Профиль</a></li>
-        </ul>
-      </nav>
-      <div class="user-actions">
-        <button class="icon-button">👤</button>
-        <button class="icon-button">🔔</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="container">
-      <!-- Welcome Card -->
-      <div class="welcome-card fade-in">
-        <h1 class="welcome-title">Статистика</h1>
-        <p class="welcome-subtitle">Анализ ваших тренировок и прогресса</p>
-      </div>
-
-      <!-- Activity Chart -->
-      <div class="chart-container fade-in delay-1">
-        <div class="chart-header">
-          <h2 class="chart-title">Активность по дням</h2>
-          <div class="chart-filters">
-            <button class="chart-filter">Неделя</button>
-            <button class="chart-filter active">Месяц</button>
-            <button class="chart-filter">Год</button>
-          </div>
-        </div>
-        <canvas id="activityChart" height="250"></canvas>
-      </div>
-
-      <!-- Stats Summary -->
-      <div class="row fade-in delay-2">
-        <div class="col">
-          <div class="card stats-card">
-            <div class="stats-icon" style="background-color: rgba(67, 97, 238, 0.2);">📈</div>
-            <div class="stats-content">
-              <div class="stats-label">Всего тренировок</div>
-              <div class="stats-value" style="color: var(--primary);">48</div>
+    {% extends "base.html" %}
+    
+    {% block title %}NOVIII Fitness - Статистика{% endblock %}
+    
+    {% block content %}
+    <div class="fade-in">
+        <div class="row mb-4">
+            <div class="col">
+                <h1><i class="fas fa-chart-line"></i> Статистика</h1>
+                <p class="lead">Отслеживайте свой прогресс и анализируйте результаты</p>
             </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card stats-card">
-            <div class="stats-icon" style="background-color: rgba(76, 201, 240, 0.2);">⏱️</div>
-            <div class="stats-content">
-              <div class="stats-label">Общее время</div>
-              <div class="stats-value" style="color: var(--tertiary);">1280 мин</div>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card stats-card">
-            <div class="stats-icon" style="background-color: rgba(77, 204, 189, 0.2);">🔥</div>
-            <div class="stats-content">
-              <div class="stats-label">Сожжено калорий</div>
-              <div class="stats-value" style="color: var(--success);">15,400</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Workout Distribution -->
-      <div class="row fade-in delay-2">
-        <div class="col">
-          <div class="chart-container">
-            <div class="chart-header">
-              <h2 class="chart-title">Распределение тренировок</h2>
-            </div>
-            <canvas id="distributionChart" height="300"></canvas>
-          </div>
-        </div>
-        <div class="col">
-          <div class="chart-container">
-            <div class="chart-header">
-              <h2 class="chart-title">Прогресс по целям</h2>
-            </div>
-            
-            <!-- Goal Progress Bars -->
-            <div class="progress-container">
-              <div class="progress-header">
-                <div class="progress-label">Тренировки в неделю</div>
-                <div class="progress-value">4/5</div>
-              </div>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width: 80%; background-color: var(--primary);"></div>
-              </div>
-            </div>
-            
-            <div class="progress-container">
-              <div class="progress-header">
-                <div class="progress-label">Время тренировок</div>
-                <div class="progress-value">320/400 мин</div>
-              </div>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width: 80%; background-color: var(--tertiary);"></div>
-              </div>
-            </div>
-            
-            <div class="progress-container">
-              <div class="progress-header">
-                <div class="progress-label">Снижение веса</div>
-                <div class="progress-value">3/5 кг</div>
-              </div>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width: 60%; background-color: var(--success);"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Detailed Stats Table -->
-      <div class="chart-container fade-in delay-3">
-        <div class="chart-header">
-          <h2 class="chart-title">Детальная статистика</h2>
-          <div class="chart-filters">
-            <button class="chart-filter active">Все</button>
-            <button class="chart-filter">Кардио</button>
-            <button class="chart-filter">Силовые</button>
-            <button class="chart-filter">Йога</button>
-          </div>
         </div>
         
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-          <thead>
-            <tr style="border-bottom: 1px solid var(--border-light); text-align: left;">
-              <th style="padding: 12px 15px;">Дата</th>
-              <th style="padding: 12px 15px;">Тренировка</th>
-              <th style="padding: 12px 15px;">Длительность</th>
-              <th style="padding: 12px 15px;">Калории</th>
-              <th style="padding: 12px 15px;">Прогресс</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="border-bottom: 1px solid var(--border-light);">
-              <td style="padding: 12px 15px;">28 мая</td>
-              <td style="padding: 12px 15px;">Интервальный бег</td>
-              <td style="padding: 12px 15px;">30 мин</td>
-              <td style="padding: 12px 15px;">320 ккал</td>
-              <td style="padding: 12px 15px; color: var(--success);">+5%</td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border-light);">
-              <td style="padding: 12px 15px;">26 мая</td>
-              <td style="padding: 12px 15px;">Силовая тренировка</td>
-              <td style="padding: 12px 15px;">45 мин</td>
-              <td style="padding: 12px 15px;">280 ккал</td>
-              <td style="padding: 12px 15px; color: var(--success);">+8%</td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border-light);">
-              <td style="padding: 12px 15px;">24 мая</td>
-              <td style="padding: 12px 15px;">Йога</td>
-              <td style="padding: 12px 15px;">20 мин</td>
-              <td style="padding: 12px 15px;">120 ккал</td>
-              <td style="padding: 12px 15px; color: var(--text-muted);">0%</td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--border-light);">
-              <td style="padding: 12px 15px;">22 мая</td>
-              <td style="padding: 12px 15px;">HIIT тренировка</td>
-              <td style="padding: 12px 15px;">25 мин</td>
-              <td style="padding: 12px 15px;">350 ккал</td>
-              <td style="padding: 12px 15px; color: var(--success);">+10%</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px 15px;">20 мая</td>
-              <td style="padding: 12px 15px;">Плавание</td>
-              <td style="padding: 12px 15px;">40 мин</td>
-              <td style="padding: 12px 15px;">400 ккал</td>
-              <td style="padding: 12px 15px; color: var(--success);">+7%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Export Options -->
-      <div class="motivation-card fade-in delay-3" style="background-color: rgba(67, 97, 238, 0.1); border-color: var(--primary);">
-        <div class="motivation-icon" style="background-color: rgba(67, 97, 238, 0.2);">📊</div>
-        <div class="motivation-content">
-          <h3 class="motivation-title" style="color: var(--primary);">Экспорт статистики</h3>
-          <p class="motivation-text">Сохраните вашу статистику для дальнейшего анализа или поделитесь своими достижениями.</p>
-          <div style="margin-top: 15px;">
-            <button class="btn btn-primary" style="margin-right: 10px;">PDF отчет</button>
-            <button class="btn btn-outline">Excel таблица</button>
-          </div>
+        <div class="row mb-4">
+            <div class="col-3 col-sm-12">
+                <div class="card stat-summary-card">
+                    <div class="stat-card">
+                        <div class="stat-card-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="stat-card-value">{{ stats.workouts_completed|default(0) }}</div>
+                        <div class="stat-card-label">Тренировок</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 col-sm-12">
+                <div class="card stat-summary-card">
+                    <div class="stat-card">
+                        <div class="stat-card-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-card-value">{{ stats.calories_burned|default(0) }}</div>
+                        <div class="stat-card-label">Калорий</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 col-sm-12">
+                <div class="card stat-summary-card">
+                    <div class="stat-card">
+                        <div class="stat-card-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-card-value">{{ stats.workout_minutes|default(0) }}</div>
+                        <div class="stat-card-label">Минут</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 col-sm-12">
+                <div class="card stat-summary-card">
+                    <div class="stat-card">
+                        <div class="stat-card-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-card-value">{{ stats.achievements|default(0) }}</div>
+                        <div class="stat-card-label">Достижений</div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+        
+        <div class="row mb-4">
+            <div class="col-8 col-sm-12">
+                <div class="card">
+                    <h3><i class="fas fa-chart-bar"></i> Активность за последние 30 дней</h3>
+                    <div class="chart-container">
+                        <canvas id="activityChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 col-sm-12">
+                <div class="card">
+                    <h3><i class="fas fa-chart-pie"></i> Типы тренировок</h3>
+                    <div class="chart-container">
+                        <canvas id="workoutTypesChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card">
+                    <h3><i class="fas fa-weight"></i> Прогресс веса</h3>
+                    <div class="chart-container">
+                        <canvas id="weightChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <h3><i class="fas fa-history"></i> История тренировок</h3>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Тренировка</th>
+                                    <th>Длительность</th>
+                                    <th>Калории</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if workout_history %}
+                                    {% for workout in workout_history %}
+                                        <tr>
+                                            <td>{{ workout.date }}</td>
+                                            <td>{{ workout.name }}</td>
+                                            <td>{{ workout.duration }} мин</td>
+                                            <td>{{ workout.calories }} ккал</td>
+                                            <td>
+                                                <a href="{{ url_for('workout_details', workout_id=workout.id) }}" class="btn btn-sm btn-secondary">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">История тренировок пуста</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </main>
-
-  <script>
-    // Простая анимация для элементов при загрузке страницы
-    document.addEventListener('DOMContentLoaded', function() {
-      const fadeElements = document.querySelectorAll('.fade-in');
-      fadeElements.forEach(element => {
-        element.style.opacity = '1';
-        element.style.transform = 'translateY(0)';
-      });
-      
-      // Инициализация графиков
-      initCharts();
-    });
-
-    // Обработка фильтров
-    const filterButtons = document.querySelectorAll('.chart-filter');
-    filterButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const parent = this.parentElement;
-        parent.querySelectorAll('.chart-filter').forEach(btn => btn.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
-
-    // Инициализация графиков
-    function initCharts() {
-      // График активности
-      const activityCtx = document.getElementById('activityChart').getContext('2d');
-      const activityChart = new Chart(activityCtx, {
-        type: 'bar',
-        data: {
-          labels: ['1 мая', '5 мая', '10 мая', '15 мая', '20 мая', '25 мая', '30 мая'],
-          datasets: [{
-            label: 'Тренировки (мин)',
-            data: [45, 60, 30, 90, 40, 75, 60],
-            backgroundColor: 'rgba(67, 97, 238, 0.7)',
-            borderColor: 'rgba(67, 97, 238, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-
-      // График распределения тренировок
-      const distributionCtx = document.getElementById('distributionChart').getContext('2d');
-      const distributionChart = new Chart(distributionCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Бег', 'Силовые', 'Йога', 'Плавание', 'HIIT'],
-          datasets: [{
-            data: [30, 25, 15, 20, 10],
-            backgroundColor: [
-              'rgba(67, 97, 238, 0.7)',
-              'rgba(58, 12, 163, 0.7)',
-              'rgba(76, 201, 240, 0.7)',
-              'rgba(77, 204, 189, 0.7)',
-              'rgba(247, 37, 133, 0.7)'
-            ],
-            borderColor: [
-              'rgba(67, 97, 238, 1)',
-              'rgba(58, 12, 163, 1)',
-              'rgba(76, 201, 240, 1)',
-              'rgba(77, 204, 189, 1)',
-              'rgba(247, 37, 133, 1)'
-            ],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }
-      });
-    }
-  </script>
+    {% endblock %}
+    
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Данные для графиков
+            const activityData = {
+                labels: [{% for day in range(1, 31) %}'{{ day }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Минуты активности',
+                    data: [{% for _ in range(30) %}{{ range(0, 60)|random }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: 'rgba(76, 201, 240, 0.2)',
+                    borderColor: 'rgba(76, 201, 240, 1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            };
+            
+            const workoutTypesData = {
+                labels: ['Кардио', 'Силовые', 'Йога', 'Растяжка'],
+                datasets: [{
+                    data: [45, 25, 20, 10],
+                    backgroundColor: [
+                        'rgba(67, 97, 238, 0.7)',
+                        'rgba(58, 12, 163, 0.7)',
+                        'rgba(76, 201, 240, 0.7)',
+                        'rgba(247, 37, 133, 0.7)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            
+            const weightData = {
+                labels: [{% for week in range(1, 13) %}'Неделя {{ week }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Вес (кг)',
+                    data: [78, 77.5, 77, 76.8, 76.5, 76, 75.8, 75.5, 75.2, 75, 74.8, 74.5],
+                    backgroundColor: 'rgba(58, 12, 163, 0.2)',
+                    borderColor: 'rgba(58, 12, 163, 1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            };
+            
+            // Создание графиков
+            const activityChart = new Chart(document.getElementById('activityChart'), {
+                type: 'line',
+                data: activityData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            const workoutTypesChart = new Chart(document.getElementById('workoutTypesChart'), {
+                type: 'doughnut',
+                data: workoutTypesData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            const weightChart = new Chart(document.getElementById('weightChart'), {
+                type: 'line',
+                data: weightData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    {% endblock %}
 </body>
 </html>
