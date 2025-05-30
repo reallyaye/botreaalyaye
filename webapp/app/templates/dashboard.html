@@ -59,66 +59,155 @@
   <div class="section">
     <h2 class="section-title"><i class="fas fa-calendar-check" style="color: var(--primary); margin-right: 10px;"></i>Предстоящие тренировки</h2>
     <div class="upcoming-workouts">
-      <div class="workout-item">
-        <div class="workout-date">
-          <div class="date-day">31</div>
-          <div class="date-month">Мая</div>
-        </div>
-        <div class="workout-info">
-          <h3 class="workout-title">Интервальный бег</h3>
-          <div class="workout-details">
-            <span><i class="fas fa-clock"></i> 08:00 - 08:30</span>
-            <span><i class="fas fa-bolt"></i> Высокая интенсивность</span>
+      <div class="workout-item-card">
+        <div class="workout-item-main">
+          <div class="workout-date">
+            <div class="date-day">31</div>
+            <div class="date-month">Мая</div>
+          </div>
+          <div class="workout-info">
+            <h3 class="workout-title">Интервальный бег</h3>
+            <div class="workout-details">
+              <span><i class="fas fa-clock"></i> 08:00 - 08:30</span>
+              <span><i class="fas fa-bolt"></i> Высокая интенсивность</span>
+            </div>
+            <div class="workout-actions">
+              <button class="btn btn-sm btn-primary">Начать</button>
+            </div>
           </div>
         </div>
-        <div class="workout-actions">
-          <button class="btn btn-sm btn-primary">Начать</button>
-          <button class="btn btn-sm btn-outline">
-            <i class="fas fa-ellipsis-v"></i>
-          </button>
-        </div>
+        <button class="btn btn-sm btn-outline workout-more"><i class="fas fa-ellipsis-v"></i></button>
       </div>
-      
-      <div class="workout-item">
-        <div class="workout-date">
-          <div class="date-day">2</div>
-          <div class="date-month">Июня</div>
-        </div>
-        <div class="workout-info">
-          <h3 class="workout-title">Силовая тренировка</h3>
-          <div class="workout-details">
-            <span><i class="fas fa-clock"></i> 18:00 - 18:45</span>
-            <span><i class="fas fa-bolt"></i> Средняя интенсивность</span>
+      <div class="workout-item-card">
+        <div class="workout-item-main">
+          <div class="workout-date">
+            <div class="date-day">2</div>
+            <div class="date-month">Июня</div>
+          </div>
+          <div class="workout-info">
+            <h3 class="workout-title">Силовая тренировка</h3>
+            <div class="workout-details">
+              <span><i class="fas fa-clock"></i> 18:00 - 18:45</span>
+              <span><i class="fas fa-bolt"></i> Средняя интенсивность</span>
+            </div>
+            <div class="workout-actions">
+              <button class="btn btn-sm btn-outline">Изменить</button>
+            </div>
           </div>
         </div>
-        <div class="workout-actions">
-          <button class="btn btn-sm btn-outline">Изменить</button>
-          <button class="btn btn-sm btn-outline">
-            <i class="fas fa-ellipsis-v"></i>
-          </button>
-        </div>
+        <button class="btn btn-sm btn-outline workout-more"><i class="fas fa-ellipsis-v"></i></button>
       </div>
-      
-      <div class="workout-item">
-        <div class="workout-date">
-          <div class="date-day">4</div>
-          <div class="date-month">Июня</div>
-        </div>
-        <div class="workout-info">
-          <h3 class="workout-title">Йога</h3>
-          <div class="workout-details">
-            <span><i class="fas fa-clock"></i> 07:30 - 08:00</span>
-            <span><i class="fas fa-bolt"></i> Низкая интенсивность</span>
+      <div class="workout-item-card">
+        <div class="workout-item-main">
+          <div class="workout-date">
+            <div class="date-day">4</div>
+            <div class="date-month">Июня</div>
+          </div>
+          <div class="workout-info">
+            <h3 class="workout-title">Йога</h3>
+            <div class="workout-details">
+              <span><i class="fas fa-clock"></i> 07:30 - 08:00</span>
+              <span><i class="fas fa-bolt"></i> Низкая интенсивность</span>
+            </div>
+            <div class="workout-actions">
+              <button class="btn btn-sm btn-outline">Изменить</button>
+            </div>
           </div>
         </div>
-        <div class="workout-actions">
-          <button class="btn btn-sm btn-outline">Изменить</button>
-          <button class="btn btn-sm btn-outline">
-            <i class="fas fa-ellipsis-v"></i>
-          </button>
-        </div>
+        <button class="btn btn-sm btn-outline workout-more"><i class="fas fa-ellipsis-v"></i></button>
       </div>
     </div>
+    <style>
+    .upcoming-workouts {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .workout-item-card {
+      display: flex;
+      align-items: stretch;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 20px 28px;
+      position: relative;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .workout-item-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+    .workout-item-main {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      gap: 32px;
+    }
+    .workout-date {
+      min-width: 48px;
+      text-align: center;
+      margin-right: 18px;
+    }
+    .date-day {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .date-month {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .workout-info {
+      flex: 1;
+    }
+    .workout-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .workout-details {
+      display: flex;
+      gap: 18px;
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .workout-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .workout-more {
+      align-self: flex-start;
+      margin-left: 18px;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    @media (max-width: 768px) {
+      .workout-item-card {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px 10px;
+      }
+      .workout-item-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .workout-more {
+        margin-left: 0;
+        margin-top: 10px;
+        align-self: flex-end;
+      }
+    }
+    </style>
   </div>
 </div>
 {% endblock %}
