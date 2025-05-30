@@ -16,13 +16,9 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-    pass
-    # op.add_column('users', sa.Column('last_name', sa.String(), nullable=True))
-    # op.add_column('users', sa.Column('email', sa.String(), nullable=True))
-    # op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
+    op.add_column('users', sa.Column('email', sa.String(), nullable=True))
+    op.add_column('users', sa.Column('last_name', sa.String(), nullable=True))
 
 def downgrade():
-    pass
-    # op.drop_index(op.f('ix_users_email'), table_name='users')
-    # op.drop_column('users', 'email')
-    # op.drop_column('users', 'last_name')
+    op.drop_column('users', 'email')
+    op.drop_column('users', 'last_name')
