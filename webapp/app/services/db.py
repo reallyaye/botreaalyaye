@@ -36,6 +36,8 @@ class User(Base):
     username = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     name = Column(String, nullable=True)
+    last_name = Column(String, nullable=True)
+    email = Column(String, unique=True, index=True, nullable=False)
     age = Column(Integer, nullable=True)
     height = Column(Float, nullable=True)
     weight = Column(Float, nullable=True)
@@ -89,15 +91,20 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-async def register_user(username: str, password: str) -> None:
+async def register_user(username: str, password: str, email: str, name: str, last_name: str) -> None:
     if not password:
         raise ValueError("Пароль обязателен")
+    if not email:
+        raise ValueError("Email обязателен")
     hashed_pw = hash_password(password)
     async with AsyncSessionLocal() as session:
         result = await session.execute(select(User).where(User.username == username))
         if result.scalars().first():
             raise ValueError("Пользователь с таким именем уже существует")
-        user = User(username=username, password=hashed_pw)
+        result = await session.execute(select(User).where(User.email == email))
+        if result.scalars().first():
+            raise ValueError("Пользователь с таким email уже существует")
+        user = User(username=username, password=hashed_pw, email=email, name=name, last_name=last_name)
         session.add(user)
         await session.commit()
 

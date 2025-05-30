@@ -101,7 +101,16 @@ async def register_form(request: Request):
 
 # --- обрабатываем регистрацию ---
 @router.post("/register", response_class=HTMLResponse)
-async def register(request: Request, username: str = Form(...), password: str = Form(...), csrf_token: str = Form(...)):
+async def register(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...),
+    email: str = Form(...),
+    firstName: str = Form(...),
+    lastName: str = Form(...),
+    confirmPassword: str = Form(...),
+    csrf_token: str = Form(...)
+):
     # Проверяем CSRF-токен
     if csrf_token != request.session.get("csrf_token"):
         return templates.TemplateResponse(
@@ -114,7 +123,17 @@ async def register(request: Request, username: str = Form(...), password: str = 
             }
         )
 
-    # Проверяем, пришёл ли пользователь через Telegram
+    if password != confirmPassword:
+        return templates.TemplateResponse(
+            "register.html",
+            {
+                "request": request,
+                "error": "Пароли не совпадают.",
+                "is_authenticated": False,
+                "csrf_token": request.session.get("csrf_token")
+            }
+        )
+
     telegram_id = request.session.get("telegram_id")
     try:
         async with AsyncSessionLocal() as session:
@@ -129,8 +148,19 @@ async def register(request: Request, username: str = Form(...), password: str = 
                         "csrf_token": request.session.get("csrf_token")
                     }
                 )
-            await register_user(username, password)
-            user = await authenticate_user(username, password)
+            result = await session.execute(select(User).where(User.email == email))
+            if result.scalars().first():
+                return templates.TemplateResponse(
+                    "register.html",
+                    {
+                        "request": request,
+                        "error": "Пользователь с таким email уже существует",
+                        "is_authenticated": False,
+                        "csrf_token": request.session.get("csrf_token")
+                    }
+                )
+            await register_user(username, password, email, firstName, lastName)
+            user, _ = await authenticate_user(username, password)
             if telegram_id:
                 user.telegram_id = telegram_id
                 session.add(user)
