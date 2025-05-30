@@ -4,157 +4,206 @@
     
 {% block content %}
 <div class="fade-in">
-    <div class="hero-section">
+    <div class="hero-section card">
         <div class="row">
             <div class="col-6 col-sm-12">
-                <h1 class="hero-title">Достигайте своих фитнес-целей с NOVIII</h1>
+                <h1 class="hero-title section-title">Достигайте своих фитнес-целей с NOVIII</h1>
                 <p class="hero-text">Персональный фитнес-помощник, который поможет вам тренироваться эффективнее, отслеживать прогресс и достигать результатов.</p>
                 <div class="hero-buttons">
-                    <a href="/register" class="btn btn-primary btn-lg">Начать бесплатно</a>
-                    <a href="#features" class="btn btn-secondary btn-lg">Узнать больше</a>
+                    <a href="/register" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus btn-icon"></i>
+                        Начать бесплатно
+                    </a>
+                    <a href="#features" class="btn btn-outline btn-lg">
+                        <i class="fas fa-info-circle btn-icon"></i>
+                        Узнать больше
+                    </a>
                 </div>
             </div>
             <div class="col-6 col-sm-12">
                 <div class="hero-graphic">
-                    <i class="fas fa-dumbbell fa-5x"></i>
-                    <i class="fas fa-running fa-5x"></i>
-                    <i class="fas fa-heartbeat fa-5x"></i>
+                    <div class="stats-icon" style="background-color: var(--primary-light); color: var(--primary);">
+                        <i class="fas fa-dumbbell fa-3x"></i>
+                    </div>
+                    <div class="stats-icon" style="background-color: var(--success-light); color: var(--success);">
+                        <i class="fas fa-running fa-3x"></i>
+                    </div>
+                    <div class="stats-icon" style="background-color: var(--tertiary-light); color: var(--tertiary);">
+                        <i class="fas fa-heartbeat fa-3x"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
     <div class="section" id="features">
-        <h2 class="section-title text-center">Возможности NOVIII Fitness</h2>
-        <div class="row">
-            <div class="col-4 col-sm-12">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-dumbbell"></i>
+        <h2 class="section-title text-center">
+            <i class="fas fa-star" style="color: var(--primary); margin-right: 10px;"></i>
+            Возможности NOVIII Fitness
+        </h2>
+        <div class="workout-grid">
+            <div class="workout-card">
+                <div class="workout-header">
+                    <div class="workout-icon">
+                        <i class="fas fa-dumbbell fa-2x"></i>
                     </div>
-                    <h3>Персональные тренировки</h3>
-                    <p>Выбирайте из множества готовых программ тренировок или создавайте свои собственные.</p>
+                </div>
+                <div class="workout-content">
+                    <h3 class="workout-title">Персональные тренировки</h3>
+                    <p class="workout-description">Выбирайте из множества готовых программ тренировок или создавайте свои собственные.</p>
                 </div>
             </div>
-            <div class="col-4 col-sm-12">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-line"></i>
+            <div class="workout-card">
+                <div class="workout-header">
+                    <div class="workout-icon">
+                        <i class="fas fa-chart-line fa-2x"></i>
                     </div>
-                    <h3>Отслеживание прогресса</h3>
-                    <p>Наблюдайте за своими достижениями с помощью детальной статистики и графиков.</p>
+                </div>
+                <div class="workout-content">
+                    <h3 class="workout-title">Отслеживание прогресса</h3>
+                    <p class="workout-description">Наблюдайте за своими достижениями с помощью детальной статистики и графиков.</p>
                 </div>
             </div>
-            <div class="col-4 col-sm-12">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-bullseye"></i>
+            <div class="workout-card">
+                <div class="workout-header">
+                    <div class="workout-icon">
+                        <i class="fas fa-bullseye fa-2x"></i>
                     </div>
-                    <h3>Постановка целей</h3>
-                    <p>Ставьте цели и отслеживайте прогресс на пути к их достижению.</p>
+                </div>
+                <div class="workout-content">
+                    <h3 class="workout-title">Постановка целей</h3>
+                    <p class="workout-description">Ставьте цели и отслеживайте прогресс на пути к их достижению.</p>
                 </div>
             </div>
         </div>
     </div>
     
-    <div class="section bg-light">
-        <h2 class="section-title text-center">Как это работает</h2>
+    <div class="section chart-container">
+        <h2 class="section-title text-center">
+            <i class="fas fa-map-signs" style="color: var(--primary); margin-right: 10px;"></i>
+            Как это работает
+        </h2>
         <div class="steps">
-            <div class="step">
-                <div class="step-number">1</div>
-                <div class="step-content">
-                    <h3>Создайте аккаунт</h3>
-                    <p>Зарегистрируйтесь и заполните свой профиль для персонализации тренировок.</p>
+            <div class="row">
+                <div class="col">
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background-color: var(--primary-light); color: var(--primary);">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-value">01</div>
+                            <div class="stats-label">Создайте аккаунт</div>
+                            <p>Зарегистрируйтесь и заполните свой профиль для персонализации тренировок.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background-color: var(--tertiary-light); color: var(--tertiary);">
+                            <i class="fas fa-list-ul"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-value">02</div>
+                            <div class="stats-label">Выберите программу</div>
+                            <p>Выберите подходящую программу тренировок из нашей библиотеки.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <div class="step-content">
-                    <h3>Выберите программу</h3>
-                    <p>Выберите подходящую программу тренировок из нашей библиотеки.</p>
+            <div class="row">
+                <div class="col">
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background-color: var(--success-light); color: var(--success);">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-value">03</div>
+                            <div class="stats-label">Тренируйтесь</div>
+                            <p>Следуйте инструкциям и выполняйте упражнения в своем темпе.</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <div class="step-content">
-                    <h3>Тренируйтесь</h3>
-                    <p>Следуйте инструкциям и выполняйте упражнения в своем темпе.</p>
-                </div>
-            </div>
-            <div class="step">
-                <div class="step-number">4</div>
-                <div class="step-content">
-                    <h3>Отслеживайте прогресс</h3>
-                    <p>Анализируйте свои результаты и корректируйте тренировки для достижения целей.</p>
+                <div class="col">
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background-color: var(--warning-light); color: var(--warning);">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-value">04</div>
+                            <div class="stats-label">Отслеживайте прогресс</div>
+                            <p>Анализируйте свои результаты и корректируйте тренировки для достижения целей.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
     <div class="section">
-        <h2 class="section-title text-center">Отзывы пользователей</h2>
-        <div class="testimonials">
-            <div class="row">
-                <div class="col-4 col-sm-12">
-                    <div class="testimonial-card">
-                        <div class="testimonial-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+        <h2 class="section-title text-center">
+            <i class="fas fa-comments" style="color: var(--primary); margin-right: 10px;"></i>
+            Отзывы пользователей
+        </h2>
+        <div class="testimonials workout-grid">
+            <div class="workout-card">
+                <div class="workout-content">
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                    </div>
+                    <p class="workout-description">"NOVIII помог мне наконец-то начать регулярно заниматься спортом. Удобный интерфейс и разнообразие тренировок - именно то, что мне было нужно!"</p>
+                    <div class="testimonial-author">
+                        <div class="profile-avatar-container" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                            <i class="fas fa-user-circle"></i>
                         </div>
-                        <p class="testimonial-text">"NOVIII помог мне наконец-то начать регулярно заниматься спортом. Удобный интерфейс и разнообразие тренировок - именно то, что мне было нужно!"</p>
-                        <div class="testimonial-author">
-                            <div class="testimonial-avatar">
-                                <i class="fas fa-user-circle"></i>
-                            </div>
-                            <div class="testimonial-info">
-                                <h4>Анна М.</h4>
-                                <p>Пользователь с 2024 года</p>
-                            </div>
+                        <div class="testimonial-info">
+                            <h4>Анна М.</h4>
+                            <p>Пользователь с 2024 года</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-4 col-sm-12">
-                    <div class="testimonial-card">
-                        <div class="testimonial-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+            </div>
+            <div class="workout-card">
+                <div class="workout-content">
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                    </div>
+                    <p class="workout-description">"За 3 месяца использования NOVIII я сбросил 8 кг и значительно улучшил свою физическую форму. Отличное приложение для тех, кто серьезно относится к тренировкам."</p>
+                    <div class="testimonial-author">
+                        <div class="profile-avatar-container" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                            <i class="fas fa-user-circle"></i>
                         </div>
-                        <p class="testimonial-text">"За 3 месяца использования NOVIII я сбросил 8 кг и значительно улучшил свою физическую форму. Отличное приложение для тех, кто серьезно относится к тренировкам."</p>
-                        <div class="testimonial-author">
-                            <div class="testimonial-avatar">
-                                <i class="fas fa-user-circle"></i>
-                            </div>
-                            <div class="testimonial-info">
-                                <h4>Дмитрий К.</h4>
-                                <p>Пользователь с 2023 года</p>
-                            </div>
+                        <div class="testimonial-info">
+                            <h4>Дмитрий К.</h4>
+                            <p>Пользователь с 2023 года</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-4 col-sm-12">
-                    <div class="testimonial-card">
-                        <div class="testimonial-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
+            </div>
+            <div class="workout-card">
+                <div class="workout-content">
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                        <i class="fas fa-star-half-alt" style="color: var(--warning);"></i>
+                    </div>
+                    <p class="workout-description">"Мне особенно нравится возможность отслеживать свой прогресс и видеть результаты в графиках. Это очень мотивирует продолжать тренировки!"</p>
+                    <div class="testimonial-author">
+                        <div class="profile-avatar-container" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                            <i class="fas fa-user-circle"></i>
                         </div>
-                        <p class="testimonial-text">"Мне особенно нравится возможность отслеживать свой прогресс и видеть результаты в графиках. Это очень мотивирует продолжать тренировки!"</p>
-                        <div class="testimonial-author">
-                            <div class="testimonial-avatar">
-                                <i class="fas fa-user-circle"></i>
-                            </div>
-                            <div class="testimonial-info">
-                                <h4>Елена В.</h4>
-                                <p>Пользователь с 2024 года</p>
-                            </div>
+                        <div class="testimonial-info">
+                            <h4>Елена В.</h4>
+                            <p>Пользователь с 2024 года</p>
                         </div>
                     </div>
                 </div>
@@ -162,16 +211,82 @@
         </div>
     </div>
     
-    <div class="section bg-primary text-white cta-section">
-        <div class="row">
-            <div class="col-8 col-sm-12">
-                <h2>Готовы начать свой путь к лучшей версии себя?</h2>
-                <p>Присоединяйтесь к тысячам пользователей, которые уже достигают своих фитнес-целей с NOVIII.</p>
-            </div>
-            <div class="col-4 col-sm-12 text-right">
-                <a href="/register" class="btn btn-lg btn-light">Начать бесплатно</a>
+    <div class="section motivation-card">
+        <div class="motivation-icon">
+            <i class="fas fa-rocket"></i>
+        </div>
+        <div class="motivation-content">
+            <h2 class="motivation-title">Готовы начать свой путь к лучшей версии себя?</h2>
+            <p class="motivation-text">Присоединяйтесь к тысячам пользователей, которые уже достигают своих фитнес-целей с NOVIII.</p>
+            <div class="hero-buttons" style="margin-top: 20px;">
+                <a href="/register" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus btn-icon"></i>
+                    Начать бесплатно
+                </a>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.hero-section {
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    background: linear-gradient(135deg, var(--primary-light), var(--tertiary-light));
+    border: none;
+}
+
+.hero-title {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--primary);
+}
+
+.hero-text {
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-lg);
+}
+
+.hero-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.hero-graphic {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md);
+    height: 100%;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    margin-top: var(--spacing-md);
+}
+
+.testimonial-info {
+    margin-left: var(--spacing-md);
+}
+
+.testimonial-rating {
+    margin-bottom: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        text-align: center;
+    }
+    
+    .hero-graphic {
+        margin-top: var(--spacing-lg);
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+}
+</style>
 {% endblock %}
