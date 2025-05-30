@@ -1,0 +1,28 @@
+{% if upcoming_workouts %}
+  {% for workout in upcoming_workouts %}
+    <div class="workout-item-card" data-id="{{ workout.id }}">
+      <div class="workout-item-main">
+        <div class="workout-date">
+          <div class="date-day">{{ workout.scheduled_time.strftime('%d') }}</div>
+          <div class="date-month">{{ workout.scheduled_time.strftime('%B')|capitalize }}</div>
+        </div>
+        <div class="workout-info">
+          <h3 class="workout-title">{{ workout.activity }}</h3>
+          <div class="workout-details">
+            <span><i class="fas fa-clock"></i> {{ workout.scheduled_time.strftime('%H:%M') }}</span>
+          </div>
+          <div class="workout-actions">
+            <button class="btn btn-sm btn-primary" onclick="window.location.href='/dashboard/start-schedule/{{ workout.id }}'; return false;">Начать</button>
+            <a href="/dashboard/edit-schedule/{{ workout.id }}" class="btn btn-sm btn-outline">Изменить</a>
+            <form method="post" action="/dashboard/delete-schedule/{{ workout.id }}" class="delete-schedule-form" data-id="{{ workout.id }}" style="display:inline;">
+              <button type="submit" class="btn btn-sm btn-outline" onclick="return false;">Удалить</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-outline workout-more"><i class="fas fa-ellipsis-v"></i></button>
+    </div>
+  {% endfor %}
+{% else %}
+  <div style="color: var(--text-muted); padding: 24px; text-align: center;">Нет запланированных тренировок</div>
+{% endif %} 

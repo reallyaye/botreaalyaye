@@ -170,3 +170,11 @@ async def edit_schedule_submit(request: Request, schedule_id: int = Path(...), a
             session.add(schedule)
             await session.commit()
     return StarletteRedirectResponse("/", status_code=302)
+
+@router.get("/upcoming-workouts", response_class=HTMLResponse)
+async def upcoming_workouts_partial(request: Request, user: User = Depends(get_current_user)):
+    upcoming_workouts = await get_user_schedules(user.id)
+    return templates.TemplateResponse(
+        "upcoming_workouts.html",
+        {"request": request, "upcoming_workouts": upcoming_workouts}
+    )

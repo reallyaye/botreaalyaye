@@ -110,6 +110,26 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    // --- AJAX для предстоящих тренировок ---
+    if (document.getElementById('add-schedule-form')) {
+        document.getElementById('add-schedule-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+            if (response.redirected || response.ok) {
+                await updateUpcomingWorkouts();
+                showNotification('Тренировка добавлена!', 'success');
+                form.reset();
+            } else {
+                showNotification('Ошибка при добавлении тренировки', 'error');
+            }
+        });
+    }
 });
 
 /**
@@ -392,4 +412,49 @@ function clearInvalid(input) {
     if (errorElement && errorElement.classList.contains('error-message')) {
         errorElement.parentNode.removeChild(errorElement);
     }
+}
+
+async function updateUpcomingWorkouts() {
+    const resp = await fetch('/dashboard/upcoming-workouts');
+    if (resp.ok) {
+        const html = await resp.text();
+        document.getElementById('upcoming-workouts-container').innerHTML = html;
+        bindDeleteScheduleForms();
+    }
+}
+
+function bindDeleteScheduleForms() {
+    document.querySelectorAll('.delete-schedule-form').forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const resp = await fetch(form.action, { method: 'POST' });
+            if (resp.redirected || resp.ok) {
+                await updateUpcomingWorkouts();
+                showNotification('Тренировка удалена!', 'success');
+            } else {
+                showNotification('Ошибка при удалении', 'error');
+            }
+        });
+    });
+}
+
+// Первичная привязка после загрузки страницы
+bindDeleteScheduleForms();
+
+// --- Простое уведомление ---
+function showNotification(msg, type) {
+    let n = document.createElement('div');
+    n.className = 'custom-toast ' + (type === 'success' ? 'toast-success' : 'toast-error');
+    n.textContent = msg;
+    document.body.appendChild(n);
+    setTimeout(() => { n.classList.add('show'); }, 10);
+    setTimeout(() => { n.classList.remove('show'); setTimeout(()=>n.remove(), 300); }, 2500);
+}
+
+// --- Стили для уведомлений ---
+if (!document.getElementById('custom-toast-style')) {
+    const style = document.createElement('style');
+    style.id = 'custom-toast-style';
+    style.innerHTML = `.custom-toast {position:fixed;top:30px;right:30px;z-index:9999;padding:16px 28px;border-radius:8px;font-size:1.1em;box-shadow:0 2px 12px rgba(0,0,0,0.12);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateY(-20px);} .custom-toast.show {opacity:1;pointer-events:auto;transform:translateY(0);} .toast-success {background:#4caf50;color:#fff;} .toast-error {background:#e53935;color:#fff;}`;
+    document.head.appendChild(style);
 }
