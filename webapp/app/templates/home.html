@@ -1,179 +1,167 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOVIII Fitness - Главная</title>
-          <link rel="stylesheet" href="{{ request.url_for('static', path='css/unified_style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    {% extends "base.html" %}
+{% extends "base.html" %}
     
-    {% block title %}NOVIII Fitness - Главная{% endblock %}
+{% block title %}NOVIII Fitness - Главная{% endblock %}
     
-    {% block content %}
-    <div class="fade-in">
-        <div class="hero-section">
-            <div class="row">
-                <div class="col-6 col-sm-12">
-                    <h1 class="hero-title">Достигайте своих фитнес-целей с NOVIII</h1>
-                    <p class="hero-text">Персональный фитнес-помощник, который поможет вам тренироваться эффективнее, отслеживать прогресс и достигать результатов.</p>
-                    <div class="hero-buttons">
-                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Начать бесплатно</a>
-                        <a href="#features" class="btn btn-secondary btn-lg">Узнать больше</a>
-                    </div>
-                </div>
-                <div class="col-6 col-sm-12">
-                    <img src="{{ url_for('static', filename='img/hero-image.jpg') }}" alt="NOVIII Fitness" class="hero-image">
+{% block content %}
+<div class="fade-in">
+    <div class="hero-section">
+        <div class="row">
+            <div class="col-6 col-sm-12">
+                <h1 class="hero-title">Достигайте своих фитнес-целей с NOVIII</h1>
+                <p class="hero-text">Персональный фитнес-помощник, который поможет вам тренироваться эффективнее, отслеживать прогресс и достигать результатов.</p>
+                <div class="hero-buttons">
+                    <a href="/register" class="btn btn-primary btn-lg">Начать бесплатно</a>
+                    <a href="#features" class="btn btn-secondary btn-lg">Узнать больше</a>
                 </div>
             </div>
-        </div>
-        
-        <div class="section" id="features">
-            <h2 class="section-title text-center">Возможности NOVIII Fitness</h2>
-            <div class="row">
-                <div class="col-4 col-sm-12">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-dumbbell"></i>
-                        </div>
-                        <h3>Персональные тренировки</h3>
-                        <p>Выбирайте из множества готовых программ тренировок или создавайте свои собственные.</p>
-                    </div>
-                </div>
-                <div class="col-4 col-sm-12">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h3>Отслеживание прогресса</h3>
-                        <p>Наблюдайте за своими достижениями с помощью детальной статистики и графиков.</p>
-                    </div>
-                </div>
-                <div class="col-4 col-sm-12">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <h3>Постановка целей</h3>
-                        <p>Ставьте цели и отслеживайте прогресс на пути к их достижению.</p>
-                    </div>
-                </div>
+            <div class="col-6 col-sm-12">
+                <img src="{{ request.url_for('static', path='img/hero-image.jpg') }}" alt="NOVIII Fitness" class="hero-image">
             </div>
         </div>
-        
-        <div class="section bg-light">
-            <h2 class="section-title text-center">Как это работает</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h3>Создайте аккаунт</h3>
-                        <p>Зарегистрируйтесь и заполните свой профиль для персонализации тренировок.</p>
+    </div>
+    
+    <div class="section" id="features">
+        <h2 class="section-title text-center">Возможности NOVIII Fitness</h2>
+        <div class="row">
+            <div class="col-4 col-sm-12">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-dumbbell"></i>
                     </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h3>Выберите программу</h3>
-                        <p>Выберите подходящую программу тренировок из нашей библиотеки.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h3>Тренируйтесь</h3>
-                        <p>Следуйте инструкциям и выполняйте упражнения в своем темпе.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h3>Отслеживайте прогресс</h3>
-                        <p>Анализируйте свои результаты и корректируйте тренировки для достижения целей.</p>
-                    </div>
+                    <h3>Персональные тренировки</h3>
+                    <p>Выбирайте из множества готовых программ тренировок или создавайте свои собственные.</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="section">
-            <h2 class="section-title text-center">Отзывы пользователей</h2>
-            <div class="testimonials">
-                <div class="row">
-                    <div class="col-4 col-sm-12">
-                        <div class="testimonial-card">
-                            <div class="testimonial-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <p class="testimonial-text">"NOVIII помог мне наконец-то начать регулярно заниматься спортом. Удобный интерфейс и разнообразие тренировок - именно то, что мне было нужно!"</p>
-                            <div class="testimonial-author">
-                                <img src="{{ url_for('static', filename='img/testimonials/user1.jpg') }}" alt="Анна М." class="testimonial-avatar">
-                                <div class="testimonial-info">
-                                    <h4>Анна М.</h4>
-                                    <p>Пользователь с 2024 года</p>
-                                </div>
-                            </div>
-                        </div>
+            <div class="col-4 col-sm-12">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
                     </div>
-                    <div class="col-4 col-sm-12">
-                        <div class="testimonial-card">
-                            <div class="testimonial-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <p class="testimonial-text">"За 3 месяца использования NOVIII я сбросил 8 кг и значительно улучшил свою физическую форму. Отличное приложение для тех, кто серьезно относится к тренировкам."</p>
-                            <div class="testimonial-author">
-                                <img src="{{ url_for('static', filename='img/testimonials/user2.jpg') }}" alt="Дмитрий К." class="testimonial-avatar">
-                                <div class="testimonial-info">
-                                    <h4>Дмитрий К.</h4>
-                                    <p>Пользователь с 2023 года</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-4 col-sm-12">
-                        <div class="testimonial-card">
-                            <div class="testimonial-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                            <p class="testimonial-text">"Мне особенно нравится возможность отслеживать свой прогресс и видеть результаты в графиках. Это очень мотивирует продолжать тренировки!"</p>
-                            <div class="testimonial-author">
-                                <img src="{{ url_for('static', filename='img/testimonials/user3.jpg') }}" alt="Елена В." class="testimonial-avatar">
-                                <div class="testimonial-info">
-                                    <h4>Елена В.</h4>
-                                    <p>Пользователь с 2024 года</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <h3>Отслеживание прогресса</h3>
+                    <p>Наблюдайте за своими достижениями с помощью детальной статистики и графиков.</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="section bg-primary text-white cta-section">
-            <div class="row">
-                <div class="col-8 col-sm-12">
-                    <h2>Готовы начать свой путь к лучшей версии себя?</h2>
-                    <p>Присоединяйтесь к тысячам пользователей, которые уже достигают своих фитнес-целей с NOVIII.</p>
-                </div>
-                <div class="col-4 col-sm-12 text-right">
-                    <a href="{{ url_for('register') }}" class="btn btn-lg btn-light">Начать бесплатно</a>
+            <div class="col-4 col-sm-12">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3>Постановка целей</h3>
+                    <p>Ставьте цели и отслеживайте прогресс на пути к их достижению.</p>
                 </div>
             </div>
         </div>
     </div>
-    {% endblock %}
-</body>
-</html>
+    
+    <div class="section bg-light">
+        <h2 class="section-title text-center">Как это работает</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Создайте аккаунт</h3>
+                    <p>Зарегистрируйтесь и заполните свой профиль для персонализации тренировок.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Выберите программу</h3>
+                    <p>Выберите подходящую программу тренировок из нашей библиотеки.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Тренируйтесь</h3>
+                    <p>Следуйте инструкциям и выполняйте упражнения в своем темпе.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Отслеживайте прогресс</h3>
+                    <p>Анализируйте свои результаты и корректируйте тренировки для достижения целей.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title text-center">Отзывы пользователей</h2>
+        <div class="testimonials">
+            <div class="row">
+                <div class="col-4 col-sm-12">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"NOVIII помог мне наконец-то начать регулярно заниматься спортом. Удобный интерфейс и разнообразие тренировок - именно то, что мне было нужно!"</p>
+                        <div class="testimonial-author">
+                            <img src="{{ request.url_for('static', path='img/testimonials/user1.jpg') }}" alt="Анна М." class="testimonial-avatar">
+                            <div class="testimonial-info">
+                                <h4>Анна М.</h4>
+                                <p>Пользователь с 2024 года</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 col-sm-12">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"За 3 месяца использования NOVIII я сбросил 8 кг и значительно улучшил свою физическую форму. Отличное приложение для тех, кто серьезно относится к тренировкам."</p>
+                        <div class="testimonial-author">
+                            <img src="{{ request.url_for('static', path='img/testimonials/user2.jpg') }}" alt="Дмитрий К." class="testimonial-avatar">
+                            <div class="testimonial-info">
+                                <h4>Дмитрий К.</h4>
+                                <p>Пользователь с 2023 года</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 col-sm-12">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <p class="testimonial-text">"Мне особенно нравится возможность отслеживать свой прогресс и видеть результаты в графиках. Это очень мотивирует продолжать тренировки!"</p>
+                        <div class="testimonial-author">
+                            <img src="{{ request.url_for('static', path='img/testimonials/user3.jpg') }}" alt="Елена В." class="testimonial-avatar">
+                            <div class="testimonial-info">
+                                <h4>Елена В.</h4>
+                                <p>Пользователь с 2024 года</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section bg-primary text-white cta-section">
+        <div class="row">
+            <div class="col-8 col-sm-12">
+                <h2>Готовы начать свой путь к лучшей версии себя?</h2>
+                <p>Присоединяйтесь к тысячам пользователей, которые уже достигают своих фитнес-целей с NOVIII.</p>
+            </div>
+            <div class="col-4 col-sm-12 text-right">
+                <a href="/register" class="btn btn-lg btn-light">Начать бесплатно</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

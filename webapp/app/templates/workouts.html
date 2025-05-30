@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOVIII Fitness - Тренировки</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/unified_style.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/unified_style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -37,7 +37,7 @@
             <div class="col-4 col-sm-12 mb-4 workout-item" data-category="cardio">
                 <div class="card workout-card">
                     <div class="workout-card-header">
-                        <img src="{{ url_for('static', filename='img/workouts/running.jpg') }}" alt="Интервальный бег">
+                        <img src="{{ request.url_for('static', path='img/workouts/running.jpg') }}" alt="Интервальный бег">
                     </div>
                     <div class="workout-card-body">
                         <h4>Интервальный бег</h4>
@@ -64,7 +64,7 @@
             <div class="col-4 col-sm-12 mb-4 workout-item" data-category="strength">
                 <div class="card workout-card">
                     <div class="workout-card-header">
-                        <img src="{{ url_for('static', filename='img/workouts/strength.jpg') }}" alt="Силовая тренировка">
+                        <img src="{{ request.url_for('static', path='img/workouts/strength.jpg') }}" alt="Силовая тренировка">
                     </div>
                     <div class="workout-card-body">
                         <h4>Силовая тренировка</h4>
@@ -91,7 +91,7 @@
             <div class="col-4 col-sm-12 mb-4 workout-item" data-category="yoga">
                 <div class="card workout-card">
                     <div class="workout-card-header">
-                        <img src="{{ url_for('static', filename='img/workouts/yoga.jpg') }}" alt="Йога для начинающих">
+                        <img src="{{ request.url_for('static', path='img/workouts/yoga.jpg') }}" alt="Йога для начинающих">
                     </div>
                     <div class="workout-card-body">
                         <h4>Йога для начинающих</h4>
@@ -118,7 +118,7 @@
             <div class="col-4 col-sm-12 mb-4 workout-item" data-category="stretch">
                 <div class="card workout-card">
                     <div class="workout-card-header">
-                        <img src="{{ url_for('static', filename='img/workouts/stretch.jpg') }}" alt="Комплексная растяжка">
+                        <img src="{{ request.url_for('static', path='img/workouts/stretch.jpg') }}" alt="Комплексная растяжка">
                     </div>
                     <div class="workout-card-body">
                         <h4>Комплексная растяжка</h4>
@@ -145,7 +145,7 @@
             <div class="col-4 col-sm-12 mb-4 workout-item" data-category="cardio">
                 <div class="card workout-card">
                     <div class="workout-card-header">
-                        <img src="{{ url_for('static', filename='img/workouts/swimming.jpg') }}" alt="Плавание">
+                        <img src="{{ request.url_for('static', path='img/workouts/swimming.jpg') }}" alt="Плавание">
                     </div>
                     <div class="workout-card-body">
                         <h4>Плавание</h4>
@@ -172,7 +172,7 @@
             <div class="col-4 col-sm-12 mb-4 workout-item" data-category="cardio">
                 <div class="card workout-card">
                     <div class="workout-card-header">
-                        <img src="{{ url_for('static', filename='img/workouts/hiit.jpg') }}" alt="HIIT тренировка">
+                        <img src="{{ request.url_for('static', path='img/workouts/hiit.jpg') }}" alt="HIIT тренировка">
                     </div>
                     <div class="workout-card-body">
                         <h4>HIIT тренировка</h4>
