@@ -1028,6 +1028,44 @@ img {
   }
 }
 
+@media (max-width: 576px) {
+  .container {
+    padding: 0 5px;
+  }
+  .section-title, .hero-title {
+    font-size: 1.2rem;
+  }
+  .btn, .form-control {
+    font-size: 1rem;
+    min-height: 44px;
+  }
+  .workout-grid, .profile-stats {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  .card, .workout-card {
+    padding: var(--spacing-sm);
+  }
+  .navbar-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .footer .row {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .profile-avatar-container {
+    margin: 0 auto var(--spacing-md) auto;
+  }
+  .main-content, main.container {
+    padding: 0 2px;
+  }
+}
+
 /* ===== UTILITIES ===== */
 .text-center {
   text-align: center;
