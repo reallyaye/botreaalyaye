@@ -1,543 +1,441 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}NOVIII Fitness - Профиль{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='css/unified_style.css') }}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    {% block extra_css %}{% endblock %}
-</head>
-<body>
-    <header class="header">
-        <div class="container header-container">
-            <a href="{{ url_for('dashboard') }}" class="logo">
-                <div class="logo-icon">N</div>
-                <span>NOVIII</span>
-            </a>
-            <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <nav class="nav" id="mainNav">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.url.path == '/dashboard' or request.url.path == '/' %}active{% endif %}">Панель</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('workouts') }}" class="nav-link {% if request.url.path == '/workouts' %}active{% endif %}">Тренировки</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('stats') }}" class="nav-link {% if request.url.path == '/stats' %}active{% endif %}">Статистика</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('profile') }}" class="nav-link {% if request.url.path == '/profile' %}active{% endif %}">Профиль</a>
-                    </li>
-                </ul>
-                <div class="user-actions">
-                    <button class="icon-button" title="Профиль">
-                        <i class="fas fa-user"></i>
-                    </button>
-                    <button class="icon-button" title="Уведомления">
-                        <i class="fas fa-bell"></i>
-                    </button>
-                </div>
-            </nav>
+{% extends "base.html" %}
+{% block title %}NOVIII Fitness - Профиль{% endblock %}
+{% block content %}
+<div class="section card fade-in">
+  <h1 class="section-title">Профиль</h1>
+  <div class="profile-header">
+    <div class="profile-avatar-container">
+      <i class="fas fa-user"></i>
+    </div>
+    <div class="profile-info">
+      <h2 class="profile-name">{{ username or 'Пользователь' }}</h2>
+      <div class="profile-stats workout-grid">
+        <div class="workout-card">
+          <div class="workout-header">
+            <div class="workout-icon" style="background-color: var(--primary-light); color: var(--primary);">
+              <i class="fas fa-dumbbell"></i>
+            </div>
+          </div>
+          <div class="workout-content">
+            <div class="workout-title">Тренировок</div>
+            <div class="workout-description">48</div>
+          </div>
         </div>
-    </header>
-
-    <main class="main-content">
-        <div class="container">
-            {% block content %}
-            <h1>Профиль</h1>
-            
-            <div class="profile-section">
-                <div class="profile-header">
-                    <div class="profile-avatar-container">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="profile-info">
-                        <h2 class="profile-name">{{ username or 'Пользователь' }}</h2>
-                        <div class="profile-stats">
-                            <div class="profile-stat">
-                                <div class="profile-stat-value">48</div>
-                                <div class="profile-stat-label">Тренировок</div>
-                            </div>
-                            <div class="profile-stat">
-                                <div class="profile-stat-value">1280</div>
-                                <div class="profile-stat-label">Минут</div>
-                            </div>
-                            <div class="profile-stat">
-                                <div class="profile-stat-value">15,400</div>
-                                <div class="profile-stat-label">Калорий</div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-edit btn-icon"></i>
-                        Редактировать
-                    </button>
-                </div>
-                </div>
+        <div class="workout-card">
+          <div class="workout-header">
+            <div class="workout-icon" style="background-color: var(--tertiary-light); color: var(--tertiary);">
+              <i class="fas fa-clock"></i>
             </div>
-            
-            <div class="profile-tabs">
-                <button class="profile-tab active" data-tab="personal">Личные данные</button>
-                <button class="profile-tab" data-tab="goals">Цели</button>
-                <button class="profile-tab" data-tab="settings">Настройки</button>
-                <button class="profile-tab" data-tab="notifications">Уведомления</button>
-            </div>
-            
-            <div class="profile-tab-content active" id="personal-tab">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Личные данные</h3>
-                        <button class="btn btn-sm btn-outline">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Имя</label>
-                                <input type="text" class="form-control" value="Александр" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Фамилия</label>
-                                <input type="text" class="form-control" value="Иванов" disabled>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" value="alexander@example.com" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Телефон</label>
-                                <input type="tel" class="form-control" value="+7 (999) 123-45-67" disabled>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Дата рождения</label>
-                                <input type="date" class="form-control" value="1990-05-15" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Пол</label>
-                                <select class="form-control" disabled>
-                                    <option selected>Мужской</option>
-                                    <option>Женский</option>
-                                    <option>Другой</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Физические параметры</h3>
-                        <button class="btn btn-sm btn-outline">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Рост (см)</label>
-                                <input type="number" class="form-control" value="182" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Вес (кг)</label>
-                                <input type="number" class="form-control" value="78" disabled>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Уровень активности</label>
-                                <select class="form-control" disabled>
-                                    <option>Низкий</option>
-                                    <option selected>Средний</option>
-                                    <option>Высокий</option>
-                                    <option>Очень высокий</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Опыт тренировок</label>
-                                <select class="form-control" disabled>
-                                    <option>Новичок</option>
-                                    <option selected>Средний</option>
-                                    <option>Продвинутый</option>
-                                    <option>Профессионал</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="profile-tab-content" id="goals-tab">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Мои цели</h3>
-                        <button class="btn btn-sm btn-outline">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="goals-list">
-                            <div class="goal-item">
-                                <div class="goal-info">
-                                    <div class="goal-name">Тренировки в неделю</div>
-                                    <div class="goal-value">4/5</div>
-                                </div>
-                                <div class="goal-progress-bg">
-                                    <div class="goal-progress-fill" style="width: 80%;"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="goal-item">
-                                <div class="goal-info">
-                                    <div class="goal-name">Время тренировок</div>
-                                    <div class="goal-value">320/400 мин</div>
-                                </div>
-                                <div class="goal-progress-bg">
-                                    <div class="goal-progress-fill" style="width: 80%;"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="goal-item">
-                                <div class="goal-info">
-                                    <div class="goal-name">Снижение веса</div>
-                                    <div class="goal-value">3/5 кг</div>
-                                </div>
-                                <div class="goal-progress-bg">
-                                    <div class="goal-progress-fill" style="width: 60%;"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="goal-item">
-                                <div class="goal-info">
-                                    <div class="goal-name">Увеличение силы</div>
-                                    <div class="goal-value">15/20 кг</div>
-                                </div>
-                                <div class="goal-progress-bg">
-                                    <div class="goal-progress-fill" style="width: 75%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Добавить новую цель</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Тип цели</label>
-                                <select class="form-control">
-                                    <option>Снижение веса</option>
-                                    <option>Набор мышечной массы</option>
-                                    <option>Увеличение выносливости</option>
-                                    <option>Улучшение гибкости</option>
-                                    <option>Другое</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Значение</label>
-                                <input type="number" class="form-control" placeholder="Введите значение">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Срок достижения</label>
-                                <input type="date" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Приоритет</label>
-                                <select class="form-control">
-                                    <option>Низкий</option>
-                                    <option selected>Средний</option>
-                                    <option>Высокий</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-plus btn-icon"></i>
-                            Добавить цель
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="profile-tab-content" id="settings-tab">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Настройки аккаунта</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label">Язык</label>
-                            <select class="form-control">
-                                <option selected>Русский</option>
-                                <option>English</option>
-                                <option>Español</option>
-                                <option>Français</option>
-                                <option>Deutsch</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Часовой пояс</label>
-                            <select class="form-control">
-                                <option selected>Москва (GMT+3)</option>
-                                <option>Лондон (GMT+0)</option>
-                                <option>Нью-Йорк (GMT-5)</option>
-                                <option>Лос-Анджелес (GMT-8)</option>
-                                <option>Токио (GMT+9)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Единицы измерения</label>
-                            <div class="toggle-group">
-                                <label class="toggle">
-                                    <input type="radio" name="units" checked>
-                                    <span class="toggle-label">Метрические (кг, см)</span>
-                                </label>
-                                <label class="toggle">
-                                    <input type="radio" name="units">
-                                    <span class="toggle-label">Имперские (фунты, дюймы)</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Тема</label>
-                            <div class="toggle-group">
-                                <label class="toggle">
-                                    <input type="radio" name="theme" checked>
-                                    <span class="toggle-label">Светлая</span>
-                                </label>
-                                <label class="toggle">
-                                    <input type="radio" name="theme">
-                                    <span class="toggle-label">Темная</span>
-                                </label>
-                                <label class="toggle">
-                                    <input type="radio" name="theme">
-                                    <span class="toggle-label">Системная</span>
-                                </label>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary">Сохранить настройки</button>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Безопасность</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label">Текущий пароль</label>
-                            <input type="password" class="form-control" placeholder="Введите текущий пароль">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Новый пароль</label>
-                            <input type="password" class="form-control" placeholder="Введите новый пароль">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Подтверждение пароля</label>
-                            <input type="password" class="form-control" placeholder="Подтвердите новый пароль">
-                        </div>
-                        <button class="btn btn-primary">Изменить пароль</button>
-                        
-                        <hr class="divider">
-                        
-                        <div class="form-group">
-                            <label class="form-label">Двухфакторная аутентификация</label>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="twoFactorAuth">
-                                <label for="twoFactorAuth"></label>
-                                <span class="toggle-label">Выключена</span>
-                            </div>
-                        </div>
-                        <p class="form-help">Повысьте безопасность вашего аккаунта, включив двухфакторную аутентификацию.</p>
-                    </div>
-                </div>
-                
-                <div class="card danger-zone">
-                    <div class="card-header">
-                        <h3 class="card-title">Опасная зона</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="danger-action">
-                            <div>
-                                <h4>Удалить все данные тренировок</h4>
-                                <p>Это действие удалит все ваши тренировки и статистику. Это действие необратимо.</p>
-                            </div>
-                            <button class="btn btn-danger">Удалить данные</button>
-                        </div>
-                        <div class="danger-action">
-                            <div>
-                                <h4>Удалить аккаунт</h4>
-                                <p>Это действие полностью удалит ваш аккаунт и все связанные с ним данные. Это действие необратимо.</p>
-                            </div>
-                            <button class="btn btn-danger">Удалить аккаунт</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="profile-tab-content" id="notifications-tab">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Настройки уведомлений</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="notification-setting">
-                            <div>
-                                <h4>Напоминания о тренировках</h4>
-                                <p>Получайте уведомления о запланированных тренировках</p>
-                            </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="workoutReminders" checked>
-                                <label for="workoutReminders"></label>
-                            </div>
-                        </div>
-                        <div class="notification-setting">
-                            <div>
-                                <h4>Достижение целей</h4>
-                                <p>Получайте уведомления о достижении поставленных целей</p>
-                            </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="goalAchievements" checked>
-                                <label for="goalAchievements"></label>
-                            </div>
-                        </div>
-                        <div class="notification-setting">
-                            <div>
-                                <h4>Новые программы тренировок</h4>
-                                <p>Получайте уведомления о новых программах тренировок</p>
-                            </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="newWorkouts" checked>
-                                <label for="newWorkouts"></label>
-                            </div>
-                        </div>
-                        <div class="notification-setting">
-                            <div>
-                                <h4>Советы и рекомендации</h4>
-                                <p>Получайте полезные советы и рекомендации по тренировкам</p>
-                            </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="tips">
-                                <label for="tips"></label>
-                            </div>
-                        </div>
-                        <div class="notification-setting">
-                            <div>
-                                <h4>Маркетинговые рассылки</h4>
-                                <p>Получайте информацию о специальных предложениях и акциях</p>
-                            </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="marketing">
-                                <label for="marketing"></label>
-                            </div>
-                        </div>
-                        
-                        <hr class="divider">
-                        
-                        <div class="form-group">
-                            <label class="form-label">Способы уведомлений</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox">
-                                    <input type="checkbox" checked>
-                                    <span class="checkbox-label">Email</span>
-                                </label>
-                                <label class="checkbox">
-                                    <input type="checkbox" checked>
-                                    <span class="checkbox-label">Push-уведомления</span>
-                                </label>
-                                <label class="checkbox">
-                                    <input type="checkbox">
-                                    <span class="checkbox-label">SMS</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <button class="btn btn-primary">Сохранить настройки</button>
-                    </div>
-                </div>
-            </div>
-            {% endblock %}
+          </div>
+          <div class="workout-content">
+            <div class="workout-title">Минут</div>
+            <div class="workout-description">1280</div>
+          </div>
         </div>
-    </main>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <h4>NOVIII Fitness</h4>
-                    <p>Ваш персональный помощник для достижения фитнес-целей</p>
-                </div>
-                <div class="col">
-                    <h4>Ссылки</h4>
-                    <ul class="footer-links">
-                        <li><a href="#" class="footer-link">О нас</a></li>
-                        <li><a href="#" class="footer-link">Контакты</a></li>
-                        <li><a href="#" class="footer-link">Политика конфиденциальности</a></li>
-                    </ul>
-                </div>
-                <div class="col">
-                    <h4>Контакты</h4>
-                    <p><i class="fas fa-envelope"></i> info@noviii-fitness.com</p>
-                    <p><i class="fas fa-phone"></i> +7 (999) 123-45-67</p>
-                </div>
+        <div class="workout-card">
+          <div class="workout-header">
+            <div class="workout-icon" style="background-color: var(--warning-light); color: var(--warning);">
+              <i class="fas fa-fire"></i>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 NOVIII Fitness. Все права защищены.</p>
-            </div>
+          </div>
+          <div class="workout-content">
+            <div class="workout-title">Калорий</div>
+            <div class="workout-description">15,400</div>
+          </div>
         </div>
-    </footer>
-
-    <script>
-        // Мобильное меню
-        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
-            document.getElementById('mainNav').classList.toggle('active');
-            this.classList.toggle('active');
-        });
+      </div>
+    </div>
+    <button class="btn btn-primary">
+      <i class="fas fa-edit btn-icon"></i>
+      Редактировать
+    </button>
+  </div>
+  <div class="profile-tabs">
+    <button class="profile-tab active" data-tab="personal">Личные данные</button>
+    <button class="profile-tab" data-tab="goals">Цели</button>
+    <button class="profile-tab" data-tab="settings">Настройки</button>
+    <button class="profile-tab" data-tab="notifications">Уведомления</button>
+  </div>
+  <div class="profile-tab-content active" id="personal-tab">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Личные данные</h3>
+        <button class="btn btn-sm btn-outline">
+          <i class="fas fa-edit"></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Имя</label>
+            <input type="text" class="form-control" value="Александр" disabled>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Фамилия</label>
+            <input type="text" class="form-control" value="Иванов" disabled>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" value="alexander@example.com" disabled>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Телефон</label>
+            <input type="tel" class="form-control" value="+7 (999) 123-45-67" disabled>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Дата рождения</label>
+            <input type="date" class="form-control" value="1990-05-15" disabled>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Пол</label>
+            <select class="form-control" disabled>
+              <option selected>Мужской</option>
+              <option>Женский</option>
+              <option>Другой</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Физические параметры</h3>
+        <button class="btn btn-sm btn-outline">
+          <i class="fas fa-edit"></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Рост (см)</label>
+            <input type="number" class="form-control" value="182" disabled>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Вес (кг)</label>
+            <input type="number" class="form-control" value="78" disabled>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Уровень активности</label>
+            <select class="form-control" disabled>
+              <option>Низкий</option>
+              <option selected>Средний</option>
+              <option>Высокий</option>
+              <option>Очень высокий</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Опыт тренировок</label>
+            <select class="form-control" disabled>
+              <option>Новичок</option>
+              <option selected>Средний</option>
+              <option>Продвинутый</option>
+              <option>Профессионал</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="profile-tab-content" id="goals-tab">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Мои цели</h3>
+        <button class="btn btn-sm btn-outline">
+          <i class="fas fa-edit"></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="goals-list">
+          <div class="goal-item">
+            <div class="goal-info">
+              <div class="goal-name">Тренировки в неделю</div>
+              <div class="goal-value">4/5</div>
+            </div>
+            <div class="goal-progress-bg">
+              <div class="goal-progress-fill" style="width: 80%;"></div>
+            </div>
+          </div>
+          
+          <div class="goal-item">
+            <div class="goal-info">
+              <div class="goal-name">Время тренировок</div>
+              <div class="goal-value">320/400 мин</div>
+            </div>
+            <div class="goal-progress-bg">
+              <div class="goal-progress-fill" style="width: 80%;"></div>
+            </div>
+          </div>
+          
+          <div class="goal-item">
+            <div class="goal-info">
+              <div class="goal-name">Снижение веса</div>
+              <div class="goal-value">3/5 кг</div>
+            </div>
+            <div class="goal-progress-bg">
+              <div class="goal-progress-fill" style="width: 60%;"></div>
+            </div>
+          </div>
+          
+          <div class="goal-item">
+            <div class="goal-info">
+              <div class="goal-name">Увеличение силы</div>
+              <div class="goal-value">15/20 кг</div>
+            </div>
+            <div class="goal-progress-bg">
+              <div class="goal-progress-fill" style="width: 75%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Добавить новую цель</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Тип цели</label>
+            <select class="form-control">
+              <option>Снижение веса</option>
+              <option>Набор мышечной массы</option>
+              <option>Увеличение выносливости</option>
+              <option>Улучшение гибкости</option>
+              <option>Другое</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Значение</label>
+            <input type="number" class="form-control" placeholder="Введите значение">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Срок достижения</label>
+            <input type="date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Приоритет</label>
+            <select class="form-control">
+              <option>Низкий</option>
+              <option selected>Средний</option>
+              <option>Высокий</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary">
+          <i class="fas fa-plus btn-icon"></i>
+          Добавить цель
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="profile-tab-content" id="settings-tab">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Настройки аккаунта</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Язык</label>
+          <select class="form-control">
+            <option selected>Русский</option>
+            <option>English</option>
+            <option>Español</option>
+            <option>Français</option>
+            <option>Deutsch</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Часовой пояс</label>
+          <select class="form-control">
+            <option selected>Москва (GMT+3)</option>
+            <option>Лондон (GMT+0)</option>
+            <option>Нью-Йорк (GMT-5)</option>
+            <option>Лос-Анджелес (GMT-8)</option>
+            <option>Токио (GMT+9)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Единицы измерения</label>
+          <div class="toggle-group">
+            <label class="toggle">
+              <input type="radio" name="units" checked>
+              <span class="toggle-label">Метрические (кг, см)</span>
+            </label>
+            <label class="toggle">
+              <input type="radio" name="units">
+              <span class="toggle-label">Имперские (фунты, дюймы)</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Тема</label>
+          <div class="toggle-group">
+            <label class="toggle">
+              <input type="radio" name="theme" checked>
+              <span class="toggle-label">Светлая</span>
+            </label>
+            <label class="toggle">
+              <input type="radio" name="theme">
+              <span class="toggle-label">Темная</span>
+            </label>
+            <label class="toggle">
+              <input type="radio" name="theme">
+              <span class="toggle-label">Системная</span>
+            </label>
+          </div>
+        </div>
+        <button class="btn btn-primary">Сохранить настройки</button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Безопасность</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Текущий пароль</label>
+          <input type="password" class="form-control" placeholder="Введите текущий пароль">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Новый пароль</label>
+          <input type="password" class="form-control" placeholder="Введите новый пароль">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Подтверждение пароля</label>
+          <input type="password" class="form-control" placeholder="Подтвердите новый пароль">
+        </div>
+        <button class="btn btn-primary">Изменить пароль</button>
         
-        // Переключение вкладок профиля
-        const profileTabs = document.querySelectorAll('.profile-tab');
-        const profileTabContents = document.querySelectorAll('.profile-tab-content');
+        <hr class="divider">
         
-        profileTabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                const tabId = this.getAttribute('data-tab');
-                
-                // Удаляем активный класс со всех вкладок и контента
-                profileTabs.forEach(t => t.classList.remove('active'));
-                profileTabContents.forEach(c => c.classList.remove('active'));
-                
-                // Добавляем активный класс выбранной вкладке и соответствующему контенту
-                this.classList.add('active');
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-            });
-        });
+        <div class="form-group">
+          <label class="form-label">Двухфакторная аутентификация</label>
+          <div class="toggle-switch">
+            <input type="checkbox" id="twoFactorAuth">
+            <label for="twoFactorAuth"></label>
+            <span class="toggle-label">Выключена</span>
+          </div>
+        </div>
+        <p class="form-help">Повысьте безопасность вашего аккаунта, включив двухфакторную аутентификацию.</p>
+      </div>
+    </div>
+    
+    <div class="card danger-zone">
+      <div class="card-header">
+        <h3 class="card-title">Опасная зона</h3>
+      </div>
+      <div class="card-body">
+        <div class="danger-action">
+          <div>
+            <h4>Удалить все данные тренировок</h4>
+            <p>Это действие удалит все ваши тренировки и статистику. Это действие необратимо.</p>
+          </div>
+          <button class="btn btn-danger">Удалить данные</button>
+        </div>
+        <div class="danger-action">
+          <div>
+            <h4>Удалить аккаунт</h4>
+            <p>Это действие полностью удалит ваш аккаунт и все связанные с ним данные. Это действие необратимо.</p>
+          </div>
+          <button class="btn btn-danger">Удалить аккаунт</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="profile-tab-content" id="notifications-tab">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Настройки уведомлений</h3>
+      </div>
+      <div class="card-body">
+        <div class="notification-setting">
+          <div>
+            <h4>Напоминания о тренировках</h4>
+            <p>Получайте уведомления о запланированных тренировках</p>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="workoutReminders" checked>
+            <label for="workoutReminders"></label>
+          </div>
+        </div>
+        <div class="notification-setting">
+          <div>
+            <h4>Достижение целей</h4>
+            <p>Получайте уведомления о достижении поставленных целей</p>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="goalAchievements" checked>
+            <label for="goalAchievements"></label>
+          </div>
+        </div>
+        <div class="notification-setting">
+          <div>
+            <h4>Новые программы тренировок</h4>
+            <p>Получайте уведомления о новых программах тренировок</p>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="newWorkouts" checked>
+            <label for="newWorkouts"></label>
+          </div>
+        </div>
+        <div class="notification-setting">
+          <div>
+            <h4>Советы и рекомендации</h4>
+            <p>Получайте полезные советы и рекомендации по тренировкам</p>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="tips">
+            <label for="tips"></label>
+          </div>
+        </div>
+        <div class="notification-setting">
+          <div>
+            <h4>Маркетинговые рассылки</h4>
+            <p>Получайте информацию о специальных предложениях и акциях</p>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="marketing">
+            <label for="marketing"></label>
+          </div>
+        </div>
         
-        // Переключатели
-        const toggleSwitches = document.querySelectorAll('.toggle-switch input');
-        toggleSwitches.forEach(toggle => {
-            toggle.addEventListener('change', function() {
-                const label = this.parentElement.querySelector('.toggle-label');
-                if (label) {
-                    label.textContent = this.checked ? 'Включена' : 'Выключена';
-                }
-            });
-        });
-    </script>
-    {% block extra_js %}{% endblock %}
-</body>
-</html>
+        <hr class="divider">
+        
+        <div class="form-group">
+          <label class="form-label">Способы уведомлений</label>
+          <div class="checkbox-group">
+            <label class="checkbox">
+              <input type="checkbox" checked>
+              <span class="checkbox-label">Email</span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" checked>
+              <span class="checkbox-label">Push-уведомления</span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox">
+              <span class="checkbox-label">SMS</span>
+            </label>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary">Сохранить настройки</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
