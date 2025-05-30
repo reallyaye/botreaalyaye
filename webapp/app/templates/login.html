@@ -22,10 +22,10 @@
     <form id="loginForm" method="post" action="/login">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <div class="form-group">
-        <label for="email" class="form-label">Email</label>
+        <label for="username" class="form-label">Email</label>
         <div class="input-with-icon">
           <i class="fas fa-envelope" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-          <input type="email" id="email" name="email" class="form-control" style="padding-left: 40px;" placeholder="Введите ваш email" required>
+          <input type="email" id="username" name="username" class="form-control" style="padding-left: 40px;" placeholder="Введите ваш email" required>
         </div>
       </div>
       
