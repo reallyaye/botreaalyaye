@@ -150,50 +150,42 @@ img {
 }
 
 /* ===== NAVIGATION ===== */
-.nav {
+.navbar-nav {
   display: flex;
-  align-items: center;
-}
-
-.nav-list {
-  display: flex;
+  flex-direction: row;
   list-style: none;
+  padding-left: 0;
+  margin: 0;
 }
 
 .nav-item {
-  margin: 0 var(--spacing-md);
+  margin-right: 24px;
+}
+
+.nav-item:last-child {
+  margin-right: 0;
 }
 
 .nav-link {
-  color: var(--text-dark);
+  display: block;
+  padding: 8px 18px;
+  border-radius: 8px;
   font-weight: 500;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  color: var(--primary);
+  background: none;
+  transition: background 0.2s, color 0.2s;
+  text-decoration: none;
   position: relative;
+  z-index: 1;
 }
 
-.nav-link:hover {
-  background-color: var(--primary-light);
-  color: var(--primary);
+.nav-link.active, .nav-link:hover {
+  background: var(--primary-light);
+  color: var(--secondary);
 }
 
-.nav-link.active {
-  background-color: var(--primary-light);
-  color: var(--primary);
-  font-weight: 600;
-}
-
-.nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 3px;
-  background-color: var(--primary);
-  border-radius: var(--radius-pill);
+.navbar-nav {
+  gap: 0;
 }
 
 .user-actions {
@@ -1341,4 +1333,33 @@ img {
 
 .user-select-none {
   user-select: none;
+}
+
+/* --- Иконки на главной (desktop) --- */
+@media (min-width: 768px) {
+  .welcome-card .fa-dumbbell,
+  .welcome-card .fa-running,
+  .welcome-card .fa-heartbeat {
+    font-size: 60px !important;
+    margin-right: 32px;
+  }
+  .welcome-card .fa-heartbeat {
+    margin-right: 0;
+  }
+  .welcome-card .fa-dumbbell {
+    margin-left: 0;
+  }
+}
+
+/* --- Иконки на главной (mobile) --- */
+@media (max-width: 767px) {
+  .welcome-card .fa-dumbbell,
+  .welcome-card .fa-running,
+  .welcome-card .fa-heartbeat {
+    font-size: 36px !important;
+    margin-right: 12px;
+  }
+  .welcome-card .fa-heartbeat {
+    margin-right: 0;
+  }
 }
