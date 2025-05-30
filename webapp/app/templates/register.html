@@ -1,79 +1,168 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOVIII Fitness - Регистрация</title>
-    <link rel="stylesheet" href="{{ request.url_for('static', path='css/unified_style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    {% extends "base.html" %}
-    
-    {% block title %}NOVIII Fitness - Регистрация{% endblock %}
-    
-    {% block content %}
-    <div class="fade-in">
-        <div class="row justify-content-center">
-            <div class="col-6 col-sm-12">
-                <div class="card">
-                    <h2 class="text-center mb-4"><i class="fas fa-user-plus"></i> Регистрация</h2>
-                    
-                    <form action="/register" method="post">
-                        <div class="form-group">
-                            <label for="username" class="form-label">Имя пользователя</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="password" class="form-label">Пароль</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="confirm_password" class="form-label">Подтверждение пароля</label>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                        </div>
-                        
-                        <div class="form-check mb-3">
-                            <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
-                            <label class="form-check-label" for="terms">Я согласен с <a href="#">условиями использования</a></label>
-                        </div>
-                        
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary btn-lg">Зарегистрироваться</button>
-                        </div>
-                    </form>
-                    
-                    <div class="text-center mt-3">
-                        <p>Уже есть аккаунт? <a href="/login">Войти</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
+{% extends "base.html" %}
+
+{% block title %}NOVIII Fitness - Регистрация{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-container">
+    <div class="auth-logo fade-in">
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <div class="logo-icon">N</div>
+        <span style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">NOVIII</span>
+      </div>
     </div>
-    {% endblock %}
+  
+  <div class="auth-card fade-in delay-1">
+    <h1 class="auth-title">Создание аккаунта</h1>
     
-    {% block extra_js %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('confirm_password');
-            
-            confirmPasswordInput.addEventListener('input', function() {
-                if (passwordInput.value !== confirmPasswordInput.value) {
-                    confirmPasswordInput.setCustomValidity('Пароли не совпадают');
-                } else {
-                    confirmPasswordInput.setCustomValidity('');
-                }
-            });
-        });
-    </script>
-    {% endblock %}
-</body>
-</html>
+    <form id="registerForm" method="post" action="/register">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="firstName" class="form-label">Имя</label>
+          <div class="input-with-icon">
+            <i class="fas fa-user" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            <input type="text" id="firstName" name="firstName" class="form-control" style="padding-left: 40px;" placeholder="Введите имя" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="lastName" class="form-label">Фамилия</label>
+          <div class="input-with-icon">
+            <i class="fas fa-user" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            <input type="text" id="lastName" name="lastName" class="form-control" style="padding-left: 40px;" placeholder="Введите фамилию" required>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <div class="input-with-icon">
+          <i class="fas fa-envelope" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+          <input type="email" id="email" name="email" class="form-control" style="padding-left: 40px;" placeholder="Введите ваш email" required>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password" class="form-label">Пароль</label>
+        <div class="input-with-icon" style="position: relative;">
+          <i class="fas fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+          <input type="password" id="password" name="password" class="form-control" style="padding-left: 40px;" placeholder="Создайте пароль" required>
+          <i class="fas fa-eye" id="togglePassword" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer;"></i>
+        </div>
+        <div class="password-strength" style="margin-top: 5px; font-size: 0.8rem;">
+          <div class="strength-meter" style="height: 4px; background-color: var(--border-light); border-radius: var(--radius-pill); margin-bottom: 5px;">
+            <div class="strength-meter-fill" style="width: 0%; height: 100%; border-radius: var(--radius-pill); background-color: var(--danger);"></div>
+          </div>
+          <span class="strength-text" style="color: var(--text-muted);">Надежность пароля</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Подтверждение пароля</label>
+        <div class="input-with-icon" style="position: relative;">
+          <i class="fas fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+          <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" style="padding-left: 40px;" placeholder="Подтвердите пароль" required>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <div style="display: flex; align-items: flex-start; margin-bottom: var(--spacing-md);">
+          <input type="checkbox" id="terms" name="terms" style="margin-right: 10px; margin-top: 5px;" required>
+          <label for="terms" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.4;">
+            Я согласен с <a href="#">Условиями использования</a> и <a href="#">Политикой конфиденциальности</a>
+          </label>
+        </div>
+      </div>
+      
+      <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
+    </form>
+    
+    <div style="text-align: center; margin: var(--spacing-lg) 0; color: var(--text-muted);">
+      или зарегистрируйтесь через
+    </div>
+    
+    <div class="social-login">
+      <a href="#" class="social-btn" style="background-color: #3b5998; color: white;">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+      <a href="#" class="social-btn" style="background-color: #db4437; color: white;">
+        <i class="fab fa-google"></i>
+      </a>
+      <a href="#" class="social-btn" style="background-color: #0077b5; color: white;">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+      <a href="#" class="social-btn" style="background-color: #000000; color: white;">
+        <i class="fab fa-apple"></i>
+      </a>
+    </div>
+  </div>
+  
+  <div class="auth-footer fade-in delay-2">
+    Уже есть аккаунт? <a href="{{ url_for('login') }}" class="auth-link">Войти</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Анимация элементов
+    const fadeElements = document.querySelectorAll('.fade-in');
+    fadeElements.forEach(element => {
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    });
+    
+    // Переключение видимости пароля
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });
+    
+    // Проверка надежности пароля
+    const strengthMeter = document.querySelector('.strength-meter-fill');
+    const strengthText = document.querySelector('.strength-text');
+    
+    passwordInput.addEventListener('input', function() {
+      const password = this.value;
+      let strength = 0;
+      
+      if (password.length >= 8) strength += 25;
+      if (password.match(/[A-Z]/)) strength += 25;
+      if (password.match(/[0-9]/)) strength += 25;
+      if (password.match(/[^A-Za-z0-9]/)) strength += 25;
+      
+      strengthMeter.style.width = strength + '%';
+      
+      if (strength <= 25) {
+        strengthMeter.style.backgroundColor = 'var(--danger)';
+        strengthText.textContent = 'Слабый пароль';
+        strengthText.style.color = 'var(--danger)';
+      } else if (strength <= 50) {
+        strengthMeter.style.backgroundColor = 'var(--warning)';
+        strengthText.textContent = 'Средний пароль';
+        strengthText.style.color = 'var(--warning)';
+      } else if (strength <= 75) {
+        strengthMeter.style.backgroundColor = 'var(--tertiary)';
+        strengthText.textContent = 'Хороший пароль';
+        strengthText.style.color = 'var(--tertiary)';
+      } else {
+        strengthMeter.style.backgroundColor = 'var(--success)';
+        strengthText.textContent = 'Отличный пароль';
+        strengthText.style.color = 'var(--success)';
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -3,244 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOVIII Fitness - Тренировки</title>
-    <link rel="stylesheet" href="{{ request.url_for('static', path='css/unified_style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>{% block title %}NOVIII Fitness - Тренировки{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/unified_style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% extends "base.html" %}
-    
-    {% block title %}NOVIII Fitness - Тренировки{% endblock %}
-    
-    {% block content %}
-    <div class="fade-in">
-        <div class="row mb-4">
-            <div class="col">
-                <h1><i class="fas fa-dumbbell"></i> Тренировки</h1>
-                <p class="lead">Выберите программу тренировки или создайте свою</p>
+    <header class="header">
+        <div class="container header-container">
+            <a href="{{ url_for('dashboard') }}" class="logo">
+                <div class="logo-icon">N</div>
+                <span>NOVIII</span>
+            </a>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="mainNav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.url.path == '/dashboard' or request.url.path == '/' %}active{% endif %}">Панель</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('workouts') }}" class="nav-link {% if request.url.path == '/workouts' %}active{% endif %}">Тренировки</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('stats') }}" class="nav-link {% if request.url.path == '/stats' %}active{% endif %}">Статистика</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('profile') }}" class="nav-link {% if request.url.path == '/profile' %}active{% endif %}">Профиль</a>
+                    </li>
+                </ul>
+                <div class="user-actions">
+                    <button class="icon-button" title="Профиль">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <button class="icon-button" title="Уведомления">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}
+            <h1>Тренировки</h1>
+            
+            <div class="page-header">
+                <p class="page-subtitle">Выберите программу тренировки или создайте свою</p>
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus btn-icon"></i>
+                    Создать тренировку
+                </button>
+            </div>
+            
+            <div class="filters-section">
+                <h2 class="section-title">
+                    <i class="fas fa-filter" style="color: var(--primary); margin-right: 10px;"></i>
+                    Фильтры
+                </h2>
+                
+                <div class="search-bar">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Поиск тренировок" class="search-input">
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="filter-btn active">Все</button>
+                    <button class="filter-btn">Кардио</button>
+                    <button class="filter-btn">Силовые</button>
+                    <button class="filter-btn">Йога</button>
+                    <button class="filter-btn">Растяжка</button>
+                </div>
+            </div>
+            
+            <section>
+                <h2 class="section-title">
+                    <i class="fas fa-star" style="color: var(--primary); margin-right: 10px;"></i>
+                    Популярное
+                </h2>
+                
+                <div class="workout-grid">
+                    <div class="workout-card">
+                        <div class="workout-image" style="background-image: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80');">
+                            <div class="workout-difficulty">
+                                <i class="fas fa-bolt"></i>
+                                <span>Высокая</span>
+                            </div>
+                        </div>
+                        <div class="workout-content">
+                            <h3 class="workout-title">Интервальный бег</h3>
+                            <p class="workout-description">Эффективная тренировка для сжигания калорий и улучшения выносливости. Чередование быстрого и медленного темпа.</p>
+                            <div class="workout-meta">
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>30 мин</span>
+                                </div>
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>320 ккал</span>
+                                </div>
+                            </div>
+                            <div class="workout-actions">
+                                <button class="btn btn-primary">Начать</button>
+                                <button class="btn btn-outline">Подробнее</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="workout-card">
+                        <div class="workout-image" style="background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80');">
+                            <div class="workout-difficulty">
+                                <i class="fas fa-bolt"></i>
+                                <span>Средняя</span>
+                            </div>
+                        </div>
+                        <div class="workout-content">
+                            <h3 class="workout-title">Силовая тренировка</h3>
+                            <p class="workout-description">Комплексная тренировка для развития силы и наращивания мышечной массы. Фокус на основные группы мышц.</p>
+                            <div class="workout-meta">
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>45 мин</span>
+                                </div>
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>280 ккал</span>
+                                </div>
+                            </div>
+                            <div class="workout-actions">
+                                <button class="btn btn-primary">Начать</button>
+                                <button class="btn btn-outline">Подробнее</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section>
+                <h2 class="section-title">
+                    <i class="fas fa-seedling" style="color: var(--success); margin-right: 10px;"></i>
+                    Новичкам
+                </h2>
+                
+                <div class="workout-grid">
+                    <div class="workout-card">
+                        <div class="workout-image" style="background-image: url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80');">
+                            <div class="workout-difficulty">
+                                <i class="fas fa-bolt"></i>
+                                <span>Низкая</span>
+                            </div>
+                        </div>
+                        <div class="workout-content">
+                            <h3 class="workout-title">Йога для начинающих</h3>
+                            <p class="workout-description">Идеальная тренировка для расслабления, улучшения гибкости и снятия стресса. Подходит для любого уровня подготовки.</p>
+                            <div class="workout-meta">
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>20 мин</span>
+                                </div>
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>120 ккал</span>
+                                </div>
+                            </div>
+                            <div class="workout-actions">
+                                <button class="btn btn-primary">Начать</button>
+                                <button class="btn btn-outline">Подробнее</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="workout-card">
+                        <div class="workout-image" style="background-image: url('https://images.unsplash.com/photo-1616699002805-0741e1e4a9c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80');">
+                            <div class="workout-difficulty">
+                                <i class="fas fa-bolt"></i>
+                                <span>Низкая</span>
+                            </div>
+                        </div>
+                        <div class="workout-content">
+                            <h3 class="workout-title">Комплексная растяжка</h3>
+                            <p class="workout-description">Улучшите гибкость и подвижность суставов с помощью этого комплекса упражнений. Идеально для восстановления.</p>
+                            <div class="workout-meta">
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>15 мин</span>
+                                </div>
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>80 ккал</span>
+                                </div>
+                            </div>
+                            <div class="workout-actions">
+                                <button class="btn btn-primary">Начать</button>
+                                <button class="btn btn-outline">Подробнее</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="workout-card">
+                        <div class="workout-image" style="background-image: url('https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80');">
+                            <div class="workout-difficulty">
+                                <i class="fas fa-bolt"></i>
+                                <span>Средняя</span>
+                            </div>
+                        </div>
+                        <div class="workout-content">
+                            <h3 class="workout-title">Плавание</h3>
+                            <p class="workout-description">Отличная кардио-тренировка с минимальной нагрузкой на суставы. Развивает все группы мышц и выносливость.</p>
+                            <div class="workout-meta">
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>40 мин</span>
+                                </div>
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>400 ккал</span>
+                                </div>
+                            </div>
+                            <div class="workout-actions">
+                                <button class="btn btn-primary">Начать</button>
+                                <button class="btn btn-outline">Подробнее</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section>
+                <h2 class="section-title">
+                    <i class="fas fa-fire" style="color: var(--warning); margin-right: 10px;"></i>
+                    Интенсивно
+                </h2>
+                
+                <div class="workout-grid">
+                    <div class="workout-card">
+                        <div class="workout-image" style="background-image: url('https://images.unsplash.com/photo-1434682881908-b43d0467b798?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80');">
+                            <div class="workout-difficulty">
+                                <i class="fas fa-bolt"></i>
+                                <span>Высокая</span>
+                            </div>
+                        </div>
+                        <div class="workout-content">
+                            <h3 class="workout-title">HIIT тренировка</h3>
+                            <p class="workout-description">Интенсивная интервальная тренировка для максимального сжигания калорий. Рекомендуется для продвинутого уровня.</p>
+                            <div class="workout-meta">
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>25 мин</span>
+                                </div>
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>350 ккал</span>
+                                </div>
+                            </div>
+                            <div class="workout-actions">
+                                <button class="btn btn-primary">Начать</button>
+                                <button class="btn btn-outline">Подробнее</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <h4>NOVIII Fitness</h4>
+                    <p>Ваш персональный помощник для достижения фитнес-целей</p>
+                </div>
+                <div class="col">
+                    <h4>Ссылки</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">О нас</a></li>
+                        <li><a href="#" class="footer-link">Контакты</a></li>
+                        <li><a href="#" class="footer-link">Политика конфиденциальности</a></li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <h4>Контакты</h4>
+                    <p><i class="fas fa-envelope"></i> info@noviii-fitness.com</p>
+                    <p><i class="fas fa-phone"></i> +7 (999) 123-45-67</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 NOVIII Fitness. Все права защищены.</p>
             </div>
         </div>
-        
-        <div class="card mb-4">
-            <h3><i class="fas fa-filter"></i> Фильтры</h3>
-            <div class="workout-filters">
-                <button class="btn btn-primary filter-btn active" data-filter="all">Все</button>
-                <button class="btn btn-secondary filter-btn" data-filter="cardio">Кардио</button>
-                <button class="btn btn-secondary filter-btn" data-filter="strength">Силовые</button>
-                <button class="btn btn-secondary filter-btn" data-filter="yoga">Йога</button>
-                <button class="btn btn-secondary filter-btn" data-filter="stretch">Растяжка</button>
-            </div>
-        </div>
-        
-        <div class="row workout-list">
-            <!-- Тренировка 1 -->
-            <div class="col-4 col-sm-12 mb-4 workout-item" data-category="cardio">
-                <div class="card workout-card">
-                    <div class="workout-card-header">
-                        <img src="{{ request.url_for('static', path='img/workouts/running.jpg') }}" alt="Интервальный бег">
-                    </div>
-                    <div class="workout-card-body">
-                        <h4>Интервальный бег</h4>
-                        <div class="workout-meta mb-2">
-                            <span class="badge badge-primary"><i class="far fa-clock"></i> 30 мин</span>
-                            <span class="badge badge-secondary"><i class="fas fa-fire"></i> Высокая</span>
-                        </div>
-                        <p>Эффективная тренировка для сжигания калорий и улучшения выносливости.</p>
-                    </div>
-                    <div class="workout-card-footer">
-                        <div class="row">
-                            <div class="col-6">
-                                <a href="/start_workout/1" class="btn btn-primary btn-sm">Начать</a>
-                            </div>
-                            <div class="col-6 text-right">
-                                <a href="/workout_details/1" class="btn btn-secondary btn-sm">Подробнее</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Тренировка 2 -->
-            <div class="col-4 col-sm-12 mb-4 workout-item" data-category="strength">
-                <div class="card workout-card">
-                    <div class="workout-card-header">
-                        <img src="{{ request.url_for('static', path='img/workouts/strength.jpg') }}" alt="Силовая тренировка">
-                    </div>
-                    <div class="workout-card-body">
-                        <h4>Силовая тренировка</h4>
-                        <div class="workout-meta mb-2">
-                            <span class="badge badge-primary"><i class="far fa-clock"></i> 45 мин</span>
-                            <span class="badge badge-secondary"><i class="fas fa-fire"></i> Средняя</span>
-                        </div>
-                        <p>Комплексная тренировка для развития силы и наращивания мышечной массы.</p>
-                    </div>
-                    <div class="workout-card-footer">
-                        <div class="row">
-                            <div class="col-6">
-                                <a href="/start_workout/2" class="btn btn-primary btn-sm">Начать</a>
-                            </div>
-                            <div class="col-6 text-right">
-                                <a href="/workout_details/2" class="btn btn-secondary btn-sm">Подробнее</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Тренировка 3 -->
-            <div class="col-4 col-sm-12 mb-4 workout-item" data-category="yoga">
-                <div class="card workout-card">
-                    <div class="workout-card-header">
-                        <img src="{{ request.url_for('static', path='img/workouts/yoga.jpg') }}" alt="Йога для начинающих">
-                    </div>
-                    <div class="workout-card-body">
-                        <h4>Йога для начинающих</h4>
-                        <div class="workout-meta mb-2">
-                            <span class="badge badge-primary"><i class="far fa-clock"></i> 20 мин</span>
-                            <span class="badge badge-secondary"><i class="fas fa-fire"></i> Низкая</span>
-                        </div>
-                        <p>Идеальная тренировка для расслабления, улучшения гибкости и снятия стресса.</p>
-                    </div>
-                    <div class="workout-card-footer">
-                        <div class="row">
-                            <div class="col-6">
-                                <a href="/start_workout/3" class="btn btn-primary btn-sm">Начать</a>
-                            </div>
-                            <div class="col-6 text-right">
-                                <a href="/workout_details/3" class="btn btn-secondary btn-sm">Подробнее</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Тренировка 4 -->
-            <div class="col-4 col-sm-12 mb-4 workout-item" data-category="stretch">
-                <div class="card workout-card">
-                    <div class="workout-card-header">
-                        <img src="{{ request.url_for('static', path='img/workouts/stretch.jpg') }}" alt="Комплексная растяжка">
-                    </div>
-                    <div class="workout-card-body">
-                        <h4>Комплексная растяжка</h4>
-                        <div class="workout-meta mb-2">
-                            <span class="badge badge-primary"><i class="far fa-clock"></i> 15 мин</span>
-                            <span class="badge badge-secondary"><i class="fas fa-fire"></i> Низкая</span>
-                        </div>
-                        <p>Улучшите гибкость и подвижность суставов с помощью этого комплекса упражнений.</p>
-                    </div>
-                    <div class="workout-card-footer">
-                        <div class="row">
-                            <div class="col-6">
-                                <a href="/start_workout/4" class="btn btn-primary btn-sm">Начать</a>
-                            </div>
-                            <div class="col-6 text-right">
-                                <a href="/workout_details/4" class="btn btn-secondary btn-sm">Подробнее</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Тренировка 5 -->
-            <div class="col-4 col-sm-12 mb-4 workout-item" data-category="cardio">
-                <div class="card workout-card">
-                    <div class="workout-card-header">
-                        <img src="{{ request.url_for('static', path='img/workouts/swimming.jpg') }}" alt="Плавание">
-                    </div>
-                    <div class="workout-card-body">
-                        <h4>Плавание</h4>
-                        <div class="workout-meta mb-2">
-                            <span class="badge badge-primary"><i class="far fa-clock"></i> 40 мин</span>
-                            <span class="badge badge-secondary"><i class="fas fa-fire"></i> Средняя</span>
-                        </div>
-                        <p>Отличная кардио-тренировка с минимальной нагрузкой на суставы.</p>
-                    </div>
-                    <div class="workout-card-footer">
-                        <div class="row">
-                            <div class="col-6">
-                                <a href="/start_workout/5" class="btn btn-primary btn-sm">Начать</a>
-                            </div>
-                            <div class="col-6 text-right">
-                                <a href="/workout_details/5" class="btn btn-secondary btn-sm">Подробнее</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Тренировка 6 -->
-            <div class="col-4 col-sm-12 mb-4 workout-item" data-category="cardio">
-                <div class="card workout-card">
-                    <div class="workout-card-header">
-                        <img src="{{ request.url_for('static', path='img/workouts/hiit.jpg') }}" alt="HIIT тренировка">
-                    </div>
-                    <div class="workout-card-body">
-                        <h4>HIIT тренировка</h4>
-                        <div class="workout-meta mb-2">
-                            <span class="badge badge-primary"><i class="far fa-clock"></i> 25 мин</span>
-                            <span class="badge badge-secondary"><i class="fas fa-fire"></i> Высокая</span>
-                        </div>
-                        <p>Интенсивная интервальная тренировка для максимального сжигания калорий.</p>
-                    </div>
-                    <div class="workout-card-footer">
-                        <div class="row">
-                            <div class="col-6">
-                                <a href="/start_workout/6" class="btn btn-primary btn-sm">Начать</a>
-                            </div>
-                            <div class="col-6 text-right">
-                                <a href="/workout_details/6" class="btn btn-secondary btn-sm">Подробнее</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row mt-4">
-            <div class="col">
-                <div class="card create-workout-card text-center">
-                    <div class="create-workout-icon">
-                        <i class="fas fa-plus-circle"></i>
-                    </div>
-                    <h3>Создайте свою тренировку</h3>
-                    <p>Не нашли подходящую программу? Создайте собственную тренировку, адаптированную под ваши цели и предпочтения.</p>
-                    <a href="/create_workout" class="btn btn-primary">Создать тренировку</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endblock %}
-    
-    {% block extra_js %}
+    </footer>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const filterButtons = document.querySelectorAll('.filter-btn');
-            const workoutItems = document.querySelectorAll('.workout-item');
-            
-            filterButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const filter = this.getAttribute('data-filter');
-                    
-                    // Активный класс для кнопок
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Применяем фильтр
-                    if (filter === 'all') {
-                        workoutItems.forEach(item => item.style.display = 'block');
-                    } else {
-                        workoutItems.forEach(item => {
-                            if (item.getAttribute('data-category') === filter) {
-                                item.style.display = 'block';
-                            } else {
-                                item.style.display = 'none';
-                            }
-                        });
-                    }
-                });
+        // Мобильное меню
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+            this.classList.toggle('active');
+        });
+        
+        // Фильтрация тренировок
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                // Здесь будет логика фильтрации
             });
         });
     </script>
-    {% endblock %}
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

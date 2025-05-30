@@ -1,230 +1,509 @@
-{% extends "base.html" %}
-    
-{% block title %}NOVIII Fitness - Панель управления{% endblock %}
-    
-{% block content %}
-<div class="fade-in">
-    <div class="row mb-4">
-        <div class="col">
-            <h1><i class="fas fa-heartbeat"></i> Добро пожаловать, {{ username }}!</h1>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NOVIII Fitness - Панель управления{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/unified_style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="{{ url_for('dashboard') }}" class="logo">
+                <div class="logo-icon">N</div>
+                <span>NOVIII</span>
+            </a>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="mainNav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.url.path == '/dashboard' or request.url.path == '/' %}active{% endif %}">Панель</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('workouts') }}" class="nav-link {% if request.url.path == '/workouts' %}active{% endif %}">Тренировки</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('stats') }}" class="nav-link {% if request.url.path == '/stats' %}active{% endif %}">Статистика</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('profile') }}" class="nav-link {% if request.url.path == '/profile' %}active{% endif %}">Профиль</a>
+                    </li>
+                </ul>
+                <div class="user-actions">
+                    <button class="icon-button" title="Профиль">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <button class="icon-button" title="Уведомления">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </nav>
         </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-6 col-sm-12">
-            <div class="card">
-                <h3><i class="fas fa-history"></i> Ваши последние действия</h3>
-                {% if user_activities %}
-                    <ul class="activity-list">
-                        {% for activity in user_activities %}
-                            <li class="activity-item">
-                                <div class="activity-icon">
-                                    {% if activity.type == 'workout' %}
-                                        <i class="fas fa-dumbbell"></i>
-                                    {% elif activity.type == 'goal' %}
-                                        <i class="fas fa-bullseye"></i>
-                                    {% else %}
-                                        <i class="fas fa-check-circle"></i>
-                                    {% endif %}
-                                </div>
-                                <div class="activity-content">
-                                    <p class="activity-text">{{ activity.description }}</p>
-                                    <p class="activity-time text-muted">{{ activity.timestamp }}</p>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <div class="empty-state">
-                        <p>У вас пока нет активности. Начните тренировку прямо сейчас!</p>
-                        <a href="/workouts" class="btn btn-primary">
-                            <i class="fas fa-dumbbell"></i> Начать тренировку
-                        </a>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}
+            <div class="dashboard-welcome">
+                <div class="welcome-content">
+                    <h1>Добро пожаловать, Александр!</h1>
+                    <p class="welcome-subtitle">Ваш персональный фитнес-помощник всегда с вами</p>
+                    <div class="welcome-actions">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-play-circle btn-icon"></i>
+                            Начать тренировку
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-calendar-alt btn-icon"></i>
+                            Запланировать
+                        </button>
                     </div>
-                {% endif %}
+                </div>
+                <div class="welcome-image">
+                    <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Фитнес мотивация">
+                </div>
             </div>
-        </div>
-        
-        <div class="col-6 col-sm-12">
-            <div class="card">
-                <h3><i class="fas fa-trophy"></i> Ваши достижения</h3>
-                <div class="row">
-                    <div class="col-4">
-                        <div class="stat-card">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-dumbbell"></i>
-                            </div>
-                            <div class="stat-card-value">{{ stats.workouts_completed|default(0) }}</div>
-                            <div class="stat-card-label">Тренировок завершено</div>
-                        </div>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: var(--primary-light); color: var(--primary);">
+                        <i class="fas fa-dumbbell"></i>
                     </div>
-                    <div class="col-4">
-                        <div class="stat-card">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-fire"></i>
-                            </div>
-                            <div class="stat-card-value">{{ stats.calories_burned|default(0) }}</div>
-                            <div class="stat-card-label">Калорий сожжено</div>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="stat-card">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="stat-card-value">{{ stats.workout_minutes|default(0) }}</div>
-                            <div class="stat-card-label">Минут на тренировки</div>
-                        </div>
+                    <div class="stat-content">
+                        <div class="stat-value">48</div>
+                        <div class="stat-label">Тренировок</div>
                     </div>
                 </div>
                 
-                <div class="mt-3">
-                    <h4>Прогресс к цели</h4>
-                    {% if user_goals %}
-                        {% for goal in user_goals %}
-                            <div class="goal-item mb-2">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span>{{ goal.name }}</span>
-                                    <span>{{ goal.progress }}%</span>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: {{ goal.progress }}%" aria-valuenow="{{ goal.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p>У вас пока нет целей. <a href="/add_goal">Добавить цель</a></p>
-                    {% endif %}
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: var(--tertiary-light); color: var(--tertiary);">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">1280</div>
+                        <div class="stat-label">Минут</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: var(--warning-light); color: var(--warning);">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">15.4K</div>
+                        <div class="stat-label">Калорий</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: var(--success-light); color: var(--success);">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Достижений</div>
+                    </div>
                 </div>
             </div>
             
-            <div class="card mt-3">
-                <h3><i class="fas fa-quote-left"></i> Мотивация дня</h3>
-                <blockquote class="blockquote">
-                    <p>"{{ motivation_quote.text }}"</p>
-                    <footer class="blockquote-footer">{{ motivation_quote.author|default('Неизвестный автор') }}</footer>
-                </blockquote>
+            <div class="row">
+                <div class="col-8">
+                    <section class="dashboard-section">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-chart-line" style="color: var(--primary); margin-right: 10px;"></i>
+                                Ваш прогресс
+                            </h2>
+                            <div class="section-actions">
+                                <button class="btn btn-sm btn-outline">За неделю</button>
+                                <button class="btn btn-sm btn-outline active">За месяц</button>
+                                <button class="btn btn-sm btn-outline">За год</button>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div id="progressChart" style="height: 300px; width: 100%;"></div>
+                        </div>
+                    </section>
+                    
+                    <section class="dashboard-section">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-calendar-check" style="color: var(--primary); margin-right: 10px;"></i>
+                                Предстоящие тренировки
+                            </h2>
+                            <button class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Добавить
+                            </button>
+                        </div>
+                        
+                        <div class="upcoming-workouts">
+                            <div class="workout-item">
+                                <div class="workout-date">
+                                    <div class="date-day">31</div>
+                                    <div class="date-month">Мая</div>
+                                </div>
+                                <div class="workout-info">
+                                    <h3 class="workout-title">Интервальный бег</h3>
+                                    <div class="workout-details">
+                                        <span><i class="fas fa-clock"></i> 08:00 - 08:30</span>
+                                        <span><i class="fas fa-bolt"></i> Высокая интенсивность</span>
+                                    </div>
+                                </div>
+                                <div class="workout-actions">
+                                    <button class="btn btn-sm btn-primary">Начать</button>
+                                    <button class="btn btn-sm btn-outline">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="workout-item">
+                                <div class="workout-date">
+                                    <div class="date-day">2</div>
+                                    <div class="date-month">Июня</div>
+                                </div>
+                                <div class="workout-info">
+                                    <h3 class="workout-title">Силовая тренировка</h3>
+                                    <div class="workout-details">
+                                        <span><i class="fas fa-clock"></i> 18:00 - 18:45</span>
+                                        <span><i class="fas fa-bolt"></i> Средняя интенсивность</span>
+                                    </div>
+                                </div>
+                                <div class="workout-actions">
+                                    <button class="btn btn-sm btn-outline">Изменить</button>
+                                    <button class="btn btn-sm btn-outline">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="workout-item">
+                                <div class="workout-date">
+                                    <div class="date-day">4</div>
+                                    <div class="date-month">Июня</div>
+                                </div>
+                                <div class="workout-info">
+                                    <h3 class="workout-title">Йога</h3>
+                                    <div class="workout-details">
+                                        <span><i class="fas fa-clock"></i> 07:30 - 08:00</span>
+                                        <span><i class="fas fa-bolt"></i> Низкая интенсивность</span>
+                                    </div>
+                                </div>
+                                <div class="workout-actions">
+                                    <button class="btn btn-sm btn-outline">Изменить</button>
+                                    <button class="btn btn-sm btn-outline">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                
+                <div class="col-4">
+                    <section class="dashboard-section">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-bullseye" style="color: var(--primary); margin-right: 10px;"></i>
+                                Цели
+                            </h2>
+                            <button class="btn btn-sm btn-outline">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="goals-list">
+                            <div class="goal-item">
+                                <div class="goal-info">
+                                    <div class="goal-name">Тренировки в неделю</div>
+                                    <div class="goal-value">4/5</div>
+                                </div>
+                                <div class="goal-progress-bg">
+                                    <div class="goal-progress-fill" style="width: 80%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="goal-item">
+                                <div class="goal-info">
+                                    <div class="goal-name">Время тренировок</div>
+                                    <div class="goal-value">320/400 мин</div>
+                                </div>
+                                <div class="goal-progress-bg">
+                                    <div class="goal-progress-fill" style="width: 80%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="goal-item">
+                                <div class="goal-info">
+                                    <div class="goal-name">Снижение веса</div>
+                                    <div class="goal-value">3/5 кг</div>
+                                </div>
+                                <div class="goal-progress-bg">
+                                    <div class="goal-progress-fill" style="width: 60%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="goal-item">
+                                <div class="goal-info">
+                                    <div class="goal-name">Увеличение силы</div>
+                                    <div class="goal-value">15/20 кг</div>
+                                </div>
+                                <div class="goal-progress-bg">
+                                    <div class="goal-progress-fill" style="width: 75%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section class="dashboard-section">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-trophy" style="color: var(--primary); margin-right: 10px;"></i>
+                                Достижения
+                            </h2>
+                            <button class="btn btn-sm btn-outline">Все</button>
+                        </div>
+                        
+                        <div class="achievements-list">
+                            <div class="achievement-item">
+                                <div class="achievement-icon" style="background-color: var(--gold); color: white;">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Огненная серия</div>
+                                    <div class="achievement-description">7 тренировок подряд</div>
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-item">
+                                <div class="achievement-icon" style="background-color: var(--silver); color: white;">
+                                    <i class="fas fa-dumbbell"></i>
+                                </div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Силач</div>
+                                    <div class="achievement-description">10 силовых тренировок</div>
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-item">
+                                <div class="achievement-icon" style="background-color: var(--bronze); color: white;">
+                                    <i class="fas fa-running"></i>
+                                </div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Марафонец</div>
+                                    <div class="achievement-description">Пробежал 50 км</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section class="dashboard-section">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-lightbulb" style="color: var(--primary); margin-right: 10px;"></i>
+                                Совет дня
+                            </h2>
+                        </div>
+                        
+                        <div class="tip-card">
+                            <div class="tip-content">
+                                <p>"Не забывайте о правильном дыхании во время тренировок. Глубокое дыхание помогает доставлять больше кислорода к мышцам и улучшает выносливость."</p>
+                            </div>
+                            <div class="tip-actions">
+                                <button class="btn btn-sm btn-outline">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="row mt-4">
-        <div class="col">
-            <div class="card">
-                <h3><i class="fas fa-calculator"></i> Калькулятор калорий</h3>
-                <div class="row">
-                    <div class="col-6 col-sm-12">
-                        <form id="calorieCalculator" class="mb-3">
-                            <div class="form-group">
-                                <label for="weight" class="form-label">Вес (кг)</label>
-                                <input type="number" class="form-control" id="weight" placeholder="Введите ваш вес">
+            
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-star" style="color: var(--primary); margin-right: 10px;"></i>
+                        Рекомендуемые тренировки
+                    </h2>
+                    <button class="btn btn-sm btn-outline">Все тренировки</button>
+                </div>
+                
+                <div class="recommended-workouts">
+                    <div class="workout-card">
+                        <div class="workout-image" style="background-image: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80');">
+                            <div class="workout-difficulty">
+                                <i class="fas fa-bolt"></i>
+                                <span>Высокая</span>
                             </div>
-                            <div class="form-group">
-                                <label for="height" class="form-label">Рост (см)</label>
-                                <input type="number" class="form-control" id="height" placeholder="Введите ваш рост">
-                            </div>
-                            <div class="form-group">
-                                <label for="age" class="form-label">Возраст</label>
-                                <input type="number" class="form-control" id="age" placeholder="Введите ваш возраст">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Пол</label>
-                                <div>
-                                    <label class="radio-inline mr-3">
-                                        <input type="radio" name="gender" value="male" checked> Мужской
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" name="gender" value="female"> Женский
-                                    </label>
+                        </div>
+                        <div class="workout-content">
+                            <h3 class="workout-title">Интервальный бег</h3>
+                            <p class="workout-description">Эффективная тренировка для сжигания калорий и улучшения выносливости.</p>
+                            <div class="workout-meta">
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>30 мин</span>
+                                </div>
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>320 ккал</span>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="activity" class="form-label">Уровень активности</label>
-                                <select class="form-control" id="activity">
-                                    <option value="1.2">Минимальная активность</option>
-                                    <option value="1.375">Легкая активность</option>
-                                    <option value="1.55" selected>Умеренная активность</option>
-                                    <option value="1.725">Высокая активность</option>
-                                    <option value="1.9">Экстремальная активность</option>
-                                </select>
+                            <div class="workout-actions">
+                                <button class="btn btn-primary">Начать</button>
+                                <button class="btn btn-outline">Подробнее</button>
                             </div>
-                            <button type="submit" class="btn btn-primary">Рассчитать</button>
-                        </form>
+                        </div>
                     </div>
-                    <div class="col-6 col-sm-12">
-                        <div id="calorieResult" class="text-center" style="display: none;">
-                            <h4>Ваша дневная норма калорий:</h4>
-                            <div class="calorie-result-value">0</div>
-                            <div class="row mt-3">
-                                <div class="col-4">
-                                    <div class="calorie-goal">
-                                        <h5>Снижение веса</h5>
-                                        <div class="calorie-goal-value weight-loss">0</div>
-                                        <small class="text-muted">ккал/день</small>
-                                    </div>
+                    
+                    <div class="workout-card">
+                        <div class="workout-image" style="background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80');">
+                            <div class="workout-difficulty">
+                                <i class="fas fa-bolt"></i>
+                                <span>Средняя</span>
+                            </div>
+                        </div>
+                        <div class="workout-content">
+                            <h3 class="workout-title">Силовая тренировка</h3>
+                            <p class="workout-description">Комплексная тренировка для развития силы и наращивания мышечной массы.</p>
+                            <div class="workout-meta">
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>45 мин</span>
                                 </div>
-                                <div class="col-4">
-                                    <div class="calorie-goal">
-                                        <h5>Поддержание</h5>
-                                        <div class="calorie-goal-value maintenance">0</div>
-                                        <small class="text-muted">ккал/день</small>
-                                    </div>
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>280 ккал</span>
                                 </div>
-                                <div class="col-4">
-                                    <div class="calorie-goal">
-                                        <h5>Набор массы</h5>
-                                        <div class="calorie-goal-value weight-gain">0</div>
-                                        <small class="text-muted">ккал/день</small>
-                                    </div>
+                            </div>
+                            <div class="workout-actions">
+                                <button class="btn btn-primary">Начать</button>
+                                <button class="btn btn-outline">Подробнее</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="workout-card">
+                        <div class="workout-image" style="background-image: url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80');">
+                            <div class="workout-difficulty">
+                                <i class="fas fa-bolt"></i>
+                                <span>Низкая</span>
+                            </div>
+                        </div>
+                        <div class="workout-content">
+                            <h3 class="workout-title">Йога для начинающих</h3>
+                            <p class="workout-description">Идеальная тренировка для расслабления, улучшения гибкости и снятия стресса.</p>
+                            <div class="workout-meta">
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>20 мин</span>
                                 </div>
+                                <div class="workout-meta-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>120 ккал</span>
+                                </div>
+                            </div>
+                            <div class="workout-actions">
+                                <button class="btn btn-primary">Начать</button>
+                                <button class="btn btn-outline">Подробнее</button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </section>
+            {% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <h4>NOVIII Fitness</h4>
+                    <p>Ваш персональный помощник для достижения фитнес-целей</p>
+                </div>
+                <div class="col">
+                    <h4>Ссылки</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">О нас</a></li>
+                        <li><a href="#" class="footer-link">Контакты</a></li>
+                        <li><a href="#" class="footer-link">Политика конфиденциальности</a></li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <h4>Контакты</h4>
+                    <p><i class="fas fa-envelope"></i> info@noviii-fitness.com</p>
+                    <p><i class="fas fa-phone"></i> +7 (999) 123-45-67</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 NOVIII Fitness. Все права защищены.</p>
             </div>
         </div>
-    </div>
-</div>
-{% endblock %}
-    
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const calorieForm = document.getElementById('calorieCalculator');
-        const calorieResult = document.getElementById('calorieResult');
-        
-        calorieForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const weight = parseFloat(document.getElementById('weight').value);
-            const height = parseFloat(document.getElementById('height').value);
-            const age = parseInt(document.getElementById('age').value);
-            const gender = document.querySelector('input[name="gender"]:checked').value;
-            const activity = parseFloat(document.getElementById('activity').value);
-            
-            if (isNaN(weight) || isNaN(height) || isNaN(age)) {
-                alert('Пожалуйста, заполните все поля корректно');
-                return;
-            }
-            
-            let bmr;
-            if (gender === 'male') {
-                bmr = 88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age);
-            } else {
-                bmr = 447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age);
-            }
-            
-            const maintenance = Math.round(bmr * activity);
-            const weightLoss = Math.round(maintenance * 0.8);
-            const weightGain = Math.round(maintenance * 1.15);
-            
-            document.querySelector('.calorie-result-value').textContent = maintenance;
-            document.querySelector('.calorie-goal-value.weight-loss').textContent = weightLoss;
-            document.querySelector('.calorie-goal-value.maintenance').textContent = maintenance;
-            document.querySelector('.calorie-goal-value.weight-gain').textContent = weightGain;
-            
-            calorieResult.style.display = 'block';
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+        // Мобильное меню
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+            this.classList.toggle('active');
         });
-    });
-</script>
-{% endblock %}
+        
+        // График прогресса
+        if (document.getElementById('progressChart')) {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1 мая', '5 мая', '10 мая', '15 мая', '20 мая', '25 мая', '30 мая'],
+                    datasets: [{
+                        label: 'Тренировки',
+                        data: [3, 5, 4, 6, 5, 7, 8],
+                        borderColor: '#4361EE',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

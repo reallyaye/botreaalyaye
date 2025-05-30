@@ -1,278 +1,546 @@
-{% extends "base.html" %}
-    
-{% block title %}NOVIII Fitness - Профиль{% endblock %}
-    
-{% block content %}
-<div class="fade-in">
-    <div class="row mb-4">
-        <div class="col">
-            <h1><i class="fas fa-user"></i> Профиль</h1>
-            <p class="lead">Управляйте своими данными и настройками</p>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NOVIII Fitness - Профиль{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/unified_style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="{{ url_for('dashboard') }}" class="logo">
+                <div class="logo-icon">N</div>
+                <span>NOVIII</span>
+            </a>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="mainNav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.url.path == '/dashboard' or request.url.path == '/' %}active{% endif %}">Панель</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('workouts') }}" class="nav-link {% if request.url.path == '/workouts' %}active{% endif %}">Тренировки</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('stats') }}" class="nav-link {% if request.url.path == '/stats' %}active{% endif %}">Статистика</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('profile') }}" class="nav-link {% if request.url.path == '/profile' %}active{% endif %}">Профиль</a>
+                    </li>
+                </ul>
+                <div class="user-actions">
+                    <button class="icon-button" title="Профиль">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <button class="icon-button" title="Уведомления">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </nav>
         </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-4 col-sm-12">
-            <div class="card">
-                <div class="profile-header">
-                    <img src="{{ request.url_for('static', path='avatars/' + user_avatar) if user_avatar else request.url_for('static', path='avatars/default.png') }}" alt="Аватар пользователя" class="profile-avatar">
-                    <div class="profile-info">
-                        <h3 class="profile-name">{{ username }}</h3>
-                        <p class="text-muted">Участник с {{ created_at }}</p>
-                        <div class="profile-stats">
-                            <div class="profile-stat">
-                                <div class="profile-stat-value">{{ stats.workouts_completed|default(0) }}</div>
-                                <div class="profile-stat-label">Тренировок</div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}
+            <h1>Профиль</h1>
+            
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Аватар пользователя" class="avatar-image">
+                    <button class="avatar-edit-btn">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+                <div class="profile-info">
+                    <h2 class="profile-name">Александр Иванов</h2>
+                    <p class="profile-subtitle">Активный с января 2025</p>
+                    <div class="profile-stats">
+                        <div class="profile-stat-item">
+                            <div class="profile-stat-value">48</div>
+                            <div class="profile-stat-label">Тренировок</div>
+                        </div>
+                        <div class="profile-stat-item">
+                            <div class="profile-stat-value">1280</div>
+                            <div class="profile-stat-label">Минут</div>
+                        </div>
+                        <div class="profile-stat-item">
+                            <div class="profile-stat-value">15.4K</div>
+                            <div class="profile-stat-label">Калорий</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-edit btn-icon"></i>
+                        Редактировать
+                    </button>
+                </div>
+            </div>
+            
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-tab="personal">Личные данные</button>
+                <button class="profile-tab" data-tab="goals">Цели</button>
+                <button class="profile-tab" data-tab="settings">Настройки</button>
+                <button class="profile-tab" data-tab="notifications">Уведомления</button>
+            </div>
+            
+            <div class="profile-tab-content active" id="personal-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Личные данные</h3>
+                        <button class="btn btn-sm btn-outline">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Имя</label>
+                                <input type="text" class="form-control" value="Александр" disabled>
                             </div>
-                            <div class="profile-stat">
-                                <div class="profile-stat-value">{{ stats.achievements|default(0) }}</div>
-                                <div class="profile-stat-label">Достижений</div>
+                            <div class="form-group">
+                                <label class="form-label">Фамилия</label>
+                                <input type="text" class="form-control" value="Иванов" disabled>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="alexander@example.com" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Телефон</label>
+                                <input type="tel" class="form-control" value="+7 (999) 123-45-67" disabled>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Дата рождения</label>
+                                <input type="date" class="form-control" value="1990-05-15" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Пол</label>
+                                <select class="form-control" disabled>
+                                    <option selected>Мужской</option>
+                                    <option>Женский</option>
+                                    <option>Другой</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="profile-actions mt-3">
-                    <button class="btn btn-primary" id="editProfileBtn">
-                        <i class="fas fa-edit"></i> Редактировать профиль
-                    </button>
-                    <button class="btn btn-secondary" id="changePasswordBtn">
-                        <i class="fas fa-key"></i> Сменить пароль
-                    </button>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Физические параметры</h3>
+                        <button class="btn btn-sm btn-outline">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Рост (см)</label>
+                                <input type="number" class="form-control" value="182" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Вес (кг)</label>
+                                <input type="number" class="form-control" value="78" disabled>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Уровень активности</label>
+                                <select class="form-control" disabled>
+                                    <option>Низкий</option>
+                                    <option selected>Средний</option>
+                                    <option>Высокий</option>
+                                    <option>Очень высокий</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Опыт тренировок</label>
+                                <select class="form-control" disabled>
+                                    <option>Новичок</option>
+                                    <option selected>Средний</option>
+                                    <option>Продвинутый</option>
+                                    <option>Профессионал</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="card mt-4">
-                <h3><i class="fas fa-trophy"></i> Достижения</h3>
-                <div class="achievements-list">
-                    {% if achievements %}
-                        {% for achievement in achievements %}
-                            <div class="achievement-item {% if achievement.unlocked %}unlocked{% else %}locked{% endif %}">
-                                <div class="achievement-icon">
-                                    <i class="fas {{ achievement.icon }}"></i>
+            <div class="profile-tab-content" id="goals-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Мои цели</h3>
+                        <button class="btn btn-sm btn-outline">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="goals-list">
+                            <div class="goal-item">
+                                <div class="goal-info">
+                                    <div class="goal-name">Тренировки в неделю</div>
+                                    <div class="goal-value">4/5</div>
                                 </div>
-                                <div class="achievement-info">
-                                    <h4>{{ achievement.name }}</h4>
-                                    <p>{{ achievement.description }}</p>
-                                    {% if achievement.unlocked %}
-                                        <span class="badge badge-success">Разблокировано</span>
-                                    {% else %}
-                                        <span class="badge badge-secondary">Заблокировано</span>
-                                    {% endif %}
+                                <div class="goal-progress-bg">
+                                    <div class="goal-progress-fill" style="width: 80%;"></div>
                                 </div>
                             </div>
-                        {% endfor %}
-                    {% else %}
-                        <p>У вас пока нет достижений. Начните тренироваться, чтобы разблокировать их!</p>
-                    {% endif %}
+                            
+                            <div class="goal-item">
+                                <div class="goal-info">
+                                    <div class="goal-name">Время тренировок</div>
+                                    <div class="goal-value">320/400 мин</div>
+                                </div>
+                                <div class="goal-progress-bg">
+                                    <div class="goal-progress-fill" style="width: 80%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="goal-item">
+                                <div class="goal-info">
+                                    <div class="goal-name">Снижение веса</div>
+                                    <div class="goal-value">3/5 кг</div>
+                                </div>
+                                <div class="goal-progress-bg">
+                                    <div class="goal-progress-fill" style="width: 60%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="goal-item">
+                                <div class="goal-info">
+                                    <div class="goal-name">Увеличение силы</div>
+                                    <div class="goal-value">15/20 кг</div>
+                                </div>
+                                <div class="goal-progress-bg">
+                                    <div class="goal-progress-fill" style="width: 75%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Добавить новую цель</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Тип цели</label>
+                                <select class="form-control">
+                                    <option>Снижение веса</option>
+                                    <option>Набор мышечной массы</option>
+                                    <option>Увеличение выносливости</option>
+                                    <option>Улучшение гибкости</option>
+                                    <option>Другое</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Значение</label>
+                                <input type="number" class="form-control" placeholder="Введите значение">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Срок достижения</label>
+                                <input type="date" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Приоритет</label>
+                                <select class="form-control">
+                                    <option>Низкий</option>
+                                    <option selected>Средний</option>
+                                    <option>Высокий</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus btn-icon"></i>
+                            Добавить цель
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-tab-content" id="settings-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Настройки аккаунта</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Язык</label>
+                            <select class="form-control">
+                                <option selected>Русский</option>
+                                <option>English</option>
+                                <option>Español</option>
+                                <option>Français</option>
+                                <option>Deutsch</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Часовой пояс</label>
+                            <select class="form-control">
+                                <option selected>Москва (GMT+3)</option>
+                                <option>Лондон (GMT+0)</option>
+                                <option>Нью-Йорк (GMT-5)</option>
+                                <option>Лос-Анджелес (GMT-8)</option>
+                                <option>Токио (GMT+9)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Единицы измерения</label>
+                            <div class="toggle-group">
+                                <label class="toggle">
+                                    <input type="radio" name="units" checked>
+                                    <span class="toggle-label">Метрические (кг, см)</span>
+                                </label>
+                                <label class="toggle">
+                                    <input type="radio" name="units">
+                                    <span class="toggle-label">Имперские (фунты, дюймы)</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Тема</label>
+                            <div class="toggle-group">
+                                <label class="toggle">
+                                    <input type="radio" name="theme" checked>
+                                    <span class="toggle-label">Светлая</span>
+                                </label>
+                                <label class="toggle">
+                                    <input type="radio" name="theme">
+                                    <span class="toggle-label">Темная</span>
+                                </label>
+                                <label class="toggle">
+                                    <input type="radio" name="theme">
+                                    <span class="toggle-label">Системная</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">Сохранить настройки</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Безопасность</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Текущий пароль</label>
+                            <input type="password" class="form-control" placeholder="Введите текущий пароль">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Новый пароль</label>
+                            <input type="password" class="form-control" placeholder="Введите новый пароль">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Подтверждение пароля</label>
+                            <input type="password" class="form-control" placeholder="Подтвердите новый пароль">
+                        </div>
+                        <button class="btn btn-primary">Изменить пароль</button>
+                        
+                        <hr class="divider">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Двухфакторная аутентификация</label>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="twoFactorAuth">
+                                <label for="twoFactorAuth"></label>
+                                <span class="toggle-label">Выключена</span>
+                            </div>
+                        </div>
+                        <p class="form-help">Повысьте безопасность вашего аккаунта, включив двухфакторную аутентификацию.</p>
+                    </div>
+                </div>
+                
+                <div class="card danger-zone">
+                    <div class="card-header">
+                        <h3 class="card-title">Опасная зона</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="danger-action">
+                            <div>
+                                <h4>Удалить все данные тренировок</h4>
+                                <p>Это действие удалит все ваши тренировки и статистику. Это действие необратимо.</p>
+                            </div>
+                            <button class="btn btn-danger">Удалить данные</button>
+                        </div>
+                        <div class="danger-action">
+                            <div>
+                                <h4>Удалить аккаунт</h4>
+                                <p>Это действие полностью удалит ваш аккаунт и все связанные с ним данные. Это действие необратимо.</p>
+                            </div>
+                            <button class="btn btn-danger">Удалить аккаунт</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-tab-content" id="notifications-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Настройки уведомлений</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="notification-setting">
+                            <div>
+                                <h4>Напоминания о тренировках</h4>
+                                <p>Получайте уведомления о запланированных тренировках</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="workoutReminders" checked>
+                                <label for="workoutReminders"></label>
+                            </div>
+                        </div>
+                        <div class="notification-setting">
+                            <div>
+                                <h4>Достижение целей</h4>
+                                <p>Получайте уведомления о достижении поставленных целей</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="goalAchievements" checked>
+                                <label for="goalAchievements"></label>
+                            </div>
+                        </div>
+                        <div class="notification-setting">
+                            <div>
+                                <h4>Новые программы тренировок</h4>
+                                <p>Получайте уведомления о новых программах тренировок</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="newWorkouts" checked>
+                                <label for="newWorkouts"></label>
+                            </div>
+                        </div>
+                        <div class="notification-setting">
+                            <div>
+                                <h4>Советы и рекомендации</h4>
+                                <p>Получайте полезные советы и рекомендации по тренировкам</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="tips">
+                                <label for="tips"></label>
+                            </div>
+                        </div>
+                        <div class="notification-setting">
+                            <div>
+                                <h4>Маркетинговые рассылки</h4>
+                                <p>Получайте информацию о специальных предложениях и акциях</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="marketing">
+                                <label for="marketing"></label>
+                            </div>
+                        </div>
+                        
+                        <hr class="divider">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Способы уведомлений</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox">
+                                    <input type="checkbox" checked>
+                                    <span class="checkbox-label">Email</span>
+                                </label>
+                                <label class="checkbox">
+                                    <input type="checkbox" checked>
+                                    <span class="checkbox-label">Push-уведомления</span>
+                                </label>
+                                <label class="checkbox">
+                                    <input type="checkbox">
+                                    <span class="checkbox-label">SMS</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary">Сохранить настройки</button>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <h4>NOVIII Fitness</h4>
+                    <p>Ваш персональный помощник для достижения фитнес-целей</p>
+                </div>
+                <div class="col">
+                    <h4>Ссылки</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" class="footer-link">О нас</a></li>
+                        <li><a href="#" class="footer-link">Контакты</a></li>
+                        <li><a href="#" class="footer-link">Политика конфиденциальности</a></li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <h4>Контакты</h4>
+                    <p><i class="fas fa-envelope"></i> info@noviii-fitness.com</p>
+                    <p><i class="fas fa-phone"></i> +7 (999) 123-45-67</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 NOVIII Fitness. Все права защищены.</p>
             </div>
         </div>
-        
-        <div class="col-8 col-sm-12">
-            <div class="card" id="profileForm">
-                <h3><i class="fas fa-user-edit"></i> Редактирование профиля</h3>
-                <form action="/update_profile" method="post" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label for="username" class="form-label">Имя пользователя</label>
-                                <input type="text" class="form-control" id="username" name="username" value="{{ username }}">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" value="{{ email }}">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="avatar" class="form-label">Аватар</label>
-                        <input type="file" class="form-control" id="avatar" name="avatar">
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label for="weight" class="form-label">Вес (кг)</label>
-                                <input type="number" step="0.1" class="form-control" id="weight" name="weight" value="{{ user_data.weight|default('') }}">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label for="height" class="form-label">Рост (см)</label>
-                                <input type="number" class="form-control" id="height" name="height" value="{{ user_data.height|default('') }}">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label for="age" class="form-label">Возраст</label>
-                                <input type="number" class="form-control" id="age" name="age" value="{{ user_data.age|default('') }}">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label class="form-label">Пол</label>
-                                <div>
-                                    <label class="radio-inline mr-3">
-                                        <input type="radio" name="gender" value="male" {% if user_data.gender == 'male' %}checked{% endif %}> Мужской
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" name="gender" value="female" {% if user_data.gender == 'female' %}checked{% endif %}> Женский
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="activity_level" class="form-label">Уровень активности</label>
-                        <select class="form-control" id="activity_level" name="activity_level">
-                            <option value="1.2" {% if user_data.activity_level == 1.2 %}selected{% endif %}>Минимальная активность</option>
-                            <option value="1.375" {% if user_data.activity_level == 1.375 %}selected{% endif %}>Легкая активность</option>
-                            <option value="1.55" {% if user_data.activity_level == 1.55 %}selected{% endif %}>Умеренная активность</option>
-                            <option value="1.725" {% if user_data.activity_level == 1.725 %}selected{% endif %}>Высокая активность</option>
-                            <option value="1.9" {% if user_data.activity_level == 1.9 %}selected{% endif %}>Экстремальная активность</option>
-                        </select>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-                </form>
-            </div>
-            
-            <div class="card mt-4" id="passwordForm" style="display: none;">
-                <h3><i class="fas fa-key"></i> Смена пароля</h3>
-                <form action="/change_password" method="post">
-                    <div class="form-group">
-                        <label for="current_password" class="form-label">Текущий пароль</label>
-                        <input type="password" class="form-control" id="current_password" name="current_password" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="new_password" class="form-label">Новый пароль</label>
-                        <input type="password" class="form-control" id="new_password" name="new_password" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="confirm_password" class="form-label">Подтверждение пароля</label>
-                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Сменить пароль</button>
-                    <button type="button" class="btn btn-secondary" id="cancelPasswordBtn">Отмена</button>
-                </form>
-            </div>
-            
-            <div class="card mt-4">
-                <h3><i class="fas fa-bullseye"></i> Цели</h3>
-                <div class="goals-list">
-                    {% if user_goals %}
-                        {% for goal in user_goals %}
-                            <div class="goal-item mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <h4>{{ goal.name }}</h4>
-                                    <span>{{ goal.progress }}%</span>
-                                </div>
-                                <div class="progress mb-2">
-                                    <div class="progress-bar" role="progressbar" style="width: {{ goal.progress }}%" aria-valuenow="{{ goal.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                                <p>{{ goal.description }}</p>
-                                <div class="goal-actions">
-                                    <a href="/edit_goal/{{ goal.id }}" class="btn btn-sm btn-secondary">
-                                        <i class="fas fa-edit"></i> Редактировать
-                                    </a>
-                                    <form action="/delete_goal/{{ goal.id }}" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash"></i> Удалить
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p>У вас пока нет целей.</p>
-                    {% endif %}
-                    
-                    <div class="text-center mt-3">
-                        <a href="/add_goal" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Добавить цель
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card mt-4">
-                <h3><i class="fas fa-cog"></i> Настройки</h3>
-                <form action="/update_settings" method="post">
-                    <div class="form-group">
-                        <label class="form-label">Уведомления</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="email_notifications" name="email_notifications" {% if user_settings.email_notifications %}checked{% endif %}>
-                            <label class="form-check-label" for="email_notifications">
-                                Получать уведомления по email
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="push_notifications" name="push_notifications" {% if user_settings.push_notifications %}checked{% endif %}>
-                            <label class="form-check-label" for="push_notifications">
-                                Получать push-уведомления
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="language" class="form-label">Язык</label>
-                        <select class="form-control" id="language" name="language">
-                            <option value="ru" {% if user_settings.language == 'ru' %}selected{% endif %}>Русский</option>
-                            <option value="en" {% if user_settings.language == 'en' %}selected{% endif %}>English</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="theme" class="form-label">Тема</label>
-                        <select class="form-control" id="theme" name="theme">
-                            <option value="light" {% if user_settings.theme == 'light' %}selected{% endif %}>Светлая</option>
-                            <option value="dark" {% if user_settings.theme == 'dark' %}selected{% endif %}>Темная</option>
-                            <option value="auto" {% if user_settings.theme == 'auto' %}selected{% endif %}>Системная</option>
-                        </select>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Сохранить настройки</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-    
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const editProfileBtn = document.getElementById('editProfileBtn');
-        const changePasswordBtn = document.getElementById('changePasswordBtn');
-        const cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
-        const profileForm = document.getElementById('profileForm');
-        const passwordForm = document.getElementById('passwordForm');
-        
-        editProfileBtn.addEventListener('click', function() {
-            profileForm.style.display = 'block';
-            passwordForm.style.display = 'none';
+    </footer>
+
+    <script>
+        // Мобильное меню
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+            this.classList.toggle('active');
         });
         
-        changePasswordBtn.addEventListener('click', function() {
-            profileForm.style.display = 'none';
-            passwordForm.style.display = 'block';
+        // Переключение вкладок профиля
+        const profileTabs = document.querySelectorAll('.profile-tab');
+        const profileTabContents = document.querySelectorAll('.profile-tab-content');
+        
+        profileTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Удаляем активный класс со всех вкладок и контента
+                profileTabs.forEach(t => t.classList.remove('active'));
+                profileTabContents.forEach(c => c.classList.remove('active'));
+                
+                // Добавляем активный класс выбранной вкладке и соответствующему контенту
+                this.classList.add('active');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
         });
         
-        cancelPasswordBtn.addEventListener('click', function() {
-            passwordForm.style.display = 'none';
-            profileForm.style.display = 'block';
+        // Переключатели
+        const toggleSwitches = document.querySelectorAll('.toggle-switch input');
+        toggleSwitches.forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const label = this.parentElement.querySelector('.toggle-label');
+                if (label) {
+                    label.textContent = this.checked ? 'Включена' : 'Выключена';
+                }
+            });
         });
-    });
-</script>
-{% endblock %}
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
