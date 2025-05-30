@@ -97,3 +97,50 @@
   </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // График активности по дням
+  const activityCtx = document.getElementById('activityChart').getContext('2d');
+  const activityLabels = {{ monthly_trend | map(attribute='date') | list | tojson }};
+  const activityData = {{ monthly_trend | map(attribute='count') | list | tojson }};
+  new Chart(activityCtx, {
+    type: 'line',
+    data: {
+      labels: activityLabels,
+      datasets: [{
+        label: 'Тренировок',
+        data: activityData,
+        borderColor: '#4361ee',
+        backgroundColor: 'rgba(67,97,238,0.1)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // График распределения по типам тренировок
+  const distCtx = document.getElementById('workoutDistributionChart').getContext('2d');
+  const distLabels = {{ activity_breakdown | map(attribute='activity') | list | tojson }};
+  const distData = {{ activity_breakdown | map(attribute='duration') | list | tojson }};
+  new Chart(distCtx, {
+    type: 'doughnut',
+    data: {
+      labels: distLabels,
+      datasets: [{
+        data: distData,
+        backgroundColor: ['#4361ee', '#fbbc04', '#43e6ee', '#ee4361', '#34a853', '#ff6f00'],
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+</script>
+{% endblock %}

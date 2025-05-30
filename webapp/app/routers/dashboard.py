@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, Form, Path
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, select
 from starlette.responses import RedirectResponse as StarletteRedirectResponse
-from webapp.app.services.db import AsyncSessionLocal, Workout, get_user_by_id, get_weekly_stats, User, get_user_stats, Goal
+from webapp.app.services.db import AsyncSessionLocal, Workout, get_user_by_id, get_weekly_stats, User, get_user_stats, Goal, get_user_schedules, add_schedule, get_workout_by_id, update_workout, delete_schedule, get_user_goals
 from datetime import datetime, timedelta
 
 router = APIRouter()
@@ -58,6 +58,12 @@ async def dashboard(request: Request, user: User = Depends(get_current_user)):
         )
         achievements_count = result.scalar() or 0
 
+    # Получаем предстоящие тренировки
+    upcoming_workouts = await get_user_schedules(user.id)
+
+    # Получаем цели пользователя
+    user_goals = await get_user_goals(user.id)
+
     # Формируем мотивационное сообщение с учётом прогресса
     motivation_message = "Начните тренироваться, чтобы достичь своих целей!"
     if weekly_stats["total_workouts"] > 0:
@@ -97,7 +103,70 @@ async def dashboard(request: Request, user: User = Depends(get_current_user)):
             "tips": tips,
             "all_time_stats": all_time_stats,
             "achievements_count": achievements_count,
+            "upcoming_workouts": upcoming_workouts,
+            "user_goals": user_goals,
             "success": request.session.pop("success", None),
             "error": request.session.pop("error", None)
         }
     )
+
+@router.post("/add-schedule", response_class=HTMLResponse)
+async def add_schedule_route(request: Request, activity: str = Form(...), scheduled_time: str = Form(...)):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return StarletteRedirectResponse("/login", status_code=302)
+    # Преобразуем строку времени в datetime
+    try:
+        scheduled_dt = datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M")
+    except Exception:
+        return templates.TemplateResponse(
+            "dashboard.html",
+            {"request": request, "error": "Некорректная дата/время"}
+        )
+    await add_schedule(user_id, activity, scheduled_dt)
+    return StarletteRedirectResponse("/", status_code=302)
+
+@router.post("/delete-schedule/{schedule_id}")
+async def delete_schedule_route(request: Request, schedule_id: int = Path(...)):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return StarletteRedirectResponse("/login", status_code=302)
+    await delete_schedule(schedule_id)
+    return StarletteRedirectResponse("/", status_code=302)
+
+@router.get("/edit-schedule/{schedule_id}", response_class=HTMLResponse)
+async def edit_schedule_form(request: Request, schedule_id: int = Path(...)):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return StarletteRedirectResponse("/login", status_code=302)
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Goal).where(Goal.id == schedule_id))
+        schedule = result.scalars().first()
+    return templates.TemplateResponse(
+        "edit_schedule.html",
+        {"request": request, "schedule": schedule}
+    )
+
+@router.post("/edit-schedule/{schedule_id}", response_class=HTMLResponse)
+async def edit_schedule_submit(request: Request, schedule_id: int = Path(...), activity: str = Form(...), scheduled_time: str = Form(...)):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return StarletteRedirectResponse("/login", status_code=302)
+    from datetime import datetime
+    try:
+        scheduled_dt = datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M")
+    except Exception:
+        return templates.TemplateResponse(
+            "edit_schedule.html",
+            {"request": request, "error": "Некорректная дата/время"}
+        )
+    # Обновляем расписание
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Goal).where(Goal.id == schedule_id))
+        schedule = result.scalars().first()
+        if schedule:
+            schedule.activity = activity
+            schedule.scheduled_time = scheduled_dt
+            session.add(schedule)
+            await session.commit()
+    return StarletteRedirectResponse("/", status_code=302)

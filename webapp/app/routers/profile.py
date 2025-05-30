@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Request, Depends, Form, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from webapp.app.services.db import get_user_by_id, update_user_profile, get_profile_history, User, AsyncSessionLocal
+from webapp.app.services.db import get_user_by_id, update_user_profile, get_profile_history, User, AsyncSessionLocal, get_user_stats, get_user_goals
 from starlette.responses import RedirectResponse as StarletteRedirectResponse
 import os
 from pathlib import Path
@@ -38,6 +38,8 @@ async def profile(
         return user
     history = await get_profile_history(user.id)
     progress = calculate_progress(user.weight, user.goal, user.height, user.age) if user.weight and user.height and user.age else 0
+    stats = await get_user_stats(user.id)
+    user_goals = await get_user_goals(user.id)
     return templates.TemplateResponse(
         "profile.html",
         {
@@ -56,7 +58,9 @@ async def profile(
             "success": request.session.pop("success", None),
             "error": request.session.pop("error", None),
             "history": history,
-            "progress": progress
+            "progress": progress,
+            "stats": stats,
+            "user_goals": user_goals
         }
     )
 

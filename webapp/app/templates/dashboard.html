@@ -58,64 +58,46 @@
   </div>
   <div class="section">
     <h2 class="section-title"><i class="fas fa-calendar-check" style="color: var(--primary); margin-right: 10px;"></i>Предстоящие тренировки</h2>
+    <form method="post" action="/add-schedule" class="add-schedule-form" style="margin-bottom: 24px; display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+      <div>
+        <label for="activity">Активность</label>
+        <input type="text" id="activity" name="activity" class="form-control" required placeholder="Например, Бег">
+      </div>
+      <div>
+        <label for="scheduled_time">Дата и время</label>
+        <input type="datetime-local" id="scheduled_time" name="scheduled_time" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Добавить тренировку</button>
+    </form>
     <div class="upcoming-workouts">
-      <div class="workout-item-card">
-        <div class="workout-item-main">
-          <div class="workout-date">
-            <div class="date-day">31</div>
-            <div class="date-month">Мая</div>
-          </div>
-          <div class="workout-info">
-            <h3 class="workout-title">Интервальный бег</h3>
-            <div class="workout-details">
-              <span><i class="fas fa-clock"></i> 08:00 - 08:30</span>
-              <span><i class="fas fa-bolt"></i> Высокая интенсивность</span>
+      {% if upcoming_workouts %}
+        {% for workout in upcoming_workouts %}
+          <div class="workout-item-card">
+            <div class="workout-item-main">
+              <div class="workout-date">
+                <div class="date-day">{{ workout.scheduled_time.strftime('%d') }}</div>
+                <div class="date-month">{{ workout.scheduled_time.strftime('%B')|capitalize }}</div>
+              </div>
+              <div class="workout-info">
+                <h3 class="workout-title">{{ workout.activity }}</h3>
+                <div class="workout-details">
+                  <span><i class="fas fa-clock"></i> {{ workout.scheduled_time.strftime('%H:%M') }}</span>
+                </div>
+                <div class="workout-actions">
+                  <button class="btn btn-sm btn-primary">Начать</button>
+                  <a href="/edit-schedule/{{ workout.id }}" class="btn btn-sm btn-outline">Изменить</a>
+                  <form method="post" action="/delete-schedule/{{ workout.id }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-outline" onclick="return confirm('Удалить тренировку?');">Удалить</button>
+                  </form>
+                </div>
+              </div>
             </div>
-            <div class="workout-actions">
-              <button class="btn btn-sm btn-primary">Начать</button>
-            </div>
+            <button class="btn btn-sm btn-outline workout-more"><i class="fas fa-ellipsis-v"></i></button>
           </div>
-        </div>
-        <button class="btn btn-sm btn-outline workout-more"><i class="fas fa-ellipsis-v"></i></button>
-      </div>
-      <div class="workout-item-card">
-        <div class="workout-item-main">
-          <div class="workout-date">
-            <div class="date-day">2</div>
-            <div class="date-month">Июня</div>
-          </div>
-          <div class="workout-info">
-            <h3 class="workout-title">Силовая тренировка</h3>
-            <div class="workout-details">
-              <span><i class="fas fa-clock"></i> 18:00 - 18:45</span>
-              <span><i class="fas fa-bolt"></i> Средняя интенсивность</span>
-            </div>
-            <div class="workout-actions">
-              <button class="btn btn-sm btn-outline">Изменить</button>
-            </div>
-          </div>
-        </div>
-        <button class="btn btn-sm btn-outline workout-more"><i class="fas fa-ellipsis-v"></i></button>
-      </div>
-      <div class="workout-item-card">
-        <div class="workout-item-main">
-          <div class="workout-date">
-            <div class="date-day">4</div>
-            <div class="date-month">Июня</div>
-          </div>
-          <div class="workout-info">
-            <h3 class="workout-title">Йога</h3>
-            <div class="workout-details">
-              <span><i class="fas fa-clock"></i> 07:30 - 08:00</span>
-              <span><i class="fas fa-bolt"></i> Низкая интенсивность</span>
-            </div>
-            <div class="workout-actions">
-              <button class="btn btn-sm btn-outline">Изменить</button>
-            </div>
-          </div>
-        </div>
-        <button class="btn btn-sm btn-outline workout-more"><i class="fas fa-ellipsis-v"></i></button>
-      </div>
+        {% endfor %}
+      {% else %}
+        <div style="color: var(--text-muted); padding: 24px; text-align: center;">Нет запланированных тренировок</div>
+      {% endif %}
     </div>
     <style>
     .upcoming-workouts {
@@ -208,6 +190,26 @@
       }
     }
     </style>
+  </div>
+  <div class="section">
+    <h2 class="section-title"><i class="fas fa-bullseye" style="color: var(--primary); margin-right: 10px;"></i>Прогресс по целям</h2>
+    <div class="goals-list">
+      {% if user_goals %}
+        {% for goal in user_goals %}
+          <div class="goal-item">
+            <div class="goal-info">
+              <div class="goal-name">{{ goal.goal_type|capitalize }}</div>
+              <div class="goal-value">{{ goal.current_value|round(1) }}/{{ goal.target_value|round(1) }}{% if goal.goal_type == 'duration' %} мин{% elif goal.goal_type == 'calories' %} ккал{% elif goal.goal_type == 'workouts' %} трен.{% endif %}</div>
+            </div>
+            <div class="goal-progress-bg">
+              <div class="goal-progress-fill" style="width: {{ goal.progress|round(0) }}%;"></div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="color: var(--text-muted); padding: 24px; text-align: center;">Нет активных целей</div>
+      {% endif %}
+    </div>
   </div>
 </div>
 {% endblock %}

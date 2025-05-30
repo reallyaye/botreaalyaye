@@ -18,7 +18,7 @@
           </div>
           <div class="workout-content">
             <div class="workout-title">Тренировок</div>
-            <div class="workout-description">48</div>
+            <div class="workout-description">{{ stats.total_workouts }}</div>
           </div>
         </div>
         <div class="workout-card">
@@ -29,7 +29,7 @@
           </div>
           <div class="workout-content">
             <div class="workout-title">Минут</div>
-            <div class="workout-description">1280</div>
+            <div class="workout-description">{{ stats.total_minutes }}</div>
           </div>
         </div>
         <div class="workout-card">
@@ -40,12 +40,12 @@
           </div>
           <div class="workout-content">
             <div class="workout-title">Калорий</div>
-            <div class="workout-description">15,400</div>
+            <div class="workout-description">{{ stats.total_calories }}</div>
           </div>
         </div>
       </div>
     </div>
-    <button class="btn btn-primary">
+    <button class="btn btn-primary" id="editProfileBtn" type="button">
       <i class="fas fa-edit btn-icon"></i>
       Редактировать
     </button>
@@ -154,45 +154,21 @@
       </div>
       <div class="card-body">
         <div class="goals-list">
-          <div class="goal-item">
-            <div class="goal-info">
-              <div class="goal-name">Тренировки в неделю</div>
-              <div class="goal-value">4/5</div>
-            </div>
-            <div class="goal-progress-bg">
-              <div class="goal-progress-fill" style="width: 80%;"></div>
-            </div>
-          </div>
-          
-          <div class="goal-item">
-            <div class="goal-info">
-              <div class="goal-name">Время тренировок</div>
-              <div class="goal-value">320/400 мин</div>
-            </div>
-            <div class="goal-progress-bg">
-              <div class="goal-progress-fill" style="width: 80%;"></div>
-            </div>
-          </div>
-          
-          <div class="goal-item">
-            <div class="goal-info">
-              <div class="goal-name">Снижение веса</div>
-              <div class="goal-value">3/5 кг</div>
-            </div>
-            <div class="goal-progress-bg">
-              <div class="goal-progress-fill" style="width: 60%;"></div>
-            </div>
-          </div>
-          
-          <div class="goal-item">
-            <div class="goal-info">
-              <div class="goal-name">Увеличение силы</div>
-              <div class="goal-value">15/20 кг</div>
-            </div>
-            <div class="goal-progress-bg">
-              <div class="goal-progress-fill" style="width: 75%;"></div>
-            </div>
-          </div>
+          {% if user_goals %}
+            {% for goal in user_goals %}
+              <div class="goal-item">
+                <div class="goal-info">
+                  <div class="goal-name">{{ goal.goal_type|capitalize }}</div>
+                  <div class="goal-value">{{ goal.current_value|round(1) }}/{{ goal.target_value|round(1) }}{% if goal.goal_type == 'duration' %} мин{% elif goal.goal_type == 'calories' %} ккал{% elif goal.goal_type == 'workouts' %} трен.{% endif %}</div>
+                </div>
+                <div class="goal-progress-bg">
+                  <div class="goal-progress-fill" style="width: {{ goal.progress|round(0) }}%;"></div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div style="color: var(--text-muted); padding: 24px; text-align: center;">Нет активных целей</div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -438,4 +414,60 @@
     </div>
   </div>
 </div>
+
+<!-- Модальное окно для редактирования профиля -->
+<div id="editProfileModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center;">
+  <div class="modal-content card fade-in" style="max-width: 500px; margin: auto; position:relative;">
+    <button type="button" class="btn btn-sm btn-outline" id="closeEditProfileModal" style="position:absolute; top:12px; right:12px;"><i class="fas fa-times"></i></button>
+    <h2 class="section-title">Редактировать профиль</h2>
+    <form method="post" action="/profile/update" enctype="multipart/form-data">
+      <div class="form-group">
+        <label>Имя</label>
+        <input type="text" name="name" class="form-control" value="{{ name }}" required>
+      </div>
+      <div class="form-group">
+        <label>Возраст</label>
+        <input type="number" name="age" class="form-control" value="{{ age }}" min="1" max="120" required>
+      </div>
+      <div class="form-group">
+        <label>Рост (см)</label>
+        <input type="number" name="height" class="form-control" value="{{ height }}" min="1" required>
+      </div>
+      <div class="form-group">
+        <label>Вес (кг)</label>
+        <input type="number" name="weight" class="form-control" value="{{ weight }}" min="1" required>
+      </div>
+      <div class="form-group">
+        <label>Цель</label>
+        <select name="goal" class="form-control">
+          <option value="maintain" {% if goal == 'maintain' %}selected{% endif %}>Поддерживать вес</option>
+          <option value="lose" {% if goal == 'lose' %}selected{% endif %}>Похудеть</option>
+          <option value="gain" {% if goal == 'gain' %}selected{% endif %}>Набрать вес</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Уровень активности</label>
+        <input type="text" name="activity_level" class="form-control" value="{{ activity_level }}">
+      </div>
+      <div class="form-group">
+        <label>Типы тренировок</label>
+        <input type="text" name="workout_types" class="form-control" value="{{ workout_types }}">
+      </div>
+      <div class="form-group">
+        <label>Аватар</label>
+        <input type="file" name="avatar" class="form-control">
+      </div>
+      <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const editBtn = document.getElementById('editProfileBtn');
+  const modal = document.getElementById('editProfileModal');
+  const closeModal = document.getElementById('closeEditProfileModal');
+  editBtn.onclick = () => { modal.style.display = 'flex'; };
+  closeModal.onclick = () => { modal.style.display = 'none'; };
+  window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+</script>
 {% endblock %}
