@@ -19,6 +19,10 @@
   <div class="auth-card fade-in delay-1">
     <h1 class="auth-title">Вход в аккаунт</h1>
     
+    {% if error %}
+      <div class="error" style="margin-bottom: 1rem;">{{ error }}</div>
+    {% endif %}
+    
     <form id="loginForm" method="post" action="/login">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <div class="form-group">
