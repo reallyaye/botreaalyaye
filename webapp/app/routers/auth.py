@@ -50,13 +50,23 @@ async def login(request: Request, username: str = Form(...), password: str = For
 
     # Обычная авторизация через логин и пароль
     try:
-        user = await authenticate_user(username, password)
-        if not user:
+        user, error_reason = await authenticate_user(username, password)
+        if error_reason == "user_not_found":
             return templates.TemplateResponse(
                 "login.html",
                 {
                     "request": request,
-                    "error": "Неверные данные",
+                    "error": "Пользователь с таким именем не найден.",
+                    "is_authenticated": False,
+                    "csrf_token": request.session.get("csrf_token")
+                }
+            )
+        if error_reason == "wrong_password":
+            return templates.TemplateResponse(
+                "login.html",
+                {
+                    "request": request,
+                    "error": "Неверный пароль.",
                     "is_authenticated": False,
                     "csrf_token": request.session.get("csrf_token")
                 }

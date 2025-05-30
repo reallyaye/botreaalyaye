@@ -101,23 +101,20 @@ async def register_user(username: str, password: str) -> None:
         session.add(user)
         await session.commit()
 
-async def authenticate_user(username: str, password: str) -> User | None:
+async def authenticate_user(username: str, password: str) -> tuple[User | None, str | None]:
     async with AsyncSessionLocal() as session:
         result = await session.execute(select(User).where(User.username == username))
         user = result.scalars().first()
-        print(f"DEBUG: Найден пользователь: {user}")
-        if user:
-            print(f"DEBUG: Введённый пароль: {password}")
-            print(f"DEBUG: Хеш из БД: {user.password}")
-            try:
-                check = verify_password(password, user.password)
-            except Exception as e:
-                print(f"DEBUG: Ошибка при проверке пароля: {e}")
-                check = False
-            print(f"DEBUG: Проверка пароля: {check}")
-        if user and verify_password(password, user.password):
-            return user
-        return None
+        if not user:
+            return None, "user_not_found"
+        try:
+            check = verify_password(password, user.password)
+        except Exception as e:
+            print(f"DEBUG: Ошибка при проверке пароля: {e}")
+            check = False
+        if not check:
+            return None, "wrong_password"
+        return user, None
 
 async def get_user_by_id(user_id: int) -> User | None:
     async with AsyncSessionLocal() as session:
