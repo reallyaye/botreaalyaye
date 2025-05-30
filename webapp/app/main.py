@@ -38,10 +38,10 @@ app.add_middleware(
     session_cookie="session",
 )
 
-# статика
+# статика с явным указанием MIME-типов
 app.mount(
     "/static",
-    StaticFiles(directory=BASE_DIR / "static"),
+    StaticFiles(directory=BASE_DIR / "static", html=True),
     name="static"
 )
 
