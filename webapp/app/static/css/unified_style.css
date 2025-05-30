@@ -1363,3 +1363,12 @@ img {
     margin-right: 0;
   }
 }
+
+.welcome-icons {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
