@@ -15,7 +15,11 @@
                 </div>
             </div>
             <div class="col-6 col-sm-12">
-                <img src="{{ request.url_for('static', path='img/hero-image.jpg') }}" alt="NOVIII Fitness" class="hero-image">
+                <div class="hero-graphic">
+                    <i class="fas fa-dumbbell fa-5x"></i>
+                    <i class="fas fa-running fa-5x"></i>
+                    <i class="fas fa-heartbeat fa-5x"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -102,7 +106,9 @@
                         </div>
                         <p class="testimonial-text">"NOVIII помог мне наконец-то начать регулярно заниматься спортом. Удобный интерфейс и разнообразие тренировок - именно то, что мне было нужно!"</p>
                         <div class="testimonial-author">
-                            <img src="{{ request.url_for('static', path='img/testimonials/user1.jpg') }}" alt="Анна М." class="testimonial-avatar">
+                            <div class="testimonial-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
                             <div class="testimonial-info">
                                 <h4>Анна М.</h4>
                                 <p>Пользователь с 2024 года</p>
@@ -121,7 +127,9 @@
                         </div>
                         <p class="testimonial-text">"За 3 месяца использования NOVIII я сбросил 8 кг и значительно улучшил свою физическую форму. Отличное приложение для тех, кто серьезно относится к тренировкам."</p>
                         <div class="testimonial-author">
-                            <img src="{{ request.url_for('static', path='img/testimonials/user2.jpg') }}" alt="Дмитрий К." class="testimonial-avatar">
+                            <div class="testimonial-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
                             <div class="testimonial-info">
                                 <h4>Дмитрий К.</h4>
                                 <p>Пользователь с 2023 года</p>
@@ -140,7 +148,9 @@
                         </div>
                         <p class="testimonial-text">"Мне особенно нравится возможность отслеживать свой прогресс и видеть результаты в графиках. Это очень мотивирует продолжать тренировки!"</p>
                         <div class="testimonial-author">
-                            <img src="{{ request.url_for('static', path='img/testimonials/user3.jpg') }}" alt="Елена В." class="testimonial-avatar">
+                            <div class="testimonial-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
                             <div class="testimonial-info">
                                 <h4>Елена В.</h4>
                                 <p>Пользователь с 2024 года</p>
