@@ -19,7 +19,7 @@
                 <div class="card">
                     <h2 class="text-center mb-4"><i class="fas fa-sign-in-alt"></i> Вход в систему</h2>
                     
-                    <form action="{{ url_for('login') }}" method="post">
+                    <form action="/login" method="post">
                         <div class="form-group">
                             <label for="username" class="form-label">Имя пользователя</label>
                             <input type="text" class="form-control" id="username" name="username" required>
@@ -41,8 +41,8 @@
                     </form>
                     
                     <div class="text-center mt-3">
-                        <p>Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрироваться</a></p>
-                        <p><a href="{{ url_for('reset_password') }}">Забыли пароль?</a></p>
+                        <p>Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+                        <p><a href="/reset_password">Забыли пароль?</a></p>
                     </div>
                 </div>
             </div>
