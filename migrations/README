@@ -1,0 +1,5 @@
+Alembic migrations folder.
+
+- Все автосгенерированные и ручные миграции будут храниться здесь.
+- Основной конфиг: ../alembic.ini
+- Основной env.py: migrations/env.py 
