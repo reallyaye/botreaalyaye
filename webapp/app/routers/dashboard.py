@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, select
 from starlette.responses import RedirectResponse as StarletteRedirectResponse
-from webapp.app.services.db import AsyncSessionLocal, Workout, get_user_by_id, get_weekly_stats, User
+from webapp.app.services.db import AsyncSessionLocal, Workout, get_user_by_id, get_weekly_stats, User, get_user_stats, Goal
 from datetime import datetime, timedelta
 
 router = APIRouter()
@@ -48,6 +48,16 @@ async def dashboard(request: Request, user: User = Depends(get_current_user)):
             "total_minutes": prev_stats.total_minutes or 0
         }
 
+    # Получаем статистику за всё время
+    all_time_stats = await get_user_stats(user.id)
+
+    # Получаем количество достижений (если есть таблица Achievement)
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(func.count()).select_from(Goal).where(Goal.user_id == user.id).where(Goal.achieved == True)
+        )
+        achievements_count = result.scalar() or 0
+
     # Формируем мотивационное сообщение с учётом прогресса
     motivation_message = "Начните тренироваться, чтобы достичь своих целей!"
     if weekly_stats["total_workouts"] > 0:
@@ -85,6 +95,8 @@ async def dashboard(request: Request, user: User = Depends(get_current_user)):
             "weekly_stats": weekly_stats,
             "motivation_message": motivation_message,
             "tips": tips,
+            "all_time_stats": all_time_stats,
+            "achievements_count": achievements_count,
             "success": request.session.pop("success", None),
             "error": request.session.pop("error", None)
         }
