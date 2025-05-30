@@ -130,6 +130,95 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // --- Модальное окно редактирования тренировки ---
+    document.body.addEventListener('click', async function(e) {
+        if (e.target.classList.contains('edit-schedule-btn')) {
+            const id = e.target.dataset.id;
+            // Получаем данные тренировки через AJAX
+            const resp = await fetch(`/dashboard/schedule-data/${id}`);
+            if (resp.ok) {
+                const data = await resp.json();
+                document.getElementById('edit-schedule-id').value = data.id;
+                document.getElementById('edit-activity').value = data.activity;
+                document.getElementById('edit-scheduled_time').value = data.scheduled_time.slice(0,16);
+                document.getElementById('edit-schedule-modal').style.display = 'flex';
+            } else {
+                showNotification('Ошибка загрузки данных', 'error');
+            }
+        }
+        if (e.target.id === 'close-edit-modal') {
+            document.getElementById('edit-schedule-modal').style.display = 'none';
+        }
+    });
+    document.getElementById('edit-schedule-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('edit-schedule-id').value;
+        const formData = new FormData(e.target);
+        const resp = await fetch(`/dashboard/edit-schedule/${id}`, {
+            method: 'POST',
+            body: formData
+        });
+        if (resp.redirected || resp.ok) {
+            document.getElementById('edit-schedule-modal').style.display = 'none';
+            await updateUpcomingWorkouts();
+            showNotification('Тренировка обновлена!', 'success');
+        } else {
+            showNotification('Ошибка при сохранении', 'error');
+        }
+    });
+
+    // --- Кнопка "Начать" с таймером ---
+    document.body.addEventListener('click', async function(e) {
+        if (e.target.classList.contains('start-schedule-btn')) {
+            const id = e.target.dataset.id;
+            // Получаем данные тренировки через AJAX
+            const resp = await fetch(`/dashboard/schedule-data/${id}`);
+            if (resp.ok) {
+                const data = await resp.json();
+                timerActivity = data.activity;
+                timerScheduleId = data.id;
+                document.getElementById('timer-activity-title').textContent = data.activity;
+                document.getElementById('timer-display').textContent = '00:00:00';
+                document.getElementById('start-timer-modal').style.display = 'flex';
+                timerStart = Date.now();
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - timerStart) / 1000);
+                    const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+                    const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+                    const s = String(elapsed % 60).padStart(2, '0');
+                    document.getElementById('timer-display').textContent = `${h}:${m}:${s}`;
+                }, 1000);
+            } else {
+                showNotification('Ошибка загрузки данных', 'error');
+            }
+        }
+        if (e.target.id === 'close-timer-modal') {
+            document.getElementById('start-timer-modal').style.display = 'none';
+            if (timerInterval) clearInterval(timerInterval);
+        }
+    });
+
+    document.getElementById('stop-timer-btn').addEventListener('click', async function() {
+        if (!timerStart || !timerScheduleId) return;
+        const elapsed = Math.floor((Date.now() - timerStart) / 1000); // в секундах
+        // Отправляем данные на сервер для сохранения тренировки
+        const resp = await fetch(`/dashboard/finish-schedule/${timerScheduleId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ duration_seconds: elapsed })
+        });
+        if (resp.ok) {
+            document.getElementById('start-timer-modal').style.display = 'none';
+            if (timerInterval) clearInterval(timerInterval);
+            await updateUpcomingWorkouts();
+            // Можно добавить обновление статистики через отдельный AJAX, если нужно
+            showNotification('Тренировка завершена и сохранена!', 'success');
+        } else {
+            showNotification('Ошибка при сохранении тренировки', 'error');
+        }
+    });
 });
 
 /**
@@ -458,3 +547,8 @@ if (!document.getElementById('custom-toast-style')) {
     style.innerHTML = `.custom-toast {position:fixed;top:30px;right:30px;z-index:9999;padding:16px 28px;border-radius:8px;font-size:1.1em;box-shadow:0 2px 12px rgba(0,0,0,0.12);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateY(-20px);} .custom-toast.show {opacity:1;pointer-events:auto;transform:translateY(0);} .toast-success {background:#4caf50;color:#fff;} .toast-error {background:#e53935;color:#fff;}`;
     document.head.appendChild(style);
 }
+
+let timerInterval = null;
+let timerStart = null;
+let timerActivity = '';
+let timerScheduleId = null;

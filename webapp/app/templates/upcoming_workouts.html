@@ -12,15 +12,14 @@
             <span><i class="fas fa-clock"></i> {{ workout.scheduled_time.strftime('%H:%M') }}</span>
           </div>
           <div class="workout-actions">
-            <button class="btn btn-sm btn-primary" onclick="window.location.href='/dashboard/start-schedule/{{ workout.id }}'; return false;">Начать</button>
-            <a href="/dashboard/edit-schedule/{{ workout.id }}" class="btn btn-sm btn-outline">Изменить</a>
+            <button class="btn btn-sm btn-primary start-schedule-btn" data-id="{{ workout.id }}">Начать</button>
+            <button class="btn btn-sm btn-outline edit-schedule-btn" data-id="{{ workout.id }}">Изменить</button>
             <form method="post" action="/dashboard/delete-schedule/{{ workout.id }}" class="delete-schedule-form" data-id="{{ workout.id }}" style="display:inline;">
               <button type="submit" class="btn btn-sm btn-outline" onclick="return false;">Удалить</button>
             </form>
           </div>
         </div>
       </div>
-      <button class="btn btn-sm btn-outline workout-more"><i class="fas fa-ellipsis-v"></i></button>
     </div>
   {% endfor %}
 {% else %}

@@ -191,4 +191,34 @@
     </div>
   </div>
 </div>
+
+<!-- Модальное окно для редактирования тренировки -->
+<div id="edit-schedule-modal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); align-items:center; justify-content:center;">
+  <div class="modal-content" style="background:#fff; border-radius:12px; max-width:400px; width:90vw; padding:32px 24px; position:relative;">
+    <button id="close-edit-modal" style="position:absolute; top:12px; right:12px; background:none; border:none; font-size:1.5em; cursor:pointer;">&times;</button>
+    <h2 style="margin-bottom:18px;">Редактировать тренировку</h2>
+    <form id="edit-schedule-form">
+      <input type="hidden" name="schedule_id" id="edit-schedule-id">
+      <div class="form-group">
+        <label for="edit-activity">Активность</label>
+        <input type="text" id="edit-activity" name="activity" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-scheduled_time">Дата и время</label>
+        <input type="datetime-local" id="edit-scheduled_time" name="scheduled_time" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+  </div>
+</div>
+
+<!-- Модальное окно для таймера тренировки -->
+<div id="start-timer-modal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); align-items:center; justify-content:center;">
+  <div class="modal-content" style="background:#fff; border-radius:12px; max-width:400px; width:90vw; padding:32px 24px; position:relative; text-align:center;">
+    <button id="close-timer-modal" style="position:absolute; top:12px; right:12px; background:none; border:none; font-size:1.5em; cursor:pointer;">&times;</button>
+    <h2 id="timer-activity-title" style="margin-bottom:18px;"></h2>
+    <div id="timer-display" style="font-size:2.5em; margin-bottom:24px;">00:00:00</div>
+    <button id="stop-timer-btn" class="btn btn-danger" style="font-size:1.1em;">Стоп</button>
+  </div>
+</div>
 {% endblock %}

@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Request, Depends, Form, Path
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Request, Depends, Form, Path, Body
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, select
 from starlette.responses import RedirectResponse as StarletteRedirectResponse
-from webapp.app.services.db import AsyncSessionLocal, Workout, get_user_by_id, get_weekly_stats, User, get_user_stats, Goal, get_user_schedules, add_schedule, get_workout_by_id, update_workout, delete_schedule, get_user_goals
+from webapp.app.services.db import AsyncSessionLocal, Workout, get_user_by_id, get_weekly_stats, User, get_user_stats, Goal, get_user_schedules, add_schedule, get_workout_by_id, update_workout, delete_schedule, get_user_goals, Schedule, add_workout
 from datetime import datetime, timedelta
 
 router = APIRouter()
@@ -178,3 +178,46 @@ async def upcoming_workouts_partial(request: Request, user: User = Depends(get_c
         "upcoming_workouts.html",
         {"request": request, "upcoming_workouts": upcoming_workouts}
     )
+
+@router.get("/schedule-data/{schedule_id}")
+async def get_schedule_data(schedule_id: int, user: User = Depends(get_current_user)):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user.id))
+        schedule = result.scalars().first()
+        if not schedule:
+            return JSONResponse(status_code=404, content={"error": "Not found"})
+        return {
+            "id": schedule.id,
+            "activity": schedule.activity,
+            "scheduled_time": schedule.scheduled_time.strftime("%Y-%m-%dT%H:%M")
+        }
+
+@router.post("/start-schedule/{schedule_id}")
+async def start_schedule(schedule_id: int, user: User = Depends(get_current_user)):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user.id))
+        schedule = result.scalars().first()
+        if schedule:
+            await session.delete(schedule)
+            await session.commit()
+    return JSONResponse({"success": True})
+
+@router.post("/finish-schedule/{schedule_id}")
+async def finish_schedule(schedule_id: int, request: Request, user: User = Depends(get_current_user)):
+    data = await request.json()
+    duration_seconds = data.get('duration_seconds')
+    if not duration_seconds:
+        return JSONResponse(status_code=400, content={"error": "No duration"})
+    async with AsyncSessionLocal() as session:
+        # Получаем расписание
+        result = await session.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user.id))
+        schedule = result.scalars().first()
+        if not schedule:
+            return JSONResponse(status_code=404, content={"error": "Not found"})
+        # Сохраняем тренировку
+        duration_min = round(duration_seconds / 60, 2)
+        await add_workout(user.id, schedule.activity, intensity="Обычная", duration=duration_min)
+        # Удаляем из расписания
+        await session.delete(schedule)
+        await session.commit()
+    return JSONResponse({"success": True})
