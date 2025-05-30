@@ -54,12 +54,12 @@
     <button class="profile-tab active" data-tab="personal">Личные данные</button>
     <button class="profile-tab" data-tab="goals">Цели</button>
     <button class="profile-tab" data-tab="settings">Настройки</button>
-    <button class="profile-tab" data-tab="notifications">Уведомления</button>
   </div>
   <div class="profile-tab-content active" id="personal-tab">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Личные данные</h3>
+        <span class="tab-hint">Ваши основные сведения. Для изменения нажмите "Редактировать".</span>
         <button class="btn btn-sm btn-outline">
           <i class="fas fa-edit"></i>
         </button>
@@ -148,6 +148,7 @@
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Мои цели</h3>
+        <span class="tab-hint">Следите за прогрессом и добавляйте новые цели.</span>
         <button class="btn btn-sm btn-outline">
           <i class="fas fa-edit"></i>
         </button>
@@ -220,6 +221,7 @@
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Настройки аккаунта</h3>
+        <span class="tab-hint">Настройте язык, единицы измерения и безопасность.</span>
       </div>
       <div class="card-body">
         <div class="form-group">
@@ -328,88 +330,6 @@
           </div>
           <button class="btn btn-danger">Удалить аккаунт</button>
         </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="profile-tab-content" id="notifications-tab">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Настройки уведомлений</h3>
-      </div>
-      <div class="card-body">
-        <div class="notification-setting">
-          <div>
-            <h4>Напоминания о тренировках</h4>
-            <p>Получайте уведомления о запланированных тренировках</p>
-          </div>
-          <div class="toggle-switch">
-            <input type="checkbox" id="workoutReminders" checked>
-            <label for="workoutReminders"></label>
-          </div>
-        </div>
-        <div class="notification-setting">
-          <div>
-            <h4>Достижение целей</h4>
-            <p>Получайте уведомления о достижении поставленных целей</p>
-          </div>
-          <div class="toggle-switch">
-            <input type="checkbox" id="goalAchievements" checked>
-            <label for="goalAchievements"></label>
-          </div>
-        </div>
-        <div class="notification-setting">
-          <div>
-            <h4>Новые программы тренировок</h4>
-            <p>Получайте уведомления о новых программах тренировок</p>
-          </div>
-          <div class="toggle-switch">
-            <input type="checkbox" id="newWorkouts" checked>
-            <label for="newWorkouts"></label>
-          </div>
-        </div>
-        <div class="notification-setting">
-          <div>
-            <h4>Советы и рекомендации</h4>
-            <p>Получайте полезные советы и рекомендации по тренировкам</p>
-          </div>
-          <div class="toggle-switch">
-            <input type="checkbox" id="tips">
-            <label for="tips"></label>
-          </div>
-        </div>
-        <div class="notification-setting">
-          <div>
-            <h4>Маркетинговые рассылки</h4>
-            <p>Получайте информацию о специальных предложениях и акциях</p>
-          </div>
-          <div class="toggle-switch">
-            <input type="checkbox" id="marketing">
-            <label for="marketing"></label>
-          </div>
-        </div>
-        
-        <hr class="divider">
-        
-        <div class="form-group">
-          <label class="form-label">Способы уведомлений</label>
-          <div class="checkbox-group">
-            <label class="checkbox">
-              <input type="checkbox" checked>
-              <span class="checkbox-label">Email</span>
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" checked>
-              <span class="checkbox-label">Push-уведомления</span>
-            </label>
-            <label class="checkbox">
-              <input type="checkbox">
-              <span class="checkbox-label">SMS</span>
-            </label>
-          </div>
-        </div>
-        
-        <button class="btn btn-primary">Сохранить настройки</button>
       </div>
     </div>
   </div>

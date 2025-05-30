@@ -278,6 +278,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Первичная привязка
         bindWorkoutListHandlers();
     }
+
+    // После загрузки страницы сразу биндим обработчики
+    bindDeleteScheduleForms();
 });
 
 /**
@@ -665,5 +668,32 @@ function bindWorkoutListHandlers() {
                 showNotification('Ошибка при удалении', 'error');
             }
         });
+    });
+}
+
+// === Динамическое обновление блока предстоящих тренировок ===
+async function reloadUpcomingWorkouts() {
+    const resp = await fetch('/dashboard/upcoming-workouts');
+    if (resp.ok) {
+        const html = await resp.text();
+        document.getElementById('upcoming-workouts-list').innerHTML = html;
+        bindDeleteScheduleForms();
+    }
+}
+
+// Переинициализация обработчиков удаления
+function bindDeleteScheduleForms() {
+    document.querySelectorAll('.delete-schedule-form').forEach(form => {
+        form.onsubmit = async function(e) {
+            e.preventDefault();
+            const id = form.dataset.id;
+            const resp = await fetch(`/dashboard/delete-schedule/${id}`, { method: 'POST' });
+            if (resp.ok) {
+                await reloadUpcomingWorkouts();
+                showNotification('Тренировка удалена!', 'success');
+            } else {
+                showNotification('Ошибка при удалении', 'error');
+            }
+        };
     });
 }
