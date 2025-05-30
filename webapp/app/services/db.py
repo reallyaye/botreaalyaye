@@ -105,6 +105,16 @@ async def authenticate_user(username: str, password: str) -> User | None:
     async with AsyncSessionLocal() as session:
         result = await session.execute(select(User).where(User.username == username))
         user = result.scalars().first()
+        print(f"DEBUG: Найден пользователь: {user}")
+        if user:
+            print(f"DEBUG: Введённый пароль: {password}")
+            print(f"DEBUG: Хеш из БД: {user.password}")
+            try:
+                check = verify_password(password, user.password)
+            except Exception as e:
+                print(f"DEBUG: Ошибка при проверке пароля: {e}")
+                check = False
+            print(f"DEBUG: Проверка пароля: {check}")
         if user and verify_password(password, user.password):
             return user
         return None
