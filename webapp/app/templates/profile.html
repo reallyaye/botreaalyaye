@@ -53,36 +53,33 @@
             {% block content %}
             <h1>Профиль</h1>
             
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Аватар пользователя" class="avatar-image">
-                    <button class="avatar-edit-btn">
-                        <i class="fas fa-camera"></i>
-                    </button>
-                </div>
-                <div class="profile-info">
-                    <h2 class="profile-name">Александр Иванов</h2>
-                    <p class="profile-subtitle">Активный с января 2025</p>
-                    <div class="profile-stats">
-                        <div class="profile-stat-item">
-                            <div class="profile-stat-value">48</div>
-                            <div class="profile-stat-label">Тренировок</div>
-                        </div>
-                        <div class="profile-stat-item">
-                            <div class="profile-stat-value">1280</div>
-                            <div class="profile-stat-label">Минут</div>
-                        </div>
-                        <div class="profile-stat-item">
-                            <div class="profile-stat-value">15.4K</div>
-                            <div class="profile-stat-label">Калорий</div>
+            <div class="profile-section">
+                <div class="profile-header">
+                    <div class="profile-avatar-container">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2 class="profile-name">{{ username or 'Пользователь' }}</h2>
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <div class="profile-stat-value">48</div>
+                                <div class="profile-stat-label">Тренировок</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="profile-stat-value">1280</div>
+                                <div class="profile-stat-label">Минут</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="profile-stat-value">15,400</div>
+                                <div class="profile-stat-label">Калорий</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="profile-actions">
                     <button class="btn btn-primary">
                         <i class="fas fa-edit btn-icon"></i>
                         Редактировать
                     </button>
+                </div>
                 </div>
             </div>
             
