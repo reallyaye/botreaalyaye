@@ -1,0 +1,25 @@
+{% if workouts %}
+  {% for w in workouts %}
+    <div class="workout-history-card" data-type="{{ w.activity|lower }}" style="display:flex;align-items:center;gap:24px;background:var(--card-bg);border-radius:16px;box-shadow:var(--shadow-md);padding:18px 24px;flex-wrap:wrap;">
+      <div style="min-width:60px;text-align:center;">
+        <div style="font-size:2em;color:var(--primary);font-weight:700;">{{ w.activity[0]|upper }}</div>
+        <div style="font-size:0.95em;color:var(--text-muted);margin-top:2px;">{{ w.created_at }}</div>
+      </div>
+      <div style="flex:1;min-width:180px;">
+        <div style="font-size:1.15em;font-weight:600;">{{ w.activity }}</div>
+        <div style="font-size:0.98em;color:var(--text-muted);margin-top:2px;">Интенсивность: {{ w.intensity }}</div>
+        <div style="font-size:0.98em;color:var(--text-muted);margin-top:2px;">Комментарий: {{ w.comment or '-' }}</div>
+      </div>
+      <div style="min-width:110px;text-align:center;">
+        <div style="font-size:1.1em;"><i class="fas fa-clock"></i> {{ w.duration }} мин</div>
+        <div style="font-size:1.1em;"><i class="fas fa-fire"></i> {{ w.calories_burned|round(0) }} ккал</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-outline edit-workout-btn" data-id="{{ w.id }}"><i class="fas fa-edit"></i> Изменить</button>
+        <button class="btn btn-outline btn-danger delete-workout-btn" data-id="{{ w.id }}"><i class="fas fa-trash"></i> Удалить</button>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div style="color:var(--text-muted);padding:32px;text-align:center;">У вас пока нет завершённых тренировок</div>
+{% endif %} 

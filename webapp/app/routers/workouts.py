@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Depends, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from starlette.responses import RedirectResponse as StarletteRedirectResponse
@@ -225,3 +225,66 @@ async def delete_workout_route(request: Request, workout_id: int, user: User = D
         print(f"Ошибка при удалении тренировки: {e}")
         request.session["error"] = "Произошла ошибка при удалении тренировки. Попробуйте снова."
     return RedirectResponse("/workouts", status_code=302)
+
+@router.get("/edit/{workout_id}")
+async def get_workout_json(request: Request, workout_id: int, user: User = Depends(get_current_user)):
+    workout = await get_workout_by_id(workout_id)
+    if not workout or workout.user_id != user.id:
+        return JSONResponse(status_code=404, content={"error": "Not found"})
+    return JSONResponse({
+        "id": workout.id,
+        "activity": workout.activity,
+        "intensity": workout.intensity,
+        "duration": workout.duration,
+        "calories_burned": workout.calories_burned,
+        "comment": workout.comment,
+        "created_at": workout.created_at.strftime("%d.%m.%Y %H:%M") if workout.created_at else ""
+    })
+
+@router.post("/add")
+async def add_workout_ajax(request: Request, user: User = Depends(get_current_user)):
+    form = await request.form()
+    activity = form.get("activity")
+    intensity = form.get("intensity")
+    duration = float(form.get("duration"))
+    comment = form.get("comment")
+    await add_workout(user.id, activity, intensity, duration, comment)
+    return JSONResponse({"success": True})
+
+@router.post("/edit/{workout_id}")
+async def edit_workout_ajax(request: Request, workout_id: int, user: User = Depends(get_current_user)):
+    form = await request.form()
+    activity = form.get("activity")
+    intensity = form.get("intensity")
+    duration = float(form.get("duration"))
+    comment = form.get("comment")
+    await update_workout(workout_id, activity, intensity, duration, comment)
+    return JSONResponse({"success": True})
+
+@router.post("/delete/{workout_id}")
+async def delete_workout_ajax(request: Request, workout_id: int, user: User = Depends(get_current_user)):
+    workout = await get_workout_by_id(workout_id)
+    if not workout or workout.user_id != user.id:
+        return JSONResponse(status_code=404, content={"error": "Not found"})
+    await delete_workout(workout_id)
+    return JSONResponse({"success": True})
+
+@router.get("/list-partial", response_class=HTMLResponse)
+async def workouts_list_partial(request: Request, user: User = Depends(get_current_user)):
+    workouts = await get_all_user_workouts(user.id)
+    formatted_workouts = []
+    for workout in workouts:
+        formatted_workout = {
+            "id": workout.id,
+            "activity": workout.activity,
+            "intensity": workout.intensity,
+            "duration": workout.duration,
+            "calories_burned": workout.calories_burned,
+            "comment": workout.comment,
+            "created_at": workout.created_at.strftime("%d.%m.%Y %H:%M") if workout.created_at else ""
+        }
+        formatted_workouts.append(formatted_workout)
+    return templates.TemplateResponse(
+        "workouts_list_partial.html",
+        {"request": request, "workouts": formatted_workouts}
+    )

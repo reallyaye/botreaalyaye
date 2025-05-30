@@ -213,12 +213,71 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('start-timer-modal').style.display = 'none';
             if (timerInterval) clearInterval(timerInterval);
             await updateUpcomingWorkouts();
-            // Можно добавить обновление статистики через отдельный AJAX, если нужно
+            await updateDashboardStats();
             showNotification('Тренировка завершена и сохранена!', 'success');
         } else {
             showNotification('Ошибка при сохранении тренировки', 'error');
         }
     });
+
+    // --- ВКЛАДКА ТРЕНИРОВКИ ---
+    if (document.getElementById('workouts-list')) {
+        // Фильтрация по типу
+        document.querySelectorAll('.chip-filter').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.chip-filter').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const type = btn.dataset.type;
+                document.querySelectorAll('.workout-history-card').forEach(card => {
+                    if (type === 'all' || card.dataset.type.includes(type)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+        // Поиск по названию
+        document.getElementById('workout-search').addEventListener('input', function() {
+            const val = this.value.toLowerCase();
+            document.querySelectorAll('.workout-history-card').forEach(card => {
+                const title = card.querySelector('div:nth-child(2) > div').textContent.toLowerCase();
+                card.style.display = title.includes(val) ? '' : 'none';
+            });
+        });
+        // Открытие модального окна для добавления
+        document.getElementById('add-workout-btn').addEventListener('click', function() {
+            document.getElementById('workout-modal-title').textContent = 'Добавить тренировку';
+            document.getElementById('workout-form').reset();
+            document.getElementById('workout-id').value = '';
+            document.getElementById('workout-modal').style.display = 'flex';
+        });
+        // Закрытие модального окна
+        document.getElementById('close-workout-modal').addEventListener('click', function() {
+            document.getElementById('workout-modal').style.display = 'none';
+        });
+        // AJAX добавление/редактирование
+        document.getElementById('workout-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('workout-id').value;
+            const formData = new FormData(e.target);
+            let url = '/workouts/add';
+            let method = 'POST';
+            if (id) {
+                url = `/workouts/edit/${id}`;
+            }
+            const resp = await fetch(url, { method, body: formData });
+            if (resp.ok) {
+                document.getElementById('workout-modal').style.display = 'none';
+                await updateWorkoutsList();
+                showNotification('Тренировка сохранена!', 'success');
+            } else {
+                showNotification('Ошибка при сохранении', 'error');
+            }
+        });
+        // Первичная привязка
+        bindWorkoutListHandlers();
+    }
 });
 
 /**
@@ -552,3 +611,59 @@ let timerInterval = null;
 let timerStart = null;
 let timerActivity = '';
 let timerScheduleId = null;
+
+async function updateDashboardStats() {
+    const resp = await fetch('/dashboard/stats-json');
+    if (resp.ok) {
+        const stats = await resp.json();
+        document.getElementById('total-workouts').textContent = stats.total_workouts;
+        document.getElementById('total-minutes').textContent = stats.total_minutes;
+        document.getElementById('total-calories').textContent = stats.total_calories;
+        document.getElementById('achievements-count').textContent = stats.achievements_count;
+    }
+}
+
+async function updateWorkoutsList() {
+    const resp = await fetch('/workouts/list-partial');
+    if (resp.ok) {
+        const html = await resp.text();
+        document.getElementById('workouts-list').innerHTML = html;
+        bindWorkoutListHandlers();
+    }
+}
+
+function bindWorkoutListHandlers() {
+    // Открытие модального окна для редактирования
+    document.querySelectorAll('.edit-workout-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const id = btn.dataset.id;
+            const resp = await fetch(`/workouts/edit/${id}`);
+            if (resp.ok) {
+                const w = await resp.json();
+                document.getElementById('workout-modal-title').textContent = 'Редактировать тренировку';
+                document.getElementById('workout-id').value = w.id;
+                document.getElementById('workout-activity').value = w.activity;
+                document.getElementById('workout-intensity').value = w.intensity;
+                document.getElementById('workout-duration').value = w.duration;
+                document.getElementById('workout-comment').value = w.comment || '';
+                document.getElementById('workout-modal').style.display = 'flex';
+            } else {
+                showNotification('Ошибка загрузки тренировки', 'error');
+            }
+        });
+    });
+    // Удаление тренировки
+    document.querySelectorAll('.delete-workout-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            if (!confirm('Удалить тренировку?')) return;
+            const id = btn.dataset.id;
+            const resp = await fetch(`/workouts/delete/${id}`, { method: 'POST' });
+            if (resp.ok) {
+                await updateWorkoutsList();
+                showNotification('Тренировка удалена!', 'success');
+            } else {
+                showNotification('Ошибка при удалении', 'error');
+            }
+        });
+    });
+}

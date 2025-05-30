@@ -411,9 +411,11 @@ async def get_user_schedules(user_id: int):
         )
         return result.scalars().all()
 
-async def delete_schedule(schedule_id: int):
+async def delete_schedule(schedule_id: int, user_id: int):
     async with AsyncSessionLocal() as session:
-        result = await session.execute(select(Schedule).where(Schedule.id == schedule_id))
+        result = await session.execute(
+            select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user_id)
+        )
         schedule = result.scalars().first()
         if schedule:
             await session.delete(schedule)

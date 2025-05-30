@@ -131,8 +131,8 @@ async def delete_schedule_route(request: Request, schedule_id: int = Path(...)):
     user_id = request.session.get("user_id")
     if not user_id:
         return StarletteRedirectResponse("/login", status_code=302)
-    await delete_schedule(schedule_id)
-    return StarletteRedirectResponse("/", status_code=302)
+    await delete_schedule(schedule_id, user_id)
+    return JSONResponse({"success": True})
 
 @router.get("/edit-schedule/{schedule_id}", response_class=HTMLResponse)
 async def edit_schedule_form(request: Request, schedule_id: int = Path(...)):
@@ -221,3 +221,18 @@ async def finish_schedule(schedule_id: int, request: Request, user: User = Depen
         await session.delete(schedule)
         await session.commit()
     return JSONResponse({"success": True})
+
+@router.get("/stats-json")
+async def stats_json(request: Request, user: User = Depends(get_current_user)):
+    all_time_stats = await get_user_stats(user.id)
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(func.count()).select_from(Goal).where(Goal.user_id == user.id).where(Goal.achieved == True)
+        )
+        achievements_count = result.scalar() or 0
+    return {
+        "total_workouts": all_time_stats["total_workouts"],
+        "total_minutes": all_time_stats["total_minutes"],
+        "total_calories": all_time_stats["total_calories"],
+        "achievements_count": achievements_count
+    }
