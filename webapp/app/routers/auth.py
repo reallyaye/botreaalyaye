@@ -46,7 +46,7 @@ async def login(request: Request, username: str = Form(...), password: str = For
             user = result.scalars().first()
             if user:
                 request.session["user_id"] = user.id
-                return RedirectResponse("/", status_code=302)
+                return RedirectResponse("/dashboard", status_code=302)
 
     # Обычная авторизация через логин и пароль
     try:
@@ -62,7 +62,7 @@ async def login(request: Request, username: str = Form(...), password: str = For
                 }
             )
         request.session["user_id"] = user.id
-        return RedirectResponse("/", status_code=302)
+        return RedirectResponse("/dashboard", status_code=302)
     except Exception as e:
         return templates.TemplateResponse(
             "login.html",
@@ -126,7 +126,7 @@ async def register(request: Request, username: str = Form(...), password: str = 
                 session.add(user)
                 await session.commit()
             request.session["user_id"] = user.id
-            return RedirectResponse("/", status_code=302)
+            return RedirectResponse("/dashboard", status_code=302)
     except Exception as e:
         return templates.TemplateResponse(
             "register.html",
@@ -149,5 +149,5 @@ async def telegram_auth(request: Request):
             user = result.scalars().first()
             if user:
                 request.session["user_id"] = user.id
-                return RedirectResponse("/", status_code=302)
+                return RedirectResponse("/dashboard", status_code=302)
     return RedirectResponse("/login", status_code=302)
