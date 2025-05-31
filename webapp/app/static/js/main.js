@@ -1,9 +1,200 @@
-/**
- * NOVIII Fitness Bot & WebApp - Основной JavaScript
- * Содержит общие функции и инициализацию для всего приложения
- */
+import { initUI } from './ui-init.js';
+import { bindProfileTabs } from './profile.js';
+import { bindWorkoutCardHandlers } from './workouts.js';
+import { bindUpcomingWorkoutHandlers } from './upcoming-workouts.js';
+import { bindAddScheduleForm } from './forms.js';
 
-document.addEventListener('DOMContentLoaded', function() {
+// Главная точка входа
+
+document.addEventListener('DOMContentLoaded', () => {
+    initUI();
+    bindProfileTabs();
+    bindWorkoutCardHandlers();
+    bindUpcomingWorkoutHandlers();
+    bindAddScheduleForm();
+    // Здесь можно добавить только глобальные события (если нужны)
+});
+
+// --- UI INIT ---
+function initUI() {
+    initTooltips();
+    initAnimations();
+    initMobileMenu();
+    initThemeToggle();
+    if (typeof Chart !== 'undefined') initCharts();
+}
+
+// --- PROFILE ---
+function bindProfileTabs() {
+    document.querySelectorAll('.profile-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const tabName = tab.getAttribute('data-tab');
+            document.querySelectorAll('.profile-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            const activeContent = document.getElementById(`${tabName}-tab`);
+            if (activeContent) activeContent.classList.add('active');
+        });
+    });
+}
+
+// --- WORKOUTS (обычные) ---
+function bindWorkoutCardHandlers() {
+    // "Начать" и "Подробнее" только для обычных тренировок
+    document.querySelectorAll('.workout-card .workout-actions .btn-primary').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const card = btn.closest('.workout-card');
+            const title = card ? card.querySelector('.workout-title')?.textContent : '';
+            if (title) {
+                window.location.href = `/workouts/start?title=${encodeURIComponent(title)}`;
+            } else {
+                showNotification('Не удалось определить тренировку', 'error');
+            }
+        });
+    });
+    document.querySelectorAll('.workout-card .workout-actions .btn-outline').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const card = btn.closest('.workout-card');
+            const title = card ? card.querySelector('.workout-title')?.textContent : '';
+            if (title) {
+                window.location.href = `/workouts/details?title=${encodeURIComponent(title)}`;
+            } else {
+                showNotification('Не удалось определить тренировку', 'error');
+            }
+        });
+    });
+    // Фильтрация
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filter = btn.textContent.trim();
+            document.querySelectorAll('.workout-card').forEach(card => {
+                if (filter === 'Все' || card.textContent.includes(filter)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+}
+
+// --- UPCOMING WORKOUTS ---
+function bindUpcomingWorkoutHandlers() {
+    bindDeleteScheduleForms();
+    // Переинициализировать после загрузки блока
+    setTimeout(() => {
+        if (document.getElementById('upcoming-workouts-list')) {
+            bindDeleteScheduleForms();
+        }
+    }, 100);
+}
+
+function bindDeleteScheduleForms() {
+    document.querySelectorAll('.delete-schedule-form').forEach(form => {
+        form.onsubmit = async function(e) {
+            e.preventDefault();
+            const id = form.dataset.id;
+            if (!confirm('Удалить предстоящую тренировку?')) return;
+            const resp = await fetch(`/dashboard/delete-schedule/${id}`, { method: 'POST' });
+            if (resp.ok) {
+                await reloadUpcomingWorkouts();
+                showNotification('Тренировка удалена!', 'success');
+            } else {
+                showNotification('Ошибка при удалении', 'error');
+            }
+        };
+    });
+    // "Изменить" предстоящую тренировку
+    document.querySelectorAll('.edit-schedule-btn').forEach(btn => {
+        btn.onclick = async function(e) {
+            e.preventDefault();
+            const id = btn.dataset.id;
+            const resp = await fetch(`/dashboard/schedule-data/${id}`);
+            if (resp.ok) {
+                const data = await resp.json();
+                document.getElementById('edit-schedule-id').value = data.id;
+                document.getElementById('edit-activity').value = data.activity;
+                document.getElementById('edit-scheduled_time').value = data.scheduled_time.slice(0,16);
+                document.getElementById('edit-schedule-modal').style.display = 'flex';
+            } else {
+                showNotification('Ошибка загрузки данных', 'error');
+            }
+        };
+    });
+    // Закрытие модального окна
+    const closeEditModal = document.getElementById('close-edit-modal');
+    if (closeEditModal) {
+        closeEditModal.onclick = function() {
+            document.getElementById('edit-schedule-modal').style.display = 'none';
+        };
+    }
+    // Отправка формы редактирования
+    const editScheduleForm = document.getElementById('edit-schedule-form');
+    if (editScheduleForm) {
+        editScheduleForm.onsubmit = async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-schedule-id').value;
+            const formData = new FormData(editScheduleForm);
+            const resp = await fetch(`/dashboard/edit-schedule/${id}`, {
+                method: 'POST',
+                body: formData
+            });
+            if (resp.redirected || resp.ok) {
+                document.getElementById('edit-schedule-modal').style.display = 'none';
+                await reloadUpcomingWorkouts();
+                showNotification('Тренировка обновлена!', 'success');
+            } else {
+                showNotification('Ошибка при сохранении', 'error');
+            }
+        };
+    }
+}
+
+// --- FORMS ---
+function bindAddScheduleForm() {
+    const form = document.getElementById('add-schedule-form');
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+            if (response.redirected || response.ok) {
+                await reloadUpcomingWorkouts();
+                showNotification('Тренировка добавлена!', 'success');
+                form.reset();
+            } else {
+                showNotification('Ошибка при добавлении тренировки', 'error');
+            }
+        });
+    }
+}
+
+// --- AJAX HELPERS ---
+async function fetchHtml(url) {
+    const resp = await fetch(url);
+    if (resp.ok) return await resp.text();
+    throw new Error('Ошибка загрузки');
+}
+async function fetchJson(url) {
+    const resp = await fetch(url);
+    if (resp.ok) return await resp.json();
+    throw new Error('Ошибка загрузки');
+}
+
+// --- Динамическое обновление блока предстоящих тренировок ---
+async function reloadUpcomingWorkouts() {
+    const html = await fetchHtml('/dashboard/upcoming-workouts');
+    document.getElementById('upcoming-workouts-list').innerHTML = html;
+    bindDeleteScheduleForms();
+}
+
     // Инициализация всплывающих подсказок
     initTooltips();
     
@@ -22,21 +213,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Кнопки "Начать" и "Подробнее" на тренировках ---
-    document.querySelectorAll('.workout-actions .btn-primary').forEach(btn => {
+    // Только для обычных тренировок (не upcoming)
+    document.querySelectorAll('.workout-card .workout-actions .btn-primary').forEach(btn => {
         btn.addEventListener('click', function() {
-            const card = btn.closest('.workout-card, .workout-item');
+            const card = btn.closest('.workout-card');
             const title = card ? card.querySelector('.workout-title')?.textContent : '';
             if (title) {
-                // Здесь можно сделать переход на страницу тренировки или начать тренировку
                 window.location.href = `/workouts/start?title=${encodeURIComponent(title)}`;
             } else {
                 showNotification('Не удалось определить тренировку', 'error');
             }
         });
     });
-    document.querySelectorAll('.workout-actions .btn-outline').forEach(btn => {
+    document.querySelectorAll('.workout-card .workout-actions .btn-outline').forEach(btn => {
         btn.addEventListener('click', function() {
-            const card = btn.closest('.workout-card, .workout-item');
+            const card = btn.closest('.workout-card');
             const title = card ? card.querySelector('.workout-title')?.textContent : '';
             if (title) {
                 window.location.href = `/workouts/details?title=${encodeURIComponent(title)}`;
@@ -122,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: formData
             });
             if (response.redirected || response.ok) {
-                await updateUpcomingWorkouts();
+                await reloadUpcomingWorkouts();
                 showNotification('Тренировка добавлена!', 'success');
                 form.reset();
             } else {
@@ -161,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         if (resp.redirected || resp.ok) {
             document.getElementById('edit-schedule-modal').style.display = 'none';
-            await updateUpcomingWorkouts();
+            await reloadUpcomingWorkouts();
             showNotification('Тренировка обновлена!', 'success');
         } else {
             showNotification('Ошибка при сохранении', 'error');
@@ -212,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (resp.ok) {
             document.getElementById('start-timer-modal').style.display = 'none';
             if (timerInterval) clearInterval(timerInterval);
-            await updateUpcomingWorkouts();
+            await reloadUpcomingWorkouts();
             await updateDashboardStats();
             showNotification('Тренировка завершена и сохранена!', 'success');
         } else {
@@ -277,11 +468,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         // Первичная привязка
         bindWorkoutListHandlers();
-    }
 
-    // После загрузки страницы сразу биндим обработчики
-    bindDeleteScheduleForms();
-});
 
 /**
  * Инициализация всплывающих подсказок
@@ -580,7 +767,7 @@ function bindDeleteScheduleForms() {
             e.preventDefault();
             const resp = await fetch(form.action, { method: 'POST' });
             if (resp.redirected || resp.ok) {
-                await updateUpcomingWorkouts();
+                await reloadUpcomingWorkouts();
                 showNotification('Тренировка удалена!', 'success');
             } else {
                 showNotification('Ошибка при удалении', 'error');
@@ -743,10 +930,7 @@ function bindDeleteScheduleForms() {
         };
     }
 }
-
-// Переинициализировать обработчики после загрузки блока предстоящих тренировок
-setTimeout(() => {
-    if (document.getElementById('upcoming-workouts-list')) {
-        bindDeleteScheduleForms();
-    }
-}, 100);
+            } else {
+                showNotification('Ошибка загрузки данных', 'error');
+            }
+        
