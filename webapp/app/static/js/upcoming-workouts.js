@@ -1,4 +1,6 @@
 // UPCOMING WORKOUTS MODULE
+import { showNotification } from './notifications.js';
+
 function bindUpcomingWorkoutHandlers() {
     bindDeleteScheduleForms();
     setTimeout(() => {
@@ -6,6 +8,29 @@ function bindUpcomingWorkoutHandlers() {
             bindDeleteScheduleForms();
         }
     }, 100);
+}
+
+// Обновление списка предстоящих тренировок через AJAX
+async function reloadUpcomingWorkouts() {
+    try {
+        const resp = await fetch('/dashboard/upcoming-workouts');
+        if (resp.ok) {
+            const html = await resp.text();
+            const container = document.getElementById('upcoming-workouts-list');
+            if (container) {
+                container.innerHTML = html;
+                bindDeleteScheduleForms();
+            }
+            return true;
+        } else {
+            showNotification('Ошибка при загрузке расписания', 'error');
+            return false;
+        }
+    } catch (err) {
+        console.error(err);
+        showNotification('Ошибка при загрузке расписания', 'error');
+        return false;
+    }
 }
 
 function bindDeleteScheduleForms() {
@@ -66,4 +91,4 @@ function bindDeleteScheduleForms() {
     }
 }
 
-export { bindUpcomingWorkoutHandlers, bindDeleteScheduleForms };
+export { bindUpcomingWorkoutHandlers, bindDeleteScheduleForms, reloadUpcomingWorkouts };

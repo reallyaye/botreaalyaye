@@ -1,4 +1,7 @@
 // FORMS MODULE
+import { showNotification } from './notifications.js';
+import { reloadUpcomingWorkouts } from './upcoming-workouts.js';
+
 function bindAddScheduleForm() {
     const form = document.getElementById('add-schedule-form');
     if (form) {
