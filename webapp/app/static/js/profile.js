@@ -81,16 +81,94 @@ function bindPersonalDataForm() {
 
 // Обработчик формы добавления цели
 function bindGoalsForm() {
-    const addGoalForm = document.querySelector('#goals-tab .card-body button.btn-primary');
-    
-    if (addGoalForm) {
-        addGoalForm.addEventListener('click', async function(e) {
-            e.preventDefault();
-            const card = this.closest('.card');
-            const formData = new FormData();
-            
-            const goalType = card.querySelector('select').value;
-            const goalValue = card.querySelector('input[type="number"]').value;
+    // Найти карточку формы добавления цели по уникальному тексту кнопки или классу
+    const card = document.querySelector('#goals-tab .card');
+    if (!card) return;
+
+    // Кнопка добавления цели
+    const addGoalBtn = card.querySelector('button.btn-primary, button[type="submit"]');
+    if (!addGoalBtn) return;
+
+    addGoalBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        // Получаем значения полей
+        const typeInput = card.querySelector('select');
+        const valueInput = card.querySelector('input[type="number"]');
+        const dateInput = card.querySelector('input[type="date"], input[type="text"][name*="date"], input[type="text"][placeholder*="достижения"]');
+        const priorityInput = card.querySelectorAll('select')[1] || card.querySelector('select[name*="priority"]');
+
+        let valid = true;
+        // Очистить прошлые ошибки
+        [typeInput, valueInput, dateInput, priorityInput].forEach(input => { if(input) clearInvalid(input); });
+
+        // Проверки
+        if (!typeInput || !typeInput.value) {
+            markInvalid(typeInput, 'Выберите тип цели');
+            valid = false;
+        }
+        if (!valueInput || !valueInput.value || isNaN(valueInput.value) || Number(valueInput.value) <= 0) {
+            markInvalid(valueInput, 'Введите корректное значение');
+            valid = false;
+        }
+        if (!dateInput || !dateInput.value) {
+            markInvalid(dateInput, 'Укажите срок достижения');
+            valid = false;
+        } else {
+            // Проверка, что дата в будущем
+            let userDate = dateInput.value;
+            // Преобразуем дату, если она в формате DD.MM.YYYY
+            if (/\d{2}\.\d{2}\.\d{4}/.test(userDate)) {
+                const [d, m, y] = userDate.split('.');
+                userDate = `${y}-${m}-${d}`;
+            }
+            const dateObj = new Date(userDate);
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            if (isNaN(dateObj.getTime()) || dateObj < now) {
+                markInvalid(dateInput, 'Дата должна быть в будущем');
+                valid = false;
+            }
+        }
+        if (!priorityInput || !priorityInput.value) {
+            markInvalid(priorityInput, 'Выберите приоритет');
+            valid = false;
+        }
+        if (!valid) {
+            showNotification('Проверьте правильность заполнения полей', 'error');
+            return;
+        }
+        // Собираем данные
+        const payload = {
+            type: typeInput.value,
+            value: valueInput.value,
+            due_date: dateInput.value,
+            priority: priorityInput.value
+        };
+        try {
+            const resp = await fetch('/goals/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (resp.ok) {
+                showNotification('Цель добавлена!', 'success');
+                // Очистить поля
+                [typeInput, valueInput, dateInput, priorityInput].forEach(input => {
+                    if (input.tagName === 'SELECT') input.selectedIndex = 0;
+                    else input.value = '';
+                    clearInvalid(input);
+                });
+                // Обновить список целей
+                if (typeof updateGoalsProgress === 'function') updateGoalsProgress();
+            } else {
+                showNotification('Ошибка при добавлении цели', 'error');
+            }
+        } catch (err) {
+            showNotification('Ошибка при добавлении цели', 'error');
+            console.error(err);
+        }
+    });
+}
             const goalDate = card.querySelector('input[type="date"]').value;
             const goalPriority = card.querySelector('select:nth-of-type(2)').value;
             
@@ -120,9 +198,9 @@ function bindGoalsForm() {
                 showNotification('Ошибка при добавлении цели', 'error');
                 console.error(err);
             }
-        });
-    }
-}
+        ;
+    
+
 
 // Обработчик формы настроек аккаунта
 function bindAccountSettingsForm() {
