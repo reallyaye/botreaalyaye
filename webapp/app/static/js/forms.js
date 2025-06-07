@@ -33,3 +33,11 @@ function bindAddScheduleForm() {
 }
 
 export { bindAddScheduleForm };
+
+// Гарантируем инициализацию обработчика после загрузки страницы
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindAddScheduleForm);
+} else {
+    bindAddScheduleForm();
+}
+
