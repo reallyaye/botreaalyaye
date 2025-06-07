@@ -1,6 +1,6 @@
 // FORMS MODULE
 import { showNotification } from './notifications.js';
-import { reloadUpcomingWorkouts } from './upcoming-workouts.js';
+import { reloadUpcomingWorkouts, bindUpcomingWorkoutHandlers } from './upcoming-workouts.js';
 
 function bindAddScheduleForm() {
     const form = document.getElementById('add-schedule-form');
@@ -15,6 +15,7 @@ function bindAddScheduleForm() {
             });
             if (response.ok) {
                 await reloadUpcomingWorkouts();
+                bindUpcomingWorkoutHandlers(); // Повторно навешиваем обработчики на новые элементы
                 showNotification('Тренировка добавлена!', 'success');
                 form.reset();
             } else {
