@@ -10,14 +10,22 @@ function bindAddScheduleForm() {
             const formData = new FormData(form);
             const response = await fetch(form.action, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
-            if (response.redirected || response.ok) {
+            if (response.ok) {
                 await reloadUpcomingWorkouts();
                 showNotification('Тренировка добавлена!', 'success');
                 form.reset();
             } else {
-                showNotification('Ошибка при добавлении тренировки', 'error');
+                let errorMsg = 'Ошибка при добавлении тренировки';
+                try {
+                    const data = await response.json();
+                    if (data && data.error === 'invalid_datetime') {
+                        errorMsg = 'Некорректная дата/время';
+                    }
+                } catch {}
+                showNotification(errorMsg, 'error');
             }
         });
     }

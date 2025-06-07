@@ -114,16 +114,21 @@ async def dashboard(request: Request, user: User = Depends(get_current_user)):
 async def add_schedule_route(request: Request, activity: str = Form(...), scheduled_time: str = Form(...)):
     user_id = request.session.get("user_id")
     if not user_id:
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JSONResponse({"error": "not_authenticated"}, status_code=401)
         return StarletteRedirectResponse("/login", status_code=302)
-    # Преобразуем строку времени в datetime
     try:
         scheduled_dt = datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M")
     except Exception:
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JSONResponse({"error": "invalid_datetime"}, status_code=400)
         return templates.TemplateResponse(
             "dashboard.html",
             {"request": request, "error": "Некорректная дата/время"}
         )
     await add_schedule(user_id, activity, scheduled_dt)
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return JSONResponse({"success": True})
     return StarletteRedirectResponse("/", status_code=302)
 
 @router.post("/delete-schedule/{schedule_id}")
