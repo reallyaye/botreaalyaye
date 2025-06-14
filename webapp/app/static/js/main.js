@@ -526,4 +526,103 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Обработка всех форм с классом .needs-validation
+    const forms = document.querySelectorAll('.needs-validation');
+    
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+
+    // Обработка алертов
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        const closeBtn = alert.querySelector('.close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                alert.style.display = 'none';
+            });
+        }
+    });
+
+    // Обработка мобильного меню
+    const menuToggle = document.querySelector('.navbar-toggler');
+    const mobileMenu = document.querySelector('.navbar-collapse');
+    
+    if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('show');
+        });
+    }
+
+    // Обработка выпадающих списков
+    const dropdowns = document.querySelectorAll('.dropdown-toggle');
+    dropdowns.forEach(dropdown => {
+        dropdown.addEventListener('click', (e) => {
+            e.preventDefault();
+            const menu = dropdown.nextElementSibling;
+            if (menu) {
+                menu.classList.toggle('show');
+            }
+        });
+    });
+
+    // Закрытие выпадающих списков при клике вне их
+    document.addEventListener('click', (e) => {
+        if (!e.target.matches('.dropdown-toggle')) {
+            const dropdowns = document.querySelectorAll('.dropdown-menu.show');
+            dropdowns.forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+    });
+
+    // Обработка модальных окон
+    const modalTriggers = document.querySelectorAll('[data-toggle="modal"]');
+    modalTriggers.forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const target = trigger.getAttribute('data-target');
+            const modal = document.querySelector(target);
+            if (modal) {
+                modal.classList.add('show');
+                modal.style.display = 'block';
+            }
+        });
+    });
+
+    // Закрытие модальных окон
+    const modalCloseButtons = document.querySelectorAll('[data-dismiss="modal"]');
+    modalCloseButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    // Обработка табов
+    const tabLinks = document.querySelectorAll('[data-toggle="tab"]');
+    tabLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = link.getAttribute('data-target');
+            const tabContent = document.querySelector(target);
+            if (tabContent) {
+                // Скрываем все табы
+                document.querySelectorAll('.tab-content > .tab-pane').forEach(tab => {
+                    tab.classList.remove('show', 'active');
+                });
+                // Показываем выбранный таб
+                tabContent.classList.add('show', 'active');
+            }
+        });
+    });
 });
