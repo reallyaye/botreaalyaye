@@ -15,13 +15,13 @@ from dotenv import load_dotenv
 
 # подгружаем ключи
 load_dotenv()
-API_KEY = os.getenv("SAMBANOVA_API_KEY") or os.getenv("OPENAI_API_KEY")
+API_KEY = os.getenv("XAI_API_KEY")
 if not API_KEY:
-    raise RuntimeError("Нужно задать SAMBANOVA_API_KEY или OPENAI_API_KEY")
+    raise RuntimeError("Нужно задать XAI_API_KEY в переменных окружения")
 
 client = OpenAI(
     api_key=API_KEY,
-    base_url="https://api.sambanova.ai/v1"
+    base_url="https://api.x.ai/v1"
 )
 
 router = Router()
@@ -154,7 +154,7 @@ async def ai_target_weight(message: Message, state: FSMContext):
 
     def _call_ai():
         return client.chat.completions.create(
-            model="DeepSeek-R1",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a professional fitness coach."},
                 {"role": "user",   "content": prompt}
