@@ -7,7 +7,7 @@ import secrets
 from datetime import datetime
 from typing import Optional
 
-from ..database import AsyncSessionLocal
+from ..database import AsyncSessionLocal, get_db
 from ..models import User
 from ..main import templates  # Импортируем настроенные шаблоны из main.py
 from webapp.app.services.db import authenticate_user, register_user, get_user_by_id
@@ -40,30 +40,30 @@ async def login(
     request: Request,
     username: str = Form(...),
     password: str = Form(...),
-    csrf_token: str = Form(...)
+    csrf_token: str = Form(...),
+    db: AsyncSession = Depends(get_db)
 ):
     if csrf_token != request.session.get("csrf_token"):
         raise HTTPException(status_code=400, detail="Invalid CSRF token")
 
-    async with AsyncSessionLocal() as session:
-        result = await session.execute(
-            select(User).where(User.username == username)
+    result = await db.execute(
+        select(User).where(User.username == username)
+    )
+    user = result.scalars().first()
+
+    if not user or user.password != password:  # В реальном приложении проверять хэш пароля
+        return templates.TemplateResponse(
+            "login.html",
+            {
+                "request": request,
+                "current_user": CurrentUser(),
+                "error": "Неверное имя пользователя или пароль",
+                "csrf_token": request.session.get("csrf_token")
+            }
         )
-        user = result.scalars().first()
 
-        if not user or user.password != password:  # В реальном приложении проверять хэш пароля
-            return templates.TemplateResponse(
-                "login.html",
-                {
-                    "request": request,
-                    "current_user": CurrentUser(),
-                    "error": "Неверное имя пользователя или пароль",
-                    "csrf_token": request.session.get("csrf_token")
-                }
-            )
-
-        request.session["user_id"] = user.id
-        return RedirectResponse("/", status_code=302)
+    request.session["user_id"] = user.id
+    return RedirectResponse("/", status_code=302)
 
 # --- показываем форму регистрации ---
 @router.get("/register", response_class=HTMLResponse)
@@ -99,47 +99,47 @@ async def register(
     goal: str = Form(...),
     activity_level: str = Form(...),
     workout_types: str = Form(...),
-    csrf_token: str = Form(...)
+    csrf_token: str = Form(...),
+    db: AsyncSession = Depends(get_db)
 ):
     if csrf_token != request.session.get("csrf_token"):
         raise HTTPException(status_code=400, detail="Invalid CSRF token")
 
-    async with AsyncSessionLocal() as session:
-        # Проверяем, существует ли пользователь
-        result = await session.execute(select(User).where(User.username == username))
-        if result.scalars().first():
-            return templates.TemplateResponse(
-                "register.html",
-                {
-                    "request": request,
-                    "current_user": CurrentUser(),
-                    "error": "Пользователь с таким именем уже существует",
-                    "csrf_token": request.session.get("csrf_token")
-                }
-            )
-
-        # Создаём нового пользователя
-        user = User(
-            username=username,
-            password=password,  # В реальном приложении пароль должен быть хэширован
-            email=email,
-            name=name,
-            last_name=last_name,
-            age=age,
-            height=height,
-            weight=weight,
-            goal=goal,
-            activity_level=activity_level,
-            workout_types=workout_types,
-            created_at=datetime.now(),
-            updated_at=datetime.now()
+    # Проверяем, существует ли пользователь
+    result = await db.execute(select(User).where(User.username == username))
+    if result.scalars().first():
+        return templates.TemplateResponse(
+            "register.html",
+            {
+                "request": request,
+                "current_user": CurrentUser(),
+                "error": "Пользователь с таким именем уже существует",
+                "csrf_token": request.session.get("csrf_token")
+            }
         )
-        session.add(user)
-        await session.commit()
 
-        # Автоматически логиним пользователя
-        request.session["user_id"] = user.id
-        return RedirectResponse("/", status_code=302)
+    # Создаём нового пользователя
+    user = User(
+        username=username,
+        password=password,  # В реальном приложении пароль должен быть хэширован
+        email=email,
+        name=name,
+        last_name=last_name,
+        age=age,
+        height=height,
+        weight=weight,
+        goal=goal,
+        activity_level=activity_level,
+        workout_types=workout_types,
+        created_at=datetime.now(),
+        updated_at=datetime.now()
+    )
+    db.add(user)
+    await db.commit()
+
+    # Автоматически логиним пользователя
+    request.session["user_id"] = user.id
+    return RedirectResponse("/", status_code=302)
 
 # --- Роут для получения Telegram ID (будет вызываться из Telegram Web App) ---
 @router.get("/telegram-auth", response_class=RedirectResponse)
