@@ -3,7 +3,7 @@ document.querySelectorAll('.alert').forEach(alert => {
     const closeBtn = alert.querySelector('.alert-close');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
-            alert.classList.add('fade');
+            alert.classList.add('hide');
             setTimeout(() => {
                 alert.remove();
             }, 300);
@@ -12,8 +12,8 @@ document.querySelectorAll('.alert').forEach(alert => {
     
     // Автоматическое закрытие через 5 секунд
     setTimeout(() => {
-        if (alert.classList.contains('alert-dismissible')) {
-            alert.classList.add('fade');
+        if (alert && !alert.classList.contains('hide')) {
+            alert.classList.add('hide');
             setTimeout(() => {
                 alert.remove();
             }, 300);
@@ -39,7 +39,7 @@ function createAlert(message, type = 'info', dismissible = true) {
         closeBtn.innerHTML = '<i class="fas fa-times"></i>';
         
         closeBtn.addEventListener('click', () => {
-            alert.classList.add('fade');
+            alert.classList.add('hide');
             setTimeout(() => {
                 alert.remove();
             }, 300);
@@ -59,7 +59,7 @@ function createAlert(message, type = 'info', dismissible = true) {
     // Автоматическое закрытие через 5 секунд
     if (dismissible) {
         setTimeout(() => {
-            alert.classList.add('fade');
+            alert.classList.add('hide');
             setTimeout(() => {
                 alert.remove();
             }, 300);

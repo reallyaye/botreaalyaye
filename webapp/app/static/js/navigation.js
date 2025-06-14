@@ -2,6 +2,7 @@
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const mobileMenuClose = document.getElementById('mobileMenuClose');
 const mobileMenu = document.getElementById('mobileMenu');
+const mobileMenuLinks = mobileMenu.querySelectorAll('.mobile-menu-link');
 
 // Открытие мобильного меню
 mobileMenuBtn.addEventListener('click', () => {
@@ -16,7 +17,7 @@ mobileMenuClose.addEventListener('click', () => {
 });
 
 // Закрытие меню при клике на ссылку
-document.querySelectorAll('.mobile-menu-link').forEach(link => {
+mobileMenuLinks.forEach(link => {
     link.addEventListener('click', () => {
         mobileMenu.classList.remove('active');
         document.body.style.overflow = '';
@@ -104,4 +105,82 @@ window.addEventListener('scroll', () => {
     }
     
     lastScrollTop = scrollTop;
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Элементы мобильного меню
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileMenuClose = document.getElementById('mobileMenuClose');
+    const mobileMenuLinks = mobileMenu.querySelectorAll('.mobile-menu-link');
+    
+    // Функция для открытия мобильного меню
+    function openMobileMenu() {
+        mobileMenu.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // Функция для закрытия мобильного меню
+    function closeMobileMenu() {
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Обработчики событий
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', openMobileMenu);
+    }
+    
+    if (mobileMenuClose) {
+        mobileMenuClose.addEventListener('click', closeMobileMenu);
+    }
+    
+    // Закрываем меню при клике на ссылку
+    mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+    });
+    
+    // Закрываем меню при клике вне его
+    document.addEventListener('click', (event) => {
+        if (mobileMenu && mobileMenu.classList.contains('active') && 
+            !mobileMenu.contains(event.target) && 
+            event.target !== mobileMenuBtn) {
+            closeMobileMenu();
+        }
+    });
+    
+    // Закрываем меню при нажатии Escape
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && mobileMenu && mobileMenu.classList.contains('active')) {
+            closeMobileMenu();
+        }
+    });
+    
+    // Обработка активных ссылок
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link, .mobile-menu-link');
+    
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPath) {
+            link.classList.add('active');
+        }
+    });
+    
+    // Плавная прокрутка для якорных ссылок
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
 }); 

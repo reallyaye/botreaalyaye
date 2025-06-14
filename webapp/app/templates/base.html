@@ -6,7 +6,7 @@
     <title>{% block title %}Фитнес-бот{% endblock %}</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ static('img/favicon.png') }}">
     
     <!-- Шрифты -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,12 +17,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Стили -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/navigation.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/buttons.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cards.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ static('css/variables.css') }}">
+    <link rel="stylesheet" href="{{ static('css/navigation.css') }}">
+    <link rel="stylesheet" href="{{ static('css/buttons.css') }}">
+    <link rel="stylesheet" href="{{ static('css/forms.css') }}">
+    <link rel="stylesheet" href="{{ static('css/cards.css') }}">
+    <link rel="stylesheet" href="{{ static('css/footer.css') }}">
+    <link rel="stylesheet" href="{{ static('css/alerts.css') }}">
+    <link rel="stylesheet" href="{{ static('css/main.css') }}">
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -30,7 +32,7 @@
     <!-- Навигация -->
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="{{ url_for('main.index') }}" class="navbar-brand">
+            <a href="{{ url_for('root') }}" class="navbar-brand">
                 <i class="fas fa-dumbbell"></i>
                 Фитнес-бот
             </a>
@@ -38,32 +40,32 @@
             <!-- Десктопное меню -->
             <div class="navbar-nav">
                 {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('main.dashboard') }}" class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
                         <i class="fas fa-chart-line"></i>
                         Панель
                     </a>
-                    <a href="{{ url_for('main.workouts') }}" class="nav-link {% if request.endpoint == 'main.workouts' %}active{% endif %}">
+                    <a href="{{ url_for('workouts') }}" class="nav-link {% if request.endpoint == 'workouts' %}active{% endif %}">
                         <i class="fas fa-dumbbell"></i>
                         Тренировки
                     </a>
-                    <a href="{{ url_for('main.stats') }}" class="nav-link {% if request.endpoint == 'main.stats' %}active{% endif %}">
+                    <a href="{{ url_for('stats') }}" class="nav-link {% if request.endpoint == 'stats' %}active{% endif %}">
                         <i class="fas fa-chart-bar"></i>
                         Статистика
                     </a>
-                    <a href="{{ url_for('main.profile') }}" class="nav-link {% if request.endpoint == 'main.profile' %}active{% endif %}">
+                    <a href="{{ url_for('profile') }}" class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}">
                         <i class="fas fa-user"></i>
                         Профиль
                     </a>
-                    <a href="{{ url_for('auth.logout') }}" class="nav-link">
+                    <a href="{{ url_for('logout') }}" class="nav-link">
                         <i class="fas fa-sign-out-alt"></i>
                         Выйти
                     </a>
                 {% else %}
-                    <a href="{{ url_for('auth.login') }}" class="nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}">
+                    <a href="{{ url_for('login') }}" class="nav-link {% if request.endpoint == 'login' %}active{% endif %}">
                         <i class="fas fa-sign-in-alt"></i>
                         Войти
                     </a>
-                    <a href="{{ url_for('auth.register') }}" class="nav-link {% if request.endpoint == 'auth.register' %}active{% endif %}">
+                    <a href="{{ url_for('register') }}" class="nav-link {% if request.endpoint == 'register' %}active{% endif %}">
                         <i class="fas fa-user-plus"></i>
                         Регистрация
                     </a>
@@ -87,32 +89,32 @@
         </div>
         <div class="mobile-menu-content">
             {% if current_user.is_authenticated %}
-                <a href="{{ url_for('main.dashboard') }}" class="mobile-menu-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
+                <a href="{{ url_for('dashboard') }}" class="mobile-menu-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
                     <i class="fas fa-chart-line"></i>
                     Панель
                 </a>
-                <a href="{{ url_for('main.workouts') }}" class="mobile-menu-link {% if request.endpoint == 'main.workouts' %}active{% endif %}">
+                <a href="{{ url_for('workouts') }}" class="mobile-menu-link {% if request.endpoint == 'workouts' %}active{% endif %}">
                     <i class="fas fa-dumbbell"></i>
                     Тренировки
                 </a>
-                <a href="{{ url_for('main.stats') }}" class="mobile-menu-link {% if request.endpoint == 'main.stats' %}active{% endif %}">
+                <a href="{{ url_for('stats') }}" class="mobile-menu-link {% if request.endpoint == 'stats' %}active{% endif %}">
                     <i class="fas fa-chart-bar"></i>
                     Статистика
                 </a>
-                <a href="{{ url_for('main.profile') }}" class="mobile-menu-link {% if request.endpoint == 'main.profile' %}active{% endif %}">
+                <a href="{{ url_for('profile') }}" class="mobile-menu-link {% if request.endpoint == 'profile' %}active{% endif %}">
                     <i class="fas fa-user"></i>
                     Профиль
                 </a>
-                <a href="{{ url_for('auth.logout') }}" class="mobile-menu-link">
+                <a href="{{ url_for('logout') }}" class="mobile-menu-link">
                     <i class="fas fa-sign-out-alt"></i>
                     Выйти
                 </a>
             {% else %}
-                <a href="{{ url_for('auth.login') }}" class="mobile-menu-link {% if request.endpoint == 'auth.login' %}active{% endif %}">
+                <a href="{{ url_for('login') }}" class="mobile-menu-link {% if request.endpoint == 'login' %}active{% endif %}">
                     <i class="fas fa-sign-in-alt"></i>
                     Войти
                 </a>
-                <a href="{{ url_for('auth.register') }}" class="mobile-menu-link {% if request.endpoint == 'auth.register' %}active{% endif %}">
+                <a href="{{ url_for('register') }}" class="mobile-menu-link {% if request.endpoint == 'register' %}active{% endif %}">
                     <i class="fas fa-user-plus"></i>
                     Регистрация
                 </a>
@@ -149,10 +151,10 @@
                     Фитнес-бот
                 </div>
                 <div class="footer-links">
-                    <a href="{{ url_for('main.about') }}" class="footer-link">О нас</a>
-                    <a href="{{ url_for('main.contact') }}" class="footer-link">Контакты</a>
-                    <a href="{{ url_for('main.privacy') }}" class="footer-link">Конфиденциальность</a>
-                    <a href="{{ url_for('main.terms') }}" class="footer-link">Условия использования</a>
+                    <a href="{{ url_for('about') }}" class="footer-link">О нас</a>
+                    <a href="{{ url_for('contact') }}" class="footer-link">Контакты</a>
+                    <a href="{{ url_for('privacy') }}" class="footer-link">Конфиденциальность</a>
+                    <a href="{{ url_for('terms') }}" class="footer-link">Условия использования</a>
                 </div>
                 <div class="footer-social">
                     <a href="#" class="social-link" aria-label="Telegram">
@@ -173,8 +175,8 @@
     </footer>
     
     <!-- Скрипты -->
-    <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+    <script src="{{ static('js/navigation.js') }}"></script>
+    <script src="{{ static('js/alerts.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -38,12 +38,9 @@ app.add_middleware(
     session_cookie="session",
 )
 
-# статика с явным указанием MIME-типов
-app.mount(
-    "/static",
-    StaticFiles(directory=BASE_DIR / "static", html=True),
-    name="static"
-)
+# статика
+static_dir = BASE_DIR / "static"
+app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 # шаблоны
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
@@ -58,6 +55,12 @@ def datetimeformat(value, format="%d.%m.%Y %H:%M"):
 print("Регистрирую фильтр datetimeformat")  # Отладочный вывод
 templates.env.filters["datetimeformat"] = datetimeformat
 print("Фильтр datetimeformat зарегистрирован")  # Отладочный вывод
+
+# Добавляем глобальные переменные в шаблоны
+templates.env.globals.update({
+    "url_for": app.url_path_for,
+    "static": lambda path: f"/static/{path}"
+})
 
 # Telegram Bot
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
