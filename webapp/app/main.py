@@ -198,13 +198,22 @@ async def root(request: Request):
                 goals = await get_user_goals(user_id)
                 print(f"Цели: {goals}")  # Отладочный вывод
 
+    # Создаём current_user для шаблона
+    class CurrentUser:
+        def __init__(self, user, is_authenticated):
+            self.is_authenticated = is_authenticated
+            self.username = user.username if user else None
+            self.weight = getattr(user, 'weight', None)
+            # Добавьте другие нужные поля при необходимости
+
+    current_user = CurrentUser(user, is_authenticated)
+
     print("Рендеринг шаблона home.html")  # Отладочный вывод
     return templates.TemplateResponse(
         "home.html",
         {
             "request": request,
-            "is_authenticated": is_authenticated,
-            "username": user.username if user else None,
+            "current_user": current_user,
             "recent_activities": recent_activities,
             "stats": stats if stats else {"total_workouts": 0, "total_calories": 0, "total_minutes": 0},
             "user_weight": user_weight,
