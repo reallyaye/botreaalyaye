@@ -87,6 +87,14 @@ async def login(request: Request, username: str = Form(...), password: str = For
 # --- показываем форму регистрации ---
 @router.get("/register", response_class=HTMLResponse)
 async def register_form(request: Request):
+    # Создаём current_user для шаблона
+    class CurrentUser:
+        def __init__(self):
+            self.is_authenticated = False
+            self.username = None
+
+    current_user = CurrentUser()
+
     # Генерируем CSRF-токен
     if "csrf_token" not in request.session:
         request.session["csrf_token"] = secrets.token_hex(16)
@@ -94,7 +102,7 @@ async def register_form(request: Request):
         "register.html",
         {
             "request": request,
-            "is_authenticated": False,
+            "current_user": current_user,
             "csrf_token": request.session.get("csrf_token")
         }
     )
