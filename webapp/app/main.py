@@ -18,6 +18,7 @@ from sqlalchemy import select, func
 import aiohttp
 import secrets
 import asyncio
+from contextlib import asynccontextmanager
 from webapp.app.services.db import init_db, User, get_user_by_id, get_user_workouts, get_user_stats, get_user_goals, check_achieved_goals, AsyncSessionLocal
 
 # корень каталога webapp/app
@@ -28,36 +29,6 @@ load_dotenv(BASE_DIR.parent.parent / ".env")
 
 # инициализируем нашу БД
 from webapp.app.routers import auth, dashboard, workouts, stats, profile, goals
-
-app = FastAPI()
-
-# сессии для логина/логаута
-app.add_middleware(
-    SessionMiddleware,
-    secret_key=os.getenv("SECRET_KEY", "changeme!"),
-    session_cookie="session",
-)
-
-# статика с явным указанием MIME-типов
-app.mount(
-    "/static",
-    StaticFiles(directory=BASE_DIR / "static", html=True),
-    name="static"
-)
-
-# шаблоны
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
-
-# Добавляем фильтр datetimeformat для форматирования даты
-def datetimeformat(value, format="%d.%m.%Y %H:%M"):
-    if isinstance(value, datetime):
-        return value.strftime(format)
-    return value
-
-# Регистрируем фильтр и добавляем отладочный вывод
-print("Регистрирую фильтр datetimeformat")  # Отладочный вывод
-templates.env.filters["datetimeformat"] = datetimeformat
-print("Фильтр datetimeformat зарегистрирован")  # Отладочный вывод
 
 # Telegram Bot
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -98,19 +69,52 @@ async def check_goals_task():
             print(f"Ошибка при проверке целей: {e}")
         await asyncio.sleep(300)  # Проверяем каждые 5 минут
 
-@app.on_event("startup")
-async def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
     await init_db()
     # Запускаем фоновую задачу для проверки целей
-    asyncio.create_task(check_goals_task())
+    task = asyncio.create_task(check_goals_task())
     # Временно отключаем установку вебхука для устранения конфликта
     # await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
     # print(f"Webhook установлен: {WEBHOOK_URL}")
-
-@app.on_event("shutdown")
-async def on_shutdown():
+    
+    yield
+    
+    # Shutdown
+    task.cancel()  # Отменяем фоновую задачу
     await bot.delete_webhook()
     await bot.session.close()
+
+app = FastAPI(lifespan=lifespan)
+
+# сессии для логина/логаута
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("SECRET_KEY", "changeme!"),
+    session_cookie="session",
+)
+
+# статика с явным указанием MIME-типов
+app.mount(
+    "/static",
+    StaticFiles(directory=BASE_DIR / "static", html=True),
+    name="static"
+)
+
+# шаблоны
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+# Добавляем фильтр datetimeformat для форматирования даты
+def datetimeformat(value, format="%d.%m.%Y %H:%M"):
+    if isinstance(value, datetime):
+        return value.strftime(format)
+    return value
+
+# Регистрируем фильтр и добавляем отладочный вывод
+print("Регистрирую фильтр datetimeformat")  # Отладочный вывод
+templates.env.filters["datetimeformat"] = datetimeformat
+print("Фильтр datetimeformat зарегистрирован")  # Отладочный вывод
 
 # Обработчик команды /start
 @router.message(Command(commands=["start"]))
