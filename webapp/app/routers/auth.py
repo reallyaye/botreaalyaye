@@ -1,18 +1,19 @@
 from fastapi import APIRouter, Request, Form, HTTPException, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import secrets
 from datetime import datetime
 from typing import Optional
+import bcrypt
+import os
 
 from ..database import AsyncSessionLocal, get_db
 from ..models import User
-from ..main import templates  # Импортируем настроенные шаблоны из main.py
+from ..templates_config import templates
 from webapp.app.services.db import authenticate_user, register_user, get_user_by_id
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 # Создаём класс для current_user
 class CurrentUser:
