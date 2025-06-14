@@ -6,7 +6,7 @@
     <title>{% block title %}Фитнес-бот{% endblock %}</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ static('img/favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ request.url_for('static', path='img/favicon.png') }}">
     
     <!-- Шрифты -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,14 +17,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Стили -->
-    <link rel="stylesheet" href="{{ static('css/variables.css') }}">
-    <link rel="stylesheet" href="{{ static('css/main.css') }}">
-    <link rel="stylesheet" href="{{ static('css/navigation.css') }}">
-    <link rel="stylesheet" href="{{ static('css/footer.css') }}">
-    <link rel="stylesheet" href="{{ static('css/buttons.css') }}">
-    <link rel="stylesheet" href="{{ static('css/forms.css') }}">
-    <link rel="stylesheet" href="{{ static('css/cards.css') }}">
-    <link rel="stylesheet" href="{{ static('css/alerts.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/variables.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/main.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/navigation.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/footer.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/buttons.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/forms.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/cards.css') }}">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/alerts.css') }}">
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -171,8 +171,8 @@
     </footer>
     
     <!-- Скрипты -->
-    <script src="{{ static('js/navigation.js') }}"></script>
-    <script src="{{ static('js/alerts.js') }}"></script>
+    <script src="{{ request.url_for('static', path='js/navigation.js') }}"></script>
+    <script src="{{ request.url_for('static', path='js/alerts.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
