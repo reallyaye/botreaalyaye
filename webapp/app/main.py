@@ -48,9 +48,9 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 # Добавляем фильтр datetimeformat для форматирования даты
 def datetimeformat(value, format="%d.%m.%Y %H:%M"):
-    if isinstance(value, datetime):
-        return value.strftime(format)
-    return value
+    if value is None:
+        return ""
+    return value.strftime(format)
 
 # Регистрируем фильтр и добавляем отладочный вывод
 print("Регистрирую фильтр datetimeformat")  # Отладочный вывод

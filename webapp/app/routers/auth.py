@@ -1,103 +1,80 @@
-from fastapi import APIRouter, Request, Form, HTTPException
+from fastapi import APIRouter, Request, Form, HTTPException, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from webapp.app.services.db import authenticate_user, register_user, get_user_by_id, AsyncSessionLocal, User
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import secrets
+from datetime import datetime
+from typing import Optional
+
+from ..database import AsyncSessionLocal
+from ..models import User
+from ..main import templates  # Импортируем настроенные шаблоны из main.py
+from webapp.app.services.db import authenticate_user, register_user, get_user_by_id
 
 router = APIRouter()
-templates = Jinja2Templates(directory="webapp/app/templates")
+
+# Создаём класс для current_user
+class CurrentUser:
+    def __init__(self, user=None, is_authenticated=False):
+        self.is_authenticated = is_authenticated
+        self.username = user.username if user else None
+        self.weight = getattr(user, 'weight', None)
 
 # --- показываем форму логина ---
 @router.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request):
-    # Генерируем CSRF-токен
-    if "csrf_token" not in request.session:
-        request.session["csrf_token"] = secrets.token_hex(16)
+    current_user = CurrentUser()
     return templates.TemplateResponse(
         "login.html",
         {
             "request": request,
-            "is_authenticated": False,
+            "current_user": current_user,
             "csrf_token": request.session.get("csrf_token")
         }
     )
 
 # --- обрабатываем логин ---
 @router.post("/login", response_class=HTMLResponse)
-async def login(request: Request, username: str = Form(...), password: str = Form(...), csrf_token: str = Form(...)):
-    # Проверяем CSRF-токен
+async def login(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...),
+    csrf_token: str = Form(...)
+):
     if csrf_token != request.session.get("csrf_token"):
-        return templates.TemplateResponse(
-            "login.html",
-            {
-                "request": request,
-                "error": "Недействительный CSRF-токен.",
-                "is_authenticated": False,
-                "csrf_token": request.session.get("csrf_token")
-            }
+        raise HTTPException(status_code=400, detail="Invalid CSRF token")
+
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(User).where(User.username == username)
         )
+        user = result.scalars().first()
 
-    # Проверяем, пришёл ли пользователь через Telegram
-    telegram_id = request.session.get("telegram_id")
-    if telegram_id:
-        async with AsyncSessionLocal() as session:
-            result = await session.execute(select(User).where(User.telegram_id == telegram_id))
-            user = result.scalars().first()
-            if user:
-                request.session["user_id"] = user.id
-                return RedirectResponse("/dashboard", status_code=302)
-
-    # Обычная авторизация через логин и пароль
-    try:
-        user, error_reason = await authenticate_user(username, password)
-        if error_reason == "user_not_found":
+        if not user or user.password != password:  # В реальном приложении проверять хэш пароля
             return templates.TemplateResponse(
                 "login.html",
                 {
                     "request": request,
-                    "error": "Пользователь с таким именем не найден.",
-                    "is_authenticated": False,
+                    "current_user": CurrentUser(),
+                    "error": "Неверное имя пользователя или пароль",
                     "csrf_token": request.session.get("csrf_token")
                 }
             )
-        if error_reason == "wrong_password":
-            return templates.TemplateResponse(
-                "login.html",
-                {
-                    "request": request,
-                    "error": "Неверный пароль.",
-                    "is_authenticated": False,
-                    "csrf_token": request.session.get("csrf_token")
-                }
-            )
+
         request.session["user_id"] = user.id
-        return RedirectResponse("/dashboard", status_code=302)
-    except Exception as e:
-        return templates.TemplateResponse(
-            "login.html",
-            {
-                "request": request,
-                "error": f"Ошибка: {str(e)}",
-                "is_authenticated": False,
-                "csrf_token": request.session.get("csrf_token")
-            }
-        )
+        return RedirectResponse("/", status_code=302)
 
 # --- показываем форму регистрации ---
 @router.get("/register", response_class=HTMLResponse)
 async def register_form(request: Request):
     # Создаём current_user для шаблона
-    class CurrentUser:
-        def __init__(self):
-            self.is_authenticated = False
-            self.username = None
-
     current_user = CurrentUser()
 
     # Генерируем CSRF-токен
     if "csrf_token" not in request.session:
         request.session["csrf_token"] = secrets.token_hex(16)
+
     return templates.TemplateResponse(
         "register.html",
         {
@@ -114,77 +91,55 @@ async def register(
     username: str = Form(...),
     password: str = Form(...),
     email: str = Form(...),
-    firstName: str = Form(...),
-    lastName: str = Form(...),
-    confirmPassword: str = Form(...),
+    name: str = Form(...),
+    last_name: str = Form(...),
+    age: int = Form(...),
+    height: float = Form(...),
+    weight: float = Form(...),
+    goal: str = Form(...),
+    activity_level: str = Form(...),
+    workout_types: str = Form(...),
     csrf_token: str = Form(...)
 ):
-    # Проверяем CSRF-токен
     if csrf_token != request.session.get("csrf_token"):
-        return templates.TemplateResponse(
-            "register.html",
-            {
-                "request": request,
-                "error": "Недействительный CSRF-токен.",
-                "is_authenticated": False,
-                "csrf_token": request.session.get("csrf_token")
-            }
-        )
+        raise HTTPException(status_code=400, detail="Invalid CSRF token")
 
-    if password != confirmPassword:
-        return templates.TemplateResponse(
-            "register.html",
-            {
-                "request": request,
-                "error": "Пароли не совпадают.",
-                "is_authenticated": False,
-                "csrf_token": request.session.get("csrf_token")
-            }
-        )
+    async with AsyncSessionLocal() as session:
+        # Проверяем, существует ли пользователь
+        result = await session.execute(select(User).where(User.username == username))
+        if result.scalars().first():
+            return templates.TemplateResponse(
+                "register.html",
+                {
+                    "request": request,
+                    "current_user": CurrentUser(),
+                    "error": "Пользователь с таким именем уже существует",
+                    "csrf_token": request.session.get("csrf_token")
+                }
+            )
 
-    telegram_id = request.session.get("telegram_id")
-    try:
-        async with AsyncSessionLocal() as session:
-            result = await session.execute(select(User).where(User.username == username))
-            if result.scalars().first():
-                return templates.TemplateResponse(
-                    "register.html",
-                    {
-                        "request": request,
-                        "error": "Пользователь уже существует",
-                        "is_authenticated": False,
-                        "csrf_token": request.session.get("csrf_token")
-                    }
-                )
-            result = await session.execute(select(User).where(User.email == email))
-            if result.scalars().first():
-                return templates.TemplateResponse(
-                    "register.html",
-                    {
-                        "request": request,
-                        "error": "Пользователь с таким email уже существует",
-                        "is_authenticated": False,
-                        "csrf_token": request.session.get("csrf_token")
-                    }
-                )
-            await register_user(username, password, email, firstName, lastName)
-            user, _ = await authenticate_user(username, password)
-            if telegram_id:
-                user.telegram_id = telegram_id
-                session.add(user)
-                await session.commit()
-            request.session["user_id"] = user.id
-            return RedirectResponse("/dashboard", status_code=302)
-    except Exception as e:
-        return templates.TemplateResponse(
-            "register.html",
-            {
-                "request": request,
-                "error": f"Ошибка: {str(e)}",
-                "is_authenticated": False,
-                "csrf_token": request.session.get("csrf_token")
-            }
+        # Создаём нового пользователя
+        user = User(
+            username=username,
+            password=password,  # В реальном приложении пароль должен быть хэширован
+            email=email,
+            name=name,
+            last_name=last_name,
+            age=age,
+            height=height,
+            weight=weight,
+            goal=goal,
+            activity_level=activity_level,
+            workout_types=workout_types,
+            created_at=datetime.now(),
+            updated_at=datetime.now()
         )
+        session.add(user)
+        await session.commit()
+
+        # Автоматически логиним пользователя
+        request.session["user_id"] = user.id
+        return RedirectResponse("/", status_code=302)
 
 # --- Роут для получения Telegram ID (будет вызываться из Telegram Web App) ---
 @router.get("/telegram-auth", response_class=RedirectResponse)
