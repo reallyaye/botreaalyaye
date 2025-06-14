@@ -10,7 +10,7 @@ import { bindWorkoutCardHandlers, updateWorkoutsList } from './workouts.js';
 import { bindUpcomingWorkoutHandlers, reloadUpcomingWorkouts } from './upcoming-workouts.js';
 import { bindAddScheduleForm } from './forms.js';
 import { updateGoalsProgress } from './goals.js';
-import { showNotification } from './notifications.js';
+import { showNotification, formatTime, validateForm, safeFetch } from './modules/utils.js';
 
 // Глобальные переменные для таймера тренировок
 let timerInterval = null;
@@ -64,30 +64,11 @@ function initNotificationStyles() {
 }
 
 /**
- * Отображение уведомления
- * @param {string} message - Текст уведомления
- * @param {string} type - Тип уведомления (success, error, info)
- * @param {number} duration - Длительность отображения в миллисекундах
- */
-function showNotification(message, type = 'info', duration = 3000) {
-    const notification = document.createElement('div');
-    notification.className = `custom-toast toast-${type}`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.classList.add('show'), 10);
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300);
-    }, duration);
-}
-
-/**
  * Обновление статистики на дашборде
  */
 async function updateDashboardStats() {
     try {
-        const resp = await fetch('/dashboard/stats-json', { signal: AbortSignal.timeout(10000) });
-        if (!resp.ok) throw new Error('Ошибка загрузки статистики');
+        const resp = await safeFetch('/dashboard/stats-json');
         const stats = await resp.json();
         document.getElementById('total-workouts').textContent = stats.total_workouts;
         document.getElementById('total-minutes').textContent = stats.total_minutes;
@@ -108,8 +89,7 @@ function bindTimerHandlers() {
         if (e.target.classList.contains('start-schedule-btn')) {
             const id = e.target.dataset.id;
             try {
-                const resp = await fetch(`/dashboard/schedule-data/${id}`, { signal: AbortSignal.timeout(10000) });
-                if (!resp.ok) throw new Error('Ошибка загрузки данных');
+                const resp = await safeFetch(`/dashboard/schedule-data/${id}`);
                 const data = await resp.json();
                 timerActivity = data.activity;
                 timerScheduleId = data.id;
@@ -120,10 +100,7 @@ function bindTimerHandlers() {
                 if (timerInterval) clearInterval(timerInterval);
                 timerInterval = setInterval(() => {
                     const elapsed = Math.floor((Date.now() - timerStart) / 1000);
-                    const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-                    const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-                    const s = String(elapsed % 60).padStart(2, '0');
-                    document.getElementById('timer-display').textContent = `${h}:${m}:${s}`;
+                    document.getElementById('timer-display').textContent = formatTime(elapsed);
                 }, 1000);
             } catch (err) {
                 console.error('Ошибка при запуске таймера:', err);
@@ -145,13 +122,11 @@ function bindTimerHandlers() {
             if (!timerStart || !timerScheduleId) return;
             const elapsed = Math.floor((Date.now() - timerStart) / 1000);
             try {
-                const resp = await fetch(`/dashboard/finish-schedule/${timerScheduleId}`, {
+                await safeFetch(`/dashboard/finish-schedule/${timerScheduleId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ duration_seconds: elapsed }),
-                    signal: AbortSignal.timeout(10000)
+                    body: JSON.stringify({ duration_seconds: elapsed })
                 });
-                if (!resp.ok) throw new Error('Ошибка сохранения тренировки');
                 document.getElementById('start-timer-modal').style.display = 'none';
                 if (timerInterval) clearInterval(timerInterval);
                 await reloadUpcomingWorkouts();
@@ -174,8 +149,7 @@ function bindWorkoutListHandlers() {
         btn.addEventListener('click', async function () {
             const id = btn.dataset.id;
             try {
-                const resp = await fetch(`/workouts/edit/${id}`, { signal: AbortSignal.timeout(10000) });
-                if (!resp.ok) throw new Error('Ошибка загрузки тренировки');
+                const resp = await safeFetch(`/workouts/edit/${id}`);
                 const w = await resp.json();
                 document.getElementById('workout-modal-title').textContent = 'Редактировать тренировку';
                 document.getElementById('workout-id').value = w.id;
@@ -197,11 +171,7 @@ function bindWorkoutListHandlers() {
             if (!confirm('Удалить тренировку?')) return;
             const id = btn.dataset.id;
             try {
-                const resp = await fetch(`/workouts/delete/${id}`, {
-                    method: 'POST',
-                    signal: AbortSignal.timeout(10000)
-                });
-                if (!resp.ok) throw new Error('Ошибка удаления тренировки');
+                await safeFetch(`/workouts/delete/${id}`, { method: 'POST' });
                 await updateWorkoutsList();
                 showNotification('Тренировка удалена!', 'success');
             } catch (err) {
@@ -235,16 +205,16 @@ function bindWorkoutListHandlers() {
     if (workoutForm) {
         workoutForm.addEventListener('submit', async function (e) {
             e.preventDefault();
+            if (!validateForm(workoutForm)) return;
+            
             const id = document.getElementById('workout-id').value;
             const formData = new FormData(workoutForm);
             const url = id ? `/workouts/edit/${id}` : '/workouts/add';
             try {
-                const resp = await fetch(url, {
+                await safeFetch(url, {
                     method: 'POST',
-                    body: formData,
-                    signal: AbortSignal.timeout(10000)
+                    body: formData
                 });
-                if (!resp.ok) throw new Error('Ошибка сохранения тренировки');
                 document.getElementById('workout-modal').style.display = 'none';
                 await updateWorkoutsList();
                 showNotification('Тренировка сохранена!', 'success');
@@ -343,11 +313,7 @@ function bindDeleteScheduleForms() {
             const id = form.dataset.id;
             if (!confirm('Удалить предстоящую тренировку?')) return;
             try {
-                const resp = await fetch(`/dashboard/delete-schedule/${id}`, {
-                    method: 'POST',
-                    signal: AbortSignal.timeout(10000)
-                });
-                if (!resp.ok) throw new Error('Ошибка удаления тренировки');
+                await safeFetch(`/dashboard/delete-schedule/${id}`, { method: 'POST' });
                 await reloadUpcomingWorkouts();
                 showNotification('Тренировка удалена!', 'success');
             } catch (err) {
@@ -362,8 +328,7 @@ function bindDeleteScheduleForms() {
             e.preventDefault();
             const id = btn.dataset.id;
             try {
-                const resp = await fetch(`/dashboard/schedule-data/${id}`, { signal: AbortSignal.timeout(10000) });
-                if (!resp.ok) throw new Error('Ошибка загрузки данных');
+                const resp = await safeFetch(`/dashboard/schedule-data/${id}`);
                 const data = await resp.json();
                 document.getElementById('edit-schedule-id').value = data.id;
                 document.getElementById('edit-activity').value = data.activity;
@@ -390,12 +355,10 @@ function bindDeleteScheduleForms() {
             const id = document.getElementById('edit-schedule-id').value;
             const formData = new FormData(editScheduleForm);
             try {
-                const resp = await fetch(`/dashboard/edit-schedule/${id}`, {
+                await safeFetch(`/dashboard/edit-schedule/${id}`, {
                     method: 'POST',
-                    body: formData,
-                    signal: AbortSignal.timeout(10000)
+                    body: formData
                 });
-                if (!resp.ok) throw new Error('Ошибка сохранения тренировки');
                 document.getElementById('edit-schedule-modal').style.display = 'none';
                 await reloadUpcomingWorkouts();
                 showNotification('Тренировка обновлена!', 'success');
@@ -497,68 +460,6 @@ function initCharts() {
 }
 
 /**
- * Валидация формы
- * @param {HTMLFormElement} form - Форма для валидации
- * @returns {boolean} - Результат валидации
- */
-function validateForm(form) {
-    const inputs = form.querySelectorAll('input, select, textarea');
-    let isValid = true;
-
-    inputs.forEach(input => {
-        if (input.hasAttribute('required') && !input.value.trim()) {
-            markInvalid(input, 'Это поле обязательно для заполнения');
-            isValid = false;
-        } else if (input.type === 'email' && input.value.trim() && !validateEmail(input.value)) {
-            markInvalid(input, 'Введите корректный email');
-            isValid = false;
-        } else {
-            clearInvalid(input);
-        }
-    });
-
-    return isValid;
-}
-
-/**
- * Валидация email
- * @param {string} email - Email для валидации
- * @returns {boolean} - Результат валидации
- */
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-/**
- * Отметка поля как невалидного
- * @param {HTMLElement} input - Поле ввода
- * @param {string} message - Сообщение об ошибке
- */
-function markInvalid(input, message) {
-    input.classList.add('is-invalid');
-    let errorElement = input.nextElementSibling;
-    if (!errorElement || !errorElement.classList.contains('error-message')) {
-        errorElement = document.createElement('div');
-        errorElement.className = 'error-message';
-        input.parentNode.insertBefore(errorElement, input.nextSibling);
-    }
-    errorElement.textContent = message;
-}
-
-/**
- * Очистка отметки о невалидности поля
- * @param {HTMLElement} input - Поле ввода
- */
-function clearInvalid(input) {
-    input.classList.remove('is-invalid');
-    const errorElement = input.nextElementSibling;
-    if (errorElement && errorElement.classList.contains('error-message')) {
-        errorElement.remove();
-    }
-}
-
-/**
  * Главная точка входа
  */
 document.addEventListener('DOMContentLoaded', () => {
@@ -622,6 +523,105 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!validateForm(form)) {
                 e.preventDefault();
                 showNotification('Пожалуйста, заполните все обязательные поля', 'error');
+            }
+        });
+    });
+
+    // Обработка всех форм с классом .needs-validation
+    const forms = document.querySelectorAll('.needs-validation');
+    
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+
+    // Обработка алертов
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        const closeBtn = alert.querySelector('.close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                alert.style.display = 'none';
+            });
+        }
+    });
+
+    // Обработка мобильного меню
+    const menuToggle = document.querySelector('.navbar-toggler');
+    const mobileMenu = document.querySelector('.navbar-collapse');
+    
+    if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('show');
+        });
+    }
+
+    // Обработка выпадающих списков
+    const dropdowns = document.querySelectorAll('.dropdown-toggle');
+    dropdowns.forEach(dropdown => {
+        dropdown.addEventListener('click', (e) => {
+            e.preventDefault();
+            const menu = dropdown.nextElementSibling;
+            if (menu) {
+                menu.classList.toggle('show');
+            }
+        });
+    });
+
+    // Закрытие выпадающих списков при клике вне их
+    document.addEventListener('click', (e) => {
+        if (!e.target.matches('.dropdown-toggle')) {
+            const dropdowns = document.querySelectorAll('.dropdown-menu.show');
+            dropdowns.forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+    });
+
+    // Обработка модальных окон
+    const modalTriggers = document.querySelectorAll('[data-toggle="modal"]');
+    modalTriggers.forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const target = trigger.getAttribute('data-target');
+            const modal = document.querySelector(target);
+            if (modal) {
+                modal.classList.add('show');
+                modal.style.display = 'block';
+            }
+        });
+    });
+
+    // Закрытие модальных окон
+    const modalCloseButtons = document.querySelectorAll('[data-dismiss="modal"]');
+    modalCloseButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    // Обработка табов
+    const tabLinks = document.querySelectorAll('[data-toggle="tab"]');
+    tabLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = link.getAttribute('data-target');
+            const tabContent = document.querySelector(target);
+            if (tabContent) {
+                // Скрываем все табы
+                document.querySelectorAll('.tab-content > .tab-pane').forEach(tab => {
+                    tab.classList.remove('show', 'active');
+                });
+                // Показываем выбранный таб
+                tabContent.classList.add('show', 'active');
             }
         });
     });

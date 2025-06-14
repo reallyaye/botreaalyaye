@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
-from fastapi import FastAPI, Request, Response, Form
+from fastapi import FastAPI, Request, Response, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
@@ -20,6 +21,9 @@ import secrets
 import asyncio
 from contextlib import asynccontextmanager
 from webapp.app.services.db import init_db, User, get_user_by_id, get_user_workouts, get_user_stats, get_user_goals, check_achieved_goals, AsyncSessionLocal
+from typing import List, Optional
+from .routers import auth, dashboard, workouts, stats, profile, goals
+from .templates_config import templates
 
 # корень каталога webapp/app
 BASE_DIR = Path(__file__).resolve().parent
@@ -29,6 +33,36 @@ load_dotenv(BASE_DIR.parent.parent / ".env")
 
 # инициализируем нашу БД
 from webapp.app.routers import auth, dashboard, workouts, stats, profile, goals
+
+app = FastAPI()
+
+# сессии для логина/логаута
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("SECRET_KEY", "changeme!"),
+    session_cookie="session",
+)
+
+# статика с явным указанием MIME-типов
+app.mount(
+    "/static",
+    StaticFiles(directory=BASE_DIR / "static", html=True),
+    name="static"
+)
+
+# шаблоны
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+# Добавляем фильтр datetimeformat для форматирования даты
+def datetimeformat(value, format="%d.%m.%Y %H:%M"):
+    if isinstance(value, datetime):
+        return value.strftime(format)
+    return value
+
+# Регистрируем фильтр и добавляем отладочный вывод
+print("Регистрирую фильтр datetimeformat")  # Отладочный вывод
+templates.env.filters["datetimeformat"] = datetimeformat
+print("Фильтр datetimeformat зарегистрирован")  # Отладочный вывод
 
 # Telegram Bot
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -199,13 +233,22 @@ async def root(request: Request):
                 goals = await get_user_goals(user_id)
                 print(f"Цели: {goals}")  # Отладочный вывод
 
+    # Создаём current_user для шаблона
+    class CurrentUser:
+        def __init__(self, user, is_authenticated):
+            self.is_authenticated = is_authenticated
+            self.username = user.username if user else None
+            self.weight = getattr(user, 'weight', None)
+            # Добавьте другие нужные поля при необходимости
+
+    current_user = CurrentUser(user, is_authenticated)
+
     print("Рендеринг шаблона home.html")  # Отладочный вывод
     return templates.TemplateResponse(
         "home.html",
         {
             "request": request,
-            "is_authenticated": is_authenticated,
-            "username": user.username if user else None,
+            "current_user": current_user,
             "recent_activities": recent_activities,
             "stats": stats if stats else {"total_workouts": 0, "total_calories": 0, "total_minutes": 0},
             "user_weight": user_weight,

@@ -154,7 +154,7 @@ async def ai_target_weight(message: Message, state: FSMContext):
 
     def _call_ai():
         return client.chat.completions.create(
-            model="DeepSeek-R1",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a professional fitness coach."},
                 {"role": "user",   "content": prompt}

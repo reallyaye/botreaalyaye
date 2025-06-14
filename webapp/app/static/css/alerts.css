@@ -1,0 +1,106 @@
+.alert {
+    position: relative;
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    animation: slideIn 0.3s ease;
+}
+
+.alert-success {
+    color: #065f46;
+    background-color: #d1fae5;
+    border-color: #a7f3d0;
+}
+
+.alert-danger {
+    color: #991b1b;
+    background-color: #fee2e2;
+    border-color: #fecaca;
+}
+
+.alert-warning {
+    color: #92400e;
+    background-color: #fef3c7;
+    border-color: #fde68a;
+}
+
+.alert-info {
+    color: #1e40af;
+    background-color: #dbeafe;
+    border-color: #bfdbfe;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    opacity: 0.5;
+    transition: opacity var(--transition-fast) ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--radius-full);
+}
+
+.alert-close:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.alert-close:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+/* Анимации */
+@keyframes slideIn {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+}
+
+.alert.hide {
+    animation: slideOut 0.3s ease forwards;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .alert {
+        padding: var(--spacing-3);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-2);
+    }
+    
+    .alert-close {
+        position: absolute;
+        top: var(--spacing-2);
+        right: var(--spacing-2);
+    }
+} 

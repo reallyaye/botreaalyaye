@@ -1,0 +1,253 @@
+/* Кнопки */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3) var(--spacing-4);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    transition: all var(--transition-fast) ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+/* Размеры кнопок */
+.btn-sm {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+    padding: var(--spacing-4) var(--spacing-6);
+    font-size: var(--font-size-lg);
+    border-radius: var(--radius-lg);
+}
+
+/* Стили кнопок */
+.btn-primary {
+    color: white;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover-color);
+    border-color: var(--primary-hover-color);
+}
+
+.btn-secondary {
+    color: var(--text-color);
+    background-color: var(--surface-hover-color);
+    border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-color);
+    border-color: var(--border-hover-color);
+}
+
+.btn-success {
+    color: white;
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.btn-success:hover {
+    background-color: #0da271;
+    border-color: #0da271;
+}
+
+.btn-danger {
+    color: white;
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+}
+
+.btn-warning {
+    color: var(--text-color);
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+}
+
+.btn-warning:hover {
+    background-color: #d97706;
+    border-color: #d97706;
+}
+
+.btn-info {
+    color: white;
+    background-color: var(--info-color);
+    border-color: var(--info-color);
+}
+
+.btn-info:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
+/* Контурные кнопки */
+.btn-outline-primary {
+    color: var(--primary-color);
+    background-color: transparent;
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    color: white;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-secondary {
+    color: var(--text-secondary-color);
+    background-color: transparent;
+    border-color: var(--border-color);
+}
+
+.btn-outline-secondary:hover {
+    color: var(--text-color);
+    background-color: var(--surface-hover-color);
+    border-color: var(--border-hover-color);
+}
+
+.btn-outline-success {
+    color: var(--success-color);
+    background-color: transparent;
+    border-color: var(--success-color);
+}
+
+.btn-outline-success:hover {
+    color: white;
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.btn-outline-danger {
+    color: var(--danger-color);
+    background-color: transparent;
+    border-color: var(--danger-color);
+}
+
+.btn-outline-danger:hover {
+    color: white;
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.btn-outline-warning {
+    color: var(--warning-color);
+    background-color: transparent;
+    border-color: var(--warning-color);
+}
+
+.btn-outline-warning:hover {
+    color: var(--text-color);
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+}
+
+.btn-outline-info {
+    color: var(--info-color);
+    background-color: transparent;
+    border-color: var(--info-color);
+}
+
+.btn-outline-info:hover {
+    color: white;
+    background-color: var(--info-color);
+    border-color: var(--info-color);
+}
+
+/* Текстовые кнопки */
+.btn-link {
+    color: var(--primary-color);
+    background-color: transparent;
+    border-color: transparent;
+    padding: 0;
+    font-weight: var(--font-weight-normal);
+}
+
+.btn-link:hover {
+    color: var(--primary-hover-color);
+    text-decoration: underline;
+    transform: none;
+}
+
+/* Блоковые кнопки */
+.btn-block {
+    display: flex;
+    width: 100%;
+}
+
+/* Группы кнопок */
+.btn-group {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.btn-group > .btn {
+    position: relative;
+    flex: 1 1 auto;
+}
+
+.btn-group > .btn:not(:first-child) {
+    margin-left: -1px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.btn-group > .btn:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .btn {
+        padding: var(--spacing-2) var(--spacing-3);
+        font-size: var(--font-size-sm);
+    }
+    
+    .btn-lg {
+        padding: var(--spacing-3) var(--spacing-4);
+        font-size: var(--font-size-base);
+    }
+    
+    .btn-sm {
+        padding: var(--spacing-1) var(--spacing-2);
+        font-size: var(--font-size-xs);
+    }
+} 

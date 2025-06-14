@@ -181,7 +181,7 @@
               <div class="goal-value">{{ goal.current_value|round(1) }}/{{ goal.target_value|round(1) }}{% if goal.goal_type == 'duration' %} мин{% elif goal.goal_type == 'calories' %} ккал{% elif goal.goal_type == 'workouts' %} трен.{% endif %}</div>
             </div>
             <div class="goal-progress-bg">
-              <div class="goal-progress-fill" style="width: {{ goal.progress|round(0) }}%;"></div>
+
             </div>
           </a>
         {% endfor %}
@@ -221,4 +221,6 @@
     <button id="stop-timer-btn" class="btn btn-danger" style="font-size:1.1em;">Стоп</button>
   </div>
 </div>
+<script type="module" src="/static/js/modules/forms.js"></script>
+<script type="module" src="/static/js/modules/upcoming-workouts.js"></script>
 {% endblock %}
