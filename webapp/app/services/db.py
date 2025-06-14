@@ -8,13 +8,15 @@ from passlib.context import CryptContext
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import aiohttp
+from ..database import Base, engine, AsyncSessionLocal
+from ..models import User, Workout, Goal
 
 # Загружаем .env автоматически из корня проекта
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///db.sqlite3")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-APP_URL = os.getenv("WEBAPP_URL")
+APP_URL = os.getenv("WEBAPP_URL", "http://localhost:8000")
 print(f"DATABASE_URL: {DATABASE_URL}")  # Отладочный вывод
 print(f"TELEGRAM_TOKEN: {TELEGRAM_TOKEN}")  # Отладочный вывод
 print(f"APP_URL: {APP_URL}")  # Отладочный вывод
@@ -224,12 +226,12 @@ async def add_workout(user_id: int, activity: str, intensity: str, duration: flo
 async def get_user_workouts(user_id: int, limit: int = 5):
     async with AsyncSessionLocal() as session:
         result = await session.execute(
-            select(Workout.activity)
+            select(Workout)
             .where(Workout.user_id == user_id)
             .order_by(Workout.created_at.desc())
             .limit(limit)
         )
-        return [row.activity for row in result.fetchall()]
+        return result.scalars().all()
 
 async def get_all_user_workouts(user_id: int):
     async with AsyncSessionLocal() as session:
@@ -292,17 +294,17 @@ async def get_user_stats(user_id: int):
     async with AsyncSessionLocal() as session:
         result = await session.execute(
             select(
-                func.count().label("total_workouts"),
-                func.sum(Workout.duration).label("total_minutes"),
-                func.sum(Workout.calories_burned).label("total_calories")
+                func.count(Workout.id).label('total_workouts'),
+                func.sum(Workout.calories_burned).label('total_calories'),
+                func.sum(Workout.duration).label('total_minutes')
             )
             .where(Workout.user_id == user_id)
         )
         stats = result.first()
         return {
-            "total_workouts": stats.total_workouts or 0,
-            "total_minutes": stats.total_minutes or 0,
-            "total_calories": stats.total_calories or 0
+            'total_workouts': stats.total_workouts or 0,
+            'total_calories': stats.total_calories or 0,
+            'total_minutes': stats.total_minutes or 0
         }
 
 async def get_weekly_stats(user_id: int):
@@ -465,82 +467,40 @@ async def get_user_goals(user_id: int):
         result = await session.execute(
             select(Goal)
             .where(Goal.user_id == user_id)
-            .where(Goal.deadline >= datetime.utcnow())
-            .where(Goal.achieved == False)
-            .order_by(Goal.created_at)
+            .order_by(Goal.deadline.asc())
         )
-        goals = result.scalars().all()
-        # Для каждой цели рассчитываем текущий прогресс
-        for goal in goals:
-            if goal.goal_type == "calories":
-                result = await session.execute(
-                    select(func.sum(Workout.calories_burned).label("current_value"))
-                    .where(Workout.user_id == user_id)
-                    .where(Workout.created_at >= goal.created_at)
-                    .where(Workout.created_at <= goal.deadline)
-                )
-            elif goal.goal_type == "workouts":
-                result = await session.execute(
-                    select(func.count().label("current_value"))
-                    .where(Workout.user_id == user_id)
-                    .where(Workout.created_at >= goal.created_at)
-                    .where(Workout.created_at <= goal.deadline)
-                )
-            elif goal.goal_type == "duration":
-                result = await session.execute(
-                    select(func.sum(Workout.duration).label("current_value"))
-                    .where(Workout.user_id == user_id)
-                    .where(Workout.created_at >= goal.created_at)
-                    .where(Workout.created_at <= goal.deadline)
-                )
-            else:
-                continue
-            current_value = result.first().current_value or 0
-            goal.current_value = current_value
-            goal.progress = (current_value / goal.target_value * 100) if goal.target_value > 0 else 0
-        return goals
+        return result.scalars().all()
 
 async def check_achieved_goals():
     async with AsyncSessionLocal() as session:
         # Получаем все активные цели
         result = await session.execute(
             select(Goal, User)
-            .join(User, User.id == Goal.user_id)
-            .where(Goal.deadline >= datetime.utcnow())
+            .join(User)
             .where(Goal.achieved == False)
         )
-        goals = result.fetchall()
+        goals_with_users = result.all()
         achieved_goals = []
-        for goal, user in goals:
-            if goal.goal_type == "calories":
-                result = await session.execute(
-                    select(func.sum(Workout.calories_burned).label("current_value"))
-                    .where(Workout.user_id == user.id)
-                    .where(Workout.created_at >= goal.created_at)
-                    .where(Workout.created_at <= goal.deadline)
-                )
-            elif goal.goal_type == "workouts":
-                result = await session.execute(
-                    select(func.count().label("current_value"))
-                    .where(Workout.user_id == user.id)
-                    .where(Workout.created_at >= goal.created_at)
-                    .where(Workout.created_at <= goal.deadline)
-                )
-            elif goal.goal_type == "duration":
-                result = await session.execute(
-                    select(func.sum(Workout.duration).label("current_value"))
-                    .where(Workout.user_id == user.id)
-                    .where(Workout.created_at >= goal.created_at)
-                    .where(Workout.created_at <= goal.deadline)
-                )
-            else:
-                continue
-            current_value = result.first().current_value or 0
-            if current_value >= goal.target_value:
+
+        for goal, user in goals_with_users:
+            # Получаем статистику пользователя
+            stats = await get_user_stats(user.id)
+            
+            # Проверяем достижение цели
+            if goal.goal_type == "calories" and stats['total_calories'] >= goal.target_value:
                 goal.achieved = True
-                session.add(goal)
                 achieved_goals.append((goal, user))
-        await session.commit()
+            elif goal.goal_type == "workouts" and stats['total_workouts'] >= goal.target_value:
+                goal.achieved = True
+                achieved_goals.append((goal, user))
+            elif goal.goal_type == "duration" and stats['total_minutes'] >= goal.target_value:
+                goal.achieved = True
+                achieved_goals.append((goal, user))
+
+        # Сохраняем изменения
+        if achieved_goals:
+            await session.commit()
+
         return achieved_goals
 
 async def delete_goal(goal_id: int):

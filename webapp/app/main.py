@@ -18,7 +18,7 @@ from sqlalchemy import select, func
 import aiohttp
 import secrets
 import asyncio
-from webapp.app.services.db import init_db, User, get_user_by_id, get_user_workouts, get_user_stats, get_user_goals, check_achieved_goals, AsyncSessionLocal
+from .services.db import init_db, User, get_user_by_id, get_user_workouts, get_user_stats, get_user_goals, check_achieved_goals, AsyncSessionLocal
 
 # корень каталога webapp/app
 BASE_DIR = Path(__file__).resolve().parent
@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR.parent.parent / ".env")
 
 # инициализируем нашу БД
-from webapp.app.routers import auth, dashboard, workouts, stats, profile, goals
+from .routers import auth, dashboard, workouts, stats, profile, goals
 
 app = FastAPI()
 
@@ -54,26 +54,62 @@ def datetimeformat(value, format="%d.%m.%Y %H:%M"):
         return value.strftime(format)
     return value
 
-# Регистрируем фильтр и добавляем отладочный вывод
-print("Регистрирую фильтр datetimeformat")  # Отладочный вывод
+# Регистрируем фильтр
 templates.env.filters["datetimeformat"] = datetimeformat
-print("Фильтр datetimeformat зарегистрирован")  # Отладочный вывод
 
 # Telegram Bot
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-APP_URL = os.getenv("WEBAPP_URL")
+APP_URL = os.getenv("WEBAPP_URL", "http://localhost:8000")
 WEBHOOK_PATH = "/telegram/webhook"
 WEBHOOK_URL = f"{APP_URL}{WEBHOOK_PATH}"
 
 # Инициализация бота и диспетчера
-session = AiohttpSession()
-bot = Bot(token=BOT_TOKEN, session=session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-storage = MemoryStorage()
-router = Router()
+if BOT_TOKEN:
+    session = AiohttpSession()
+    bot = Bot(token=BOT_TOKEN, session=session, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    storage = MemoryStorage()
+    router = Router()
 
-# Создаём клавиатуру с кнопкой для открытия веб-приложения
-webapp_button = InlineKeyboardButton(text="Открыть веб-приложение", web_app=types.WebAppInfo(url=APP_URL))
-webapp_keyboard = InlineKeyboardMarkup(inline_keyboard=[[webapp_button]])
+    # Создаём клавиатуру с кнопкой для открытия веб-приложения
+    webapp_button = InlineKeyboardButton(text="Открыть веб-приложение", web_app=types.WebAppInfo(url=APP_URL))
+    webapp_keyboard = InlineKeyboardMarkup(inline_keyboard=[[webapp_button]])
+
+    # Обработчик команды /start
+    @router.message(Command(commands=["start"]))
+    async def send_welcome(message: types.Message):
+        await message.reply(
+            "Привет! Это твой фитнес-бот.\nИспользуй /link <username> для связки с профилем или нажми кнопку ниже, чтобы открыть веб-приложение.",
+            reply_markup=webapp_keyboard
+        )
+
+    # Обработчик команды /link
+    @router.message(Command(commands=["link"]))
+    async def link_profile(message: types.Message):
+        args = message.text.split()
+        if len(args) == 2:
+            username = args[1]
+            async with AsyncSessionLocal() as session:
+                result = await session.execute(select(User).where(User.username == username))
+                user = result.scalars().first()
+                if user:
+                    user.telegram_id = str(message.chat.id)
+                    session.add(user)
+                    await session.commit()
+                    await message.reply(
+                        f"Профиль {username} успешно связан с вашим Telegram!\nТеперь ты можешь открыть веб-приложение.",
+                        reply_markup=webapp_keyboard
+                    )
+                else:
+                    await message.reply("Пользователь не найден.")
+        else:
+            await message.reply("Используйте: /link <username>")
+
+    # Обработчик вебхука
+    @app.post(WEBHOOK_PATH)
+    async def telegram_webhook(request: Request):
+        update = types.Update(**await request.json())
+        await router.process_update(update)
+        return Response(status_code=200)
 
 # Фоновая задача для проверки достижения целей
 async def check_goals_task():
@@ -81,7 +117,7 @@ async def check_goals_task():
         try:
             achieved_goals = await check_achieved_goals()
             for goal, user in achieved_goals:
-                if user.telegram_id:
+                if user.telegram_id and BOT_TOKEN:
                     goal_description = ""
                     if goal.goal_type == "calories":
                         goal_description = f"Сжечь {goal.target_value} калорий"
@@ -103,51 +139,16 @@ async def on_startup():
     await init_db()
     # Запускаем фоновую задачу для проверки целей
     asyncio.create_task(check_goals_task())
-    # Временно отключаем установку вебхука для устранения конфликта
-    # await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
-    # print(f"Webhook установлен: {WEBHOOK_URL}")
+    # Устанавливаем вебхук только если есть токен бота
+    if BOT_TOKEN:
+        await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
+        print(f"Webhook установлен: {WEBHOOK_URL}")
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    await bot.delete_webhook()
-    await bot.session.close()
-
-# Обработчик команды /start
-@router.message(Command(commands=["start"]))
-async def send_welcome(message: types.Message):
-    await message.reply(
-        "Привет! Это твой фитнес-бот.\nИспользуй /link <username> для связки с профилем или нажми кнопку ниже, чтобы открыть веб-приложение.",
-        reply_markup=webapp_keyboard
-    )
-
-# Обработчик команды /link
-@router.message(Command(commands=["link"]))
-async def link_profile(message: types.Message):
-    args = message.text.split()
-    if len(args) == 2:
-        username = args[1]
-        async with AsyncSessionLocal() as session:
-            result = await session.execute(select(User).where(User.username == username))
-            user = result.scalars().first()
-            if user:
-                user.telegram_id = str(message.chat.id)
-                session.add(user)
-                await session.commit()
-                await message.reply(
-                    f"Профиль {username} успешно связан с вашим Telegram!\nТеперь ты можешь открыть веб-приложение.",
-                    reply_markup=webapp_keyboard
-                )
-            else:
-                await message.reply("Пользователь не найден.")
-    else:
-        await message.reply("Используйте: /link <username>")
-
-# Обработчик вебхука
-@app.post(WEBHOOK_PATH)
-async def telegram_webhook(request: Request):
-    update = types.Update(**await request.json())
-    await router.process_update(update)
-    return Response(status_code=200)
+    if BOT_TOKEN:
+        await bot.delete_webhook()
+        await bot.session.close()
 
 @app.post("/logout")
 async def logout(request: Request):
@@ -161,12 +162,10 @@ async def clear_session(request: Request):
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    print("Получен запрос к /")  # Отладочный вывод
     # Генерируем CSRF-токен
     if "csrf_token" not in request.session:
         request.session["csrf_token"] = secrets.token_hex(16)
     is_authenticated = bool(request.session.get("user_id"))
-    print(f"Пользователь авторизован: {is_authenticated}")  # Отладочный вывод
     user = None
     stats = {"total_workouts": 0, "total_calories": 0, "total_minutes": 0}
     recent_activities = []
@@ -177,25 +176,18 @@ async def root(request: Request):
 
     if is_authenticated:
         user_id = request.session.get("user_id")
-        print(f"User ID: {user_id}")  # Отладочный вывод
         async with AsyncSessionLocal() as session:
-            print("Открываю сессию с БД")  # Отладочный вывод
             # Получаем пользователя
             user = await get_user_by_id(user_id)
-            print(f"Пользователь найден: {user.username if user else None}")  # Отладочный вывод
             if user:
                 user_weight = user.weight
                 # Получаем статистику тренировок
                 stats = await get_user_stats(user_id)
-                print(f"Статистика: {stats}")  # Отладочный вывод
                 # Получаем последние действия
                 recent_activities = await get_user_workouts(user_id, limit=5)
-                print(f"Последние действия: {recent_activities}")  # Отладочный вывод
                 # Получаем цели пользователя
                 goals = await get_user_goals(user_id)
-                print(f"Цели: {goals}")  # Отладочный вывод
 
-    print("Рендеринг шаблона home.html")  # Отладочный вывод
     return templates.TemplateResponse(
         "home.html",
         {
