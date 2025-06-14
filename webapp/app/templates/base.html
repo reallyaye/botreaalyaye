@@ -125,15 +125,7 @@
     <!-- Основной контент -->
     <main class="container">
         <!-- Сообщения -->
-        {% for message in get_flashed_messages() %}
-            <div class="alert alert-{{ message.type }} alert-dismissible fade show" role="alert">
-                {{ message.message }}
-                <button type="button" class="alert-close" aria-label="Закрыть">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        {% endfor %}
-        
+
         <!-- Блок контента -->
         {% block content %}{% endblock %}
     </main>
