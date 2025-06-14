@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from fastapi import FastAPI, Request, Response, Form
+from fastapi import FastAPI, Request, Response, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -19,6 +19,7 @@ import aiohttp
 import secrets
 import asyncio
 from webapp.app.services.db import init_db, User, get_user_by_id, get_user_workouts, get_user_stats, get_user_goals, check_achieved_goals, AsyncSessionLocal
+from typing import List, Optional
 
 # корень каталога webapp/app
 BASE_DIR = Path(__file__).resolve().parent
@@ -29,7 +30,7 @@ load_dotenv(BASE_DIR.parent.parent / ".env")
 # инициализируем нашу БД
 from webapp.app.routers import auth, dashboard, workouts, stats, profile, goals
 
-app = FastAPI()
+app = FastAPI(title="Fitness Bot Web App")
 
 # сессии для логина/логаута
 app.add_middleware(
@@ -59,7 +60,8 @@ print("Фильтр datetimeformat зарегистрирован")  # Отла�
 # Добавляем глобальные переменные в шаблоны
 templates.env.globals.update({
     "url_for": app.url_path_for,
-    "static": lambda path: f"/static/{path}"
+    "static": lambda path: f"/static/{path}",
+    "get_flashed_messages": lambda: []
 })
 
 # Telegram Bot

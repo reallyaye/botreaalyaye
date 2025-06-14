@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Фитнес-бот{% endblock %}</title>
+    <title>{% block title %}Fitness Bot{% endblock %}</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ static('img/favicon.png') }}">
@@ -32,145 +32,84 @@
     <!-- Навигация -->
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="{{ url_for('root') }}" class="navbar-brand">
-                <i class="fas fa-dumbbell"></i>
-                Фитнес-бот
-            </a>
-            
-            <!-- Десктопное меню -->
+            <a href="/" class="navbar-brand">Fitness Bot</a>
+            <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <div class="navbar-nav">
                 {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
-                        <i class="fas fa-chart-line"></i>
-                        Панель
+                    <a href="/dashboard" class="nav-link {% if request.url.path == '/dashboard' %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i> Панель
                     </a>
-                    <a href="{{ url_for('workouts') }}" class="nav-link {% if request.endpoint == 'workouts' %}active{% endif %}">
-                        <i class="fas fa-dumbbell"></i>
-                        Тренировки
+                    <a href="/workouts" class="nav-link {% if request.url.path == '/workouts' %}active{% endif %}">
+                        <i class="fas fa-dumbbell"></i> Тренировки
                     </a>
-                    <a href="{{ url_for('stats') }}" class="nav-link {% if request.endpoint == 'stats' %}active{% endif %}">
-                        <i class="fas fa-chart-bar"></i>
-                        Статистика
+                    <a href="/stats" class="nav-link {% if request.url.path == '/stats' %}active{% endif %}">
+                        <i class="fas fa-chart-bar"></i> Статистика
                     </a>
-                    <a href="{{ url_for('profile') }}" class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}">
-                        <i class="fas fa-user"></i>
-                        Профиль
+                    <a href="/profile" class="nav-link {% if request.url.path == '/profile' %}active{% endif %}">
+                        <i class="fas fa-user"></i> Профиль
                     </a>
-                    <a href="{{ url_for('logout') }}" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Выйти
+                    <a href="/logout" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i> Выход
                     </a>
                 {% else %}
-                    <a href="{{ url_for('login') }}" class="nav-link {% if request.endpoint == 'login' %}active{% endif %}">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Войти
+                    <a href="/login" class="nav-link {% if request.url.path == '/login' %}active{% endif %}">
+                        <i class="fas fa-sign-in-alt"></i> Вход
                     </a>
-                    <a href="{{ url_for('register') }}" class="nav-link {% if request.endpoint == 'register' %}active{% endif %}">
-                        <i class="fas fa-user-plus"></i>
-                        Регистрация
+                    <a href="/register" class="nav-link {% if request.url.path == '/register' %}active{% endif %}">
+                        <i class="fas fa-user-plus"></i> Регистрация
                     </a>
                 {% endif %}
             </div>
-            
-            <!-- Кнопка мобильного меню -->
-            <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Открыть меню">
-                <i class="fas fa-bars"></i>
-            </button>
         </div>
     </nav>
     
     <!-- Мобильное меню -->
     <div id="mobileMenu" class="mobile-menu">
-        <div class="mobile-menu-header">
-            <h3>Меню</h3>
-            <button id="mobileMenuClose" class="mobile-menu-close" aria-label="Закрыть меню">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="mobile-menu-content">
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('dashboard') }}" class="mobile-menu-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
-                    <i class="fas fa-chart-line"></i>
-                    Панель
-                </a>
-                <a href="{{ url_for('workouts') }}" class="mobile-menu-link {% if request.endpoint == 'workouts' %}active{% endif %}">
-                    <i class="fas fa-dumbbell"></i>
-                    Тренировки
-                </a>
-                <a href="{{ url_for('stats') }}" class="mobile-menu-link {% if request.endpoint == 'stats' %}active{% endif %}">
-                    <i class="fas fa-chart-bar"></i>
-                    Статистика
-                </a>
-                <a href="{{ url_for('profile') }}" class="mobile-menu-link {% if request.endpoint == 'profile' %}active{% endif %}">
-                    <i class="fas fa-user"></i>
-                    Профиль
-                </a>
-                <a href="{{ url_for('logout') }}" class="mobile-menu-link">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Выйти
-                </a>
-            {% else %}
-                <a href="{{ url_for('login') }}" class="mobile-menu-link {% if request.endpoint == 'login' %}active{% endif %}">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Войти
-                </a>
-                <a href="{{ url_for('register') }}" class="mobile-menu-link {% if request.endpoint == 'register' %}active{% endif %}">
-                    <i class="fas fa-user-plus"></i>
-                    Регистрация
-                </a>
-            {% endif %}
-        </div>
+        {% if current_user.is_authenticated %}
+            <a href="/dashboard" class="mobile-menu-link {% if request.url.path == '/dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> Панель
+            </a>
+            <a href="/workouts" class="mobile-menu-link {% if request.url.path == '/workouts' %}active{% endif %}">
+                <i class="fas fa-dumbbell"></i> Тренировки
+            </a>
+            <a href="/stats" class="mobile-menu-link {% if request.url.path == '/stats' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i> Статистика
+            </a>
+            <a href="/profile" class="mobile-menu-link {% if request.url.path == '/profile' %}active{% endif %}">
+                <i class="fas fa-user"></i> Профиль
+            </a>
+            <a href="/logout" class="mobile-menu-link">
+                <i class="fas fa-sign-out-alt"></i> Выход
+            </a>
+        {% else %}
+            <a href="/login" class="mobile-menu-link {% if request.url.path == '/login' %}active{% endif %}">
+                <i class="fas fa-sign-in-alt"></i> Вход
+            </a>
+            <a href="/register" class="mobile-menu-link {% if request.url.path == '/register' %}active{% endif %}">
+                <i class="fas fa-user-plus"></i> Регистрация
+            </a>
+        {% endif %}
     </div>
     
     <!-- Основной контент -->
-    <main class="container">
-        <!-- Сообщения -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="alert-close" aria-label="Закрыть">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+    <main class="main-content">
+        {% for message in get_flashed_messages() %}
+            <div class="alert alert-{{ message.type }}">
+                {{ message.message }}
+            </div>
+        {% endfor %}
         
-        <!-- Блок контента -->
         {% block content %}{% endblock %}
     </main>
     
     <!-- Подвал -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <i class="fas fa-dumbbell"></i>
-                    Фитнес-бот
-                </div>
-                <div class="footer-links">
-                    <a href="{{ url_for('about') }}" class="footer-link">О нас</a>
-                    <a href="{{ url_for('contact') }}" class="footer-link">Контакты</a>
-                    <a href="{{ url_for('privacy') }}" class="footer-link">Конфиденциальность</a>
-                    <a href="{{ url_for('terms') }}" class="footer-link">Условия использования</a>
-                </div>
-                <div class="footer-social">
-                    <a href="#" class="social-link" aria-label="Telegram">
-                        <i class="fab fa-telegram"></i>
-                    </a>
-                    <a href="#" class="social-link" aria-label="VK">
-                        <i class="fab fa-vk"></i>
-                    </a>
-                    <a href="#" class="social-link" aria-label="YouTube">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; {{ now.year }} Фитнес-бот. Все права защищены.</p>
-            </div>
+        <div class="footer-content">
+            <p>&copy; {{ current_year }} Fitness Bot. Все права защищены.</p>
         </div>
     </footer>
     
