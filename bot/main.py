@@ -24,16 +24,16 @@ load_dotenv(BASE_DIR / ".env")
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
-OPENAI_API_KEY = os.getenv("SAMBANOVA_API_KEY")
+API_KEY = os.getenv("SAMBANOVA_API_KEY") or os.getenv("OPENAI_API_KEY")
 
 if not BOT_TOKEN or not ADMIN_ID:
     raise RuntimeError("TELEGRAM_BOT_TOKEN и ADMIN_ID должны быть заданы в .env")
 
-if not OPENAI_API_KEY:
-    raise RuntimeError("SAMBANOVA_API_KEY должен быть задан в .env")
+if not API_KEY:
+    raise RuntimeError("SAMBANOVA_API_KEY или OPENAI_API_KEY должен быть задан в .env")
 
 # Инициализация OpenAI клиента
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+openai_client = OpenAI(api_key=API_KEY)
 
 # ================== События старта/остановки ==================
 
