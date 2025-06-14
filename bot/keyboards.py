@@ -1,6 +1,5 @@
 # bot/keyboards.py
 import os
-from dotenv import load_dotenv
 from aiogram.types import (
     ReplyKeyboardMarkup,
     KeyboardButton,
@@ -8,11 +7,6 @@ from aiogram.types import (
     InlineKeyboardButton,
     WebAppInfo,
 )
-
-load_dotenv()
-WEBAPP_URL = os.getenv("WEBAPP_URL")
-if not WEBAPP_URL:
-    raise RuntimeError("WEBAPP_URL не задана в .env")
 
 # ——— Основные кнопки ———
 btn_programs = KeyboardButton(text="📋 Программы")
@@ -40,14 +34,19 @@ cancel_keyboard = ReplyKeyboardMarkup(
 )
 
 # ——— WebApp-inline-кнопка ———
-webapp_inline_kb = InlineKeyboardMarkup(
-    inline_keyboard=[[
-        InlineKeyboardButton(
-            text="🌐 Открыть WebApp",
-            web_app=WebAppInfo(url=WEBAPP_URL)
-        )
-    ]]
-)
+def get_webapp_keyboard():
+    webapp_url = os.getenv("WEBAPP_URL", "").rstrip("/")
+    if not webapp_url:
+        return None
+    
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[
+            InlineKeyboardButton(
+                text="🌐 Открыть WebApp",
+                web_app=WebAppInfo(url=webapp_url)
+            )
+        ]]
+    )
 
 # ——— Меню «Программы» ———
 programs_menu = ReplyKeyboardMarkup(
