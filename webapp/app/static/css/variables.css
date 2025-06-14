@@ -1,0 +1,120 @@
+:root {
+    /* Основные цвета */
+    --primary-color: #4a90e2;
+    --primary-color-dark: #357abd;
+    --primary-color-rgb: 74, 144, 226;
+    
+    --secondary-color: #6c757d;
+    --secondary-color-dark: #5a6268;
+    --secondary-color-rgb: 108, 117, 125;
+    
+    --success-color: #28a745;
+    --success-color-rgb: 40, 167, 69;
+    
+    --danger-color: #dc3545;
+    --danger-color-rgb: 220, 53, 69;
+    
+    --warning-color: #ffc107;
+    --warning-color-rgb: 255, 193, 7;
+    
+    --info-color: #17a2b8;
+    --info-color-rgb: 23, 162, 184;
+    
+    /* Светлая тема */
+    --bg-color: #ffffff;
+    --bg-light: #f8f9fa;
+    --text-color: #212529;
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+    
+    /* Темная тема */
+    --dark-bg-color: #212529;
+    --dark-bg-light: #343a40;
+    --dark-text-color: #f8f9fa;
+    --dark-text-muted: #adb5bd;
+    --dark-border-color: #495057;
+    
+    /* Тени */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    
+    /* Скругления */
+    --border-radius-sm: 4px;
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 16px;
+    
+    /* Анимации */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    
+    /* Размеры шрифтов */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+    
+    /* Межстрочные интервалы */
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-loose: 1.75;
+    
+    /* Отступы */
+    --spacing-0: 0;
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 1rem;
+    --spacing-4: 1.5rem;
+    --spacing-5: 3rem;
+    
+    /* Максимальные ширины контейнеров */
+    --container-sm: 540px;
+    --container-md: 720px;
+    --container-lg: 960px;
+    --container-xl: 1140px;
+    
+    /* Z-индексы */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* Темная тема */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: var(--dark-bg-color);
+        --bg-light: var(--dark-bg-light);
+        --text-color: var(--dark-text-color);
+        --text-muted: var(--dark-text-muted);
+        --border-color: var(--dark-border-color);
+    }
+}
+
+/* Поддержка высокого контраста */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #0000ff;
+        --primary-color-dark: #0000cc;
+        --text-color: #000000;
+        --bg-color: #ffffff;
+    }
+}
+
+/* Поддержка уменьшенного движения */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --transition-fast: 0s;
+        --transition-normal: 0s;
+        --transition-slow: 0s;
+    }
+} 
