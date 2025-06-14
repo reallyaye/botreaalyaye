@@ -14,6 +14,7 @@ from bot.handlers.navigation        import router as navigation_router
 from bot.handlers.programs          import router as programs_router
 from bot.handlers.custom_programs   import router as custom_programs_router
 from bot.handlers.ai                import router as ask_router 
+from bot.handlers.clear             import router as clear_router
 from bot.services.db                import init_db
 
 # ================== Загрузка конфигурации ==================
@@ -64,6 +65,7 @@ async def main():
     dp.include_router(programs_router)
     dp.include_router(custom_programs_router)
     dp.include_router(ask_router)
+    dp.include_router(clear_router)
 
     # Регистрируем обработчики старта и остановки
     dp.startup.register(on_startup)
