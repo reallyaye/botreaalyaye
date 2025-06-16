@@ -83,7 +83,7 @@ async def dashboard(request: Request, user: User = Depends(get_current_user)):
             tips.append("Добавьте дыхательные упражнения в свою йогу для большего расслабления.")
             tips.append("Практикуйте йогу утром, чтобы зарядиться энергией на весь день.")
         elif "приседания" in top_activity:
-            tips.append("Попробуйте приседания с утяжелением, чтобы усилить эффект от тренировок.")
+            tips.append("Попробуйте приседания с утяжелениям, чтобы усилить эффект от тренировок.")
             tips.append("Следите за техникой: держите спину прямо во время приседаний.")
         elif "планка" in top_activity:
             tips.append("Увеличьте время удержания планки на 10 секунд каждую неделю для прогресса.")
@@ -155,23 +155,25 @@ async def edit_schedule_submit(request: Request, schedule_id: int = Path(...), a
     from datetime import datetime
     try:
         scheduled_dt = datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M")
-    except Exception:
-        return templates.TemplateResponse(
-            "edit_schedule.html",
-            {"request": request, "error": "Некорректная дата/время"}
-        )
+    except ValueError:
+        request.session["error"] = "Некорректная дата/время."
+        return StarletteRedirectResponse("/dashboard", status_code=302)
     # Обновляем расписание
-    async with AsyncSessionLocal() as session:
-        result = await session.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user_id))
-        schedule = result.scalars().first()
-        if schedule:
-            schedule.activity = activity
-            schedule.scheduled_time = scheduled_dt
-            session.add(schedule)
-            await session.commit()
-            request.session["success"] = "Тренировка успешно обновлена!"
-        else:
-            request.session["error"] = "Запланированная тренировка не найдена или доступ запрещён."
+    try:
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user_id))
+            schedule = result.scalars().first()
+            if schedule:
+                schedule.activity = activity
+                schedule.scheduled_time = scheduled_dt
+                session.add(schedule)
+                await session.commit()
+                request.session["success"] = "Тренировка успешно обновлена!"
+            else:
+                request.session["error"] = "Запланированная тренировка не найдена или доступ запрещён."
+    except Exception as e:
+        print(f"Ошибка при обновлении запланированной тренировки: {e}")
+        request.session["error"] = "Произошла ошибка при обновлении тренировки."
     return StarletteRedirectResponse("/dashboard", status_code=302)
 
 @router.get("/upcoming-workouts", response_class=HTMLResponse)
