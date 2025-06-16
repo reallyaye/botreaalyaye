@@ -1,9 +1,85 @@
 {% extends "base.html" %}
 {% block title %}NOVIII Fitness - Тренировки{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="/static/workouts.css?v=1.0.2">
+{% endblock %}
 {% block content %}
 <div class="section card fade-in">
   <h1 class="section-title">Тренировки</h1>
   <p class="hero-text">Ваши завершённые тренировки и прогресс</p>
+
+  <div class="section">
+    <h2 class="section-title"><i class="fas fa-compass" style="color: var(--primary); margin-right: 10px;"></i>Виды тренировок</h2>
+    <div class="workout-grid">
+      <div class="workout-card">
+        <div class="workout-header">
+          <div class="workout-icon" style="background-color: var(--tertiary-light); color: var(--tertiary);">
+            <i class="fas fa-running"></i>
+          </div>
+        </div>
+        <div class="workout-content">
+          <h3 class="workout-title">Кардио</h3>
+          <p class="workout-description">Улучшите выносливость и сожгите калории.</p>
+        </div>
+      </div>
+      <div class="workout-card">
+        <div class="workout-header">
+          <div class="workout-icon" style="background-color: var(--primary-light); color: var(--primary);">
+            <i class="fas fa-dumbbell"></i>
+          </div>
+        </div>
+        <div class="workout-content">
+          <h3 class="workout-title">Силовые</h3>
+          <p class="workout-description">Нарастите мышечную массу и увеличьте силу.</p>
+        </div>
+      </div>
+      <div class="workout-card">
+        <div class="workout-header">
+          <div class="workout-icon" style="background-color: var(--success-light); color: var(--success);">
+            <i class="fas fa-spa"></i>
+          </div>
+        </div>
+        <div class="workout-content">
+          <h3 class="workout-title">Йога</h3>
+          <p class="workout-description">Повысьте гибкость и внутреннюю гармонию.</p>
+        </div>
+      </div>
+      <div class="workout-card">
+        <div class="workout-header">
+          <div class="workout-icon" style="background-color: var(--warning-light); color: var(--warning);">
+            <i class="fas fa-child"></i>
+          </div>
+        </div>
+        <div class="workout-content">
+          <h3 class="workout-title">Растяжка</h3>
+          <p class="workout-description">Улучшите подвижность и снимите напряжение.</p>
+        </div>
+      </div>
+      <div class="workout-card">
+        <div class="workout-header">
+          <div class="workout-icon" style="background-color: var(--danger-light); color: var(--danger);">
+            <i class="fas fa-fire"></i>
+          </div>
+        </div>
+        <div class="workout-content">
+          <h3 class="workout-title">Высокоинтенсивные (ВИИТ)</h3>
+          <p class="workout-description">Максимальная эффективность за короткое время.</p>
+        </div>
+      </div>
+      <div class="workout-card">
+        <div class="workout-header">
+          <div class="workout-icon" style="background-color: var(--info-light); color: var(--info);">
+            <i class="fas fa-person-walking"></i>
+          </div>
+        </div>
+        <div class="workout-content">
+          <h3 class="workout-title">Функциональные</h3>
+          <p class="workout-description">Укрепите тело для повседневной жизни.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="filters-section" style="margin-bottom: 24px;">
     <div class="workout-filters" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
       <button class="chip-filter active" data-type="all"><i class="fas fa-list"></i> Все</button>
