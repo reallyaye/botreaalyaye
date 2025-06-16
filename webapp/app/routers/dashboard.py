@@ -274,3 +274,11 @@ async def delete_schedule(schedule_id: int, user_id: int):
             print(f"DEBUG: Attempted to delete non-existent or unauthorized schedule ID {schedule_id} for user {user_id}")
 
 async def get_pending_reminders():
+    async with AsyncSessionLocal() as session:
+        current_time = datetime.now()
+        result = await session.execute(
+            select(Schedule)
+            .where(Schedule.scheduled_time > current_time)
+            .order_by(Schedule.scheduled_time)
+        )
+        return result.scalars().all()
