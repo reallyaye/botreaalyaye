@@ -269,14 +269,15 @@
             method: 'POST',
             body: formData
           });
-          const result = await response.text(); // Assuming HTML response with redirect
           
-          // FastAPI will likely return a redirect, so we'll just reload the page
-          // A more sophisticated approach would be to parse the HTML and update parts of the DOM
-          window.location.href = '/dashboard';
-          // For partial update, we would check if response.ok and then refreshUpcomingWorkouts();
-          // Since the backend for edit-schedule returns HTML response and then redirects,
-          // the simplest is to just reload the page to get all updated stats.
+          if (response.ok) {
+            // FastAPI will likely return a redirect, so we'll just reload the page
+            window.location.href = '/dashboard';
+          } else {
+            const errorResult = await response.text();
+            console.error('Backend error response:', errorResult);
+            alert('Произошла ошибка при обновлении тренировки. Проверьте консоль для деталей.');
+          }
 
         } catch (error) {
           console.error('Error updating schedule:', error);

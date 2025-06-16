@@ -155,7 +155,8 @@ async def edit_schedule_submit(request: Request, schedule_id: int = Path(...), a
     from datetime import datetime
     try:
         scheduled_dt = datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M")
-    except ValueError:
+    except ValueError as e:
+        print(f"Ошибка при парсинге даты/времени: {e}")
         request.session["error"] = "Некорректная дата/время."
         return StarletteRedirectResponse("/dashboard", status_code=302)
     # Обновляем расписание
