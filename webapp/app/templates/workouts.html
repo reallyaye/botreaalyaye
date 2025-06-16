@@ -257,3 +257,48 @@
 }
 </style>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.chip-filter');
+    const workoutSearchInput = document.getElementById('workout-search');
+    const workoutsList = document.getElementById('workouts-list');
+    const workoutCards = workoutsList ? workoutsList.querySelectorAll('.workout-history-card') : [];
+
+    function filterWorkouts() {
+      const activeType = document.querySelector('.chip-filter.active')?.dataset.type || 'all';
+      const searchText = workoutSearchInput.value.toLowerCase();
+
+      workoutCards.forEach(card => {
+        const type = card.dataset.type;
+        const activityText = card.querySelector('.workout-content .workout-title')?.textContent.toLowerCase() || '';
+
+        const typeMatch = (activeType === 'all' || type === activeType);
+        const searchMatch = activityText.includes(searchText);
+
+        if (typeMatch && searchMatch) {
+          card.style.display = 'flex'; // Показываем карточку
+        } else {
+          card.style.display = 'none'; // Скрываем карточку
+        }
+      });
+    }
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        filterWorkouts();
+      });
+    });
+
+    if (workoutSearchInput) {
+      workoutSearchInput.addEventListener('input', filterWorkouts);
+    }
+
+    // Initial filter on page load
+    filterWorkouts();
+  });
+</script>
+{% endblock %}
