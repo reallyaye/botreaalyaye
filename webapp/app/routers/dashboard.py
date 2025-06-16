@@ -110,21 +110,23 @@ async def dashboard(request: Request, user: User = Depends(get_current_user)):
         }
     )
 
-@router.post("/add-schedule", response_class=HTMLResponse)
+@router.post("/add-schedule", response_class=JSONResponse)
 async def add_schedule_route(request: Request, activity: str = Form(...), scheduled_time: str = Form(...)):
     user_id = request.session.get("user_id")
     if not user_id:
-        return StarletteRedirectResponse("/login", status_code=302)
-    # Преобразуем строку времени в datetime
+        return JSONResponse(status_code=401, content={"status": "error", "message": "Пользователь не авторизован."})
     try:
         scheduled_dt = datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M")
-    except Exception:
-        return templates.TemplateResponse(
-            "dashboard.html",
-            {"request": request, "error": "Некорректная дата/время"}
-        )
-    await add_schedule(user_id, activity, scheduled_dt)
-    return StarletteRedirectResponse("/", status_code=302)
+        await add_schedule(user_id, activity, scheduled_dt)
+        request.session["success"] = "Тренировка успешно запланирована!"
+        return JSONResponse(status_code=200, content={"status": "success", "message": "Тренировка успешно запланирована!"})
+    except ValueError:
+        request.session["error"] = "Некорректная дата/время."
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Некорректная дата/время."})
+    except Exception as e:
+        print(f"Ошибка при добавлении расписания: {e}")
+        request.session["error"] = "Произошла ошибка при планировании тренировки."
+        return JSONResponse(status_code=500, content={"status": "error", "message": "Произошла ошибка при планировании тренировки."})
 
 @router.post("/delete-schedule/{schedule_id}")
 async def delete_schedule_route(request: Request, schedule_id: int = Path(...)):
