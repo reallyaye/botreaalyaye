@@ -134,13 +134,18 @@ document.addEventListener('DOMContentLoaded', function() {
           body: formData
         });
         
-        if (response.ok) {
-          // FastAPI will likely return a redirect, so we'll just reload the page
-          window.location.href = '/dashboard';
+        const result = await response.json(); // Parse the response as JSON
+
+        if (result.status === 'success') {
+          alert(result.message);
+          if (result.redirect_url) {
+            window.location.href = result.redirect_url; // Redirect if success and URL is provided
+          } else {
+            refreshUpcomingWorkouts(); // Otherwise, just refresh the list
+            refreshDashboardStats();
+          }
         } else {
-          const errorResult = await response.text();
-          console.error('Backend error response:', errorResult);
-          alert('Произошла ошибка при обновлении тренировки. Проверьте консоль для деталей.');
+          alert('Ошибка: ' + result.message); // Display error message from backend
         }
 
       } catch (error) {

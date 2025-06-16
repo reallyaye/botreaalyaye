@@ -149,18 +149,18 @@ async def edit_schedule_form(request: Request, schedule_id: int = Path(...)):
         {"request": request, "schedule": schedule}
     )
 
-@router.post("/edit-schedule/{schedule_id}", response_class=HTMLResponse)
+@router.post("/edit-schedule/{schedule_id}")
 async def edit_schedule_submit(request: Request, schedule_id: int = Path(...), activity: str = Form(...), scheduled_time: str = Form(...)):
     user_id = request.session.get("user_id")
     if not user_id:
-        return StarletteRedirectResponse("/login", status_code=302)
+        return JSONResponse(status_code=401, content={"status": "error", "message": "Пользователь не авторизован."})
     from datetime import datetime
     try:
         scheduled_dt = datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M")
     except ValueError as e:
         print(f"Ошибка при парсинге даты/времени: {e}")
         request.session["error"] = "Некорректная дата/время."
-        return StarletteRedirectResponse("/dashboard", status_code=302)
+        return JSONResponse(status_code=400, content={"status": "error", "message": "Некорректная дата/время."})
     # Обновляем расписание
     try:
         async with AsyncSessionLocal() as session:
@@ -172,12 +172,14 @@ async def edit_schedule_submit(request: Request, schedule_id: int = Path(...), a
                 session.add(schedule)
                 await session.commit()
                 request.session["success"] = "Тренировка успешно обновлена!"
+                return JSONResponse(status_code=200, content={"status": "success", "message": "Тренировка успешно обновлена!", "redirect_url": "/dashboard"})
             else:
                 request.session["error"] = "Запланированная тренировка не найдена или доступ запрещён."
+                return JSONResponse(status_code=404, content={"status": "error", "message": "Запланированная тренировка не найдена или доступ запрещён."})
     except Exception as e:
         print(f"Ошибка при обновлении запланированной тренировки: {e}")
         request.session["error"] = "Произошла ошибка при обновлении тренировки."
-    return StarletteRedirectResponse("/dashboard", status_code=302)
+        return JSONResponse(status_code=500, content={"status": "error", "message": "Произошла ошибка при обновлении тренировки."})
 
 @router.get("/upcoming-workouts", response_class=HTMLResponse)
 async def upcoming_workouts_partial(request: Request, user: User = Depends(get_current_user)):
