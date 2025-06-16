@@ -14,9 +14,7 @@
           <div class="workout-actions">
             <button class="btn btn-sm btn-primary start-schedule-btn" data-id="{{ workout.id }}">Начать</button>
             <button class="btn btn-sm btn-outline edit-schedule-btn" data-id="{{ workout.id }}">Изменить</button>
-            <form method="post" action="/dashboard/delete-schedule/{{ workout.id }}" class="delete-schedule-form" data-id="{{ workout.id }}" style="display:inline;">
-              <button type="submit" class="btn btn-sm btn-outline" onclick="return false;">Удалить</button>
-            </form>
+            <button class="btn btn-sm btn-outline btn-danger delete-schedule-btn" data-id="{{ workout.id }}">Удалить</button>
           </div>
         </div>
       </div>

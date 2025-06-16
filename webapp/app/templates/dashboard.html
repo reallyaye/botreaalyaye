@@ -78,97 +78,6 @@
     <div id="upcoming-workouts-list">
       {% include "upcoming_workouts.html" %}
     </div>
-    <style>
-    .upcoming-workouts {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      margin-top: 24px;
-    }
-    .workout-item-card {
-      display: flex;
-      align-items: stretch;
-      background: var(--card-bg);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      padding: 20px 28px;
-      position: relative;
-      transition: box-shadow 0.2s, transform 0.2s;
-    }
-    .workout-item-card:hover {
-      box-shadow: var(--shadow-lg);
-      transform: translateY(-2px);
-    }
-    .workout-item-main {
-      display: flex;
-      align-items: center;
-      flex: 1;
-      gap: 32px;
-    }
-    .workout-date {
-      min-width: 48px;
-      text-align: center;
-      margin-right: 18px;
-    }
-    .date-day {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--primary);
-      line-height: 1;
-    }
-    .date-month {
-      font-size: 1rem;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-    .workout-info {
-      flex: 1;
-    }
-    .workout-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-    .workout-details {
-      display: flex;
-      gap: 18px;
-      font-size: 0.98rem;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-    .workout-actions {
-      display: flex;
-      gap: 10px;
-    }
-    .workout-more {
-      align-self: flex-start;
-      margin-left: 18px;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-    }
-    @media (max-width: 768px) {
-      .workout-item-card {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 16px 10px;
-      }
-      .workout-item-main {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-      .workout-more {
-        margin-left: 0;
-        margin-top: 10px;
-        align-self: flex-end;
-      }
-    }
-    </style>
   </div>
   <div class="section">
     <h2 class="section-title"><i class="fas fa-bullseye" style="color: var(--primary); margin-right: 10px;"></i>Прогресс по целям</h2>
@@ -198,16 +107,17 @@
     <button id="close-edit-modal" style="position:absolute; top:12px; right:12px; background:none; border:none; font-size:1.5em; cursor:pointer;">&times;</button>
     <h2 style="margin-bottom:18px;">Редактировать тренировку</h2>
     <form id="edit-schedule-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <input type="hidden" name="schedule_id" id="edit-schedule-id">
       <div class="form-group">
         <label for="edit-activity">Активность</label>
         <input type="text" id="edit-activity" name="activity" class="form-control" required>
       </div>
       <div class="form-group">
-        <label for="edit-scheduled_time">Дата и время</label>
-        <input type="datetime-local" id="edit-scheduled_time" name="scheduled_time" class="form-control" required>
+        <label for="edit-scheduled-time">Дата и время</label>
+        <input type="datetime-local" id="edit-scheduled-time" name="scheduled_time" class="form-control" required>
       </div>
-      <button type="submit" class="btn btn-primary">Сохранить</button>
+      <button type="submit" class="btn btn-primary">Сохранить изменения</button>
     </form>
   </div>
 </div>
@@ -221,4 +131,163 @@
     <button id="stop-timer-btn" class="btn btn-danger" style="font-size:1.1em;">Стоп</button>
   </div>
 </div>
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    const upcomingWorkoutsList = document.getElementById('upcoming-workouts-list');
+    const editScheduleModal = document.getElementById('edit-schedule-modal');
+    const closeEditModalBtn = document.getElementById('close-edit-modal');
+    const editScheduleForm = document.getElementById('edit-schedule-form');
+    const editScheduleIdInput = document.getElementById('edit-schedule-id');
+    const editActivityInput = document.getElementById('edit-activity');
+    const editScheduledTimeInput = document.getElementById('edit-scheduled-time');
+
+    // Function to refresh upcoming workouts list
+    async function refreshUpcomingWorkouts() {
+      try {
+        const response = await fetch('/dashboard/upcoming-workouts');
+        const html = await response.text();
+        if (upcomingWorkoutsList) {
+          upcomingWorkoutsList.innerHTML = html;
+        }
+        attachEventListenersToWorkoutButtons(); // Re-attach listeners after refresh
+      } catch (error) {
+        console.error('Error refreshing upcoming workouts:', error);
+      }
+    }
+
+    // Function to attach event listeners to dynamic buttons
+    function attachEventListenersToWorkoutButtons() {
+      // Start button
+      document.querySelectorAll('.start-schedule-btn').forEach(button => {
+        button.removeEventListener('click', handleStartSchedule); // Prevent duplicate listeners
+        button.addEventListener('click', handleStartSchedule);
+      });
+
+      // Edit button
+      document.querySelectorAll('.edit-schedule-btn').forEach(button => {
+        button.removeEventListener('click', handleEditSchedule);
+        button.addEventListener('click', handleEditSchedule);
+      });
+
+      // Delete button
+      document.querySelectorAll('.delete-schedule-btn').forEach(button => {
+        button.removeEventListener('click', handleDeleteSchedule);
+        button.addEventListener('click', handleDeleteSchedule);
+      });
+    }
+
+    // Handlers for buttons
+    async function handleStartSchedule(event) {
+      const scheduleId = this.dataset.id;
+      try {
+        const response = await fetch(`/dashboard/start-schedule/${scheduleId}`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken // Assuming CSRF token is passed as a header for AJAX POST
+          },
+          body: new URLSearchParams({'csrf_token': csrfToken})
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+          alert(result.message);
+          refreshUpcomingWorkouts();
+          // Optionally, update dashboard stats here if they don't refresh automatically
+        } else {
+          alert('Ошибка: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error starting schedule:', error);
+        alert('Произошла ошибка сети или сервера.');
+      }
+    }
+
+    async function handleEditSchedule(event) {
+      const scheduleId = this.dataset.id;
+      try {
+        const response = await fetch(`/dashboard/schedule-data/${scheduleId}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          editScheduleIdInput.value = data.id;
+          editActivityInput.value = data.activity;
+          editScheduledTimeInput.value = data.scheduled_time;
+          editScheduleModal.style.display = 'flex';
+        } else {
+          alert('Ошибка загрузки данных: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching schedule data:', error);
+        alert('Произошла ошибка при загрузке данных тренировки.');
+      }
+    }
+
+    async function handleDeleteSchedule(event) {
+      const scheduleId = this.dataset.id;
+      if (!confirm('Вы уверены, что хотите удалить эту тренировку?')) {
+        return;
+      }
+      try {
+        const response = await fetch(`/dashboard/delete-schedule/${scheduleId}`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken
+          },
+          body: new URLSearchParams({'csrf_token': csrfToken})
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert('Тренировка успешно удалена!');
+          refreshUpcomingWorkouts();
+        } else {
+          alert('Ошибка при удалении: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error deleting schedule:', error);
+        alert('Произошла ошибка сети или сервера.');
+      }
+    }
+
+    // Modal close event
+    if (closeEditModalBtn) {
+      closeEditModalBtn.addEventListener('click', function() {
+        editScheduleModal.style.display = 'none';
+      });
+    }
+
+    // Edit form submission
+    if (editScheduleForm) {
+      editScheduleForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const scheduleId = editScheduleIdInput.value;
+        const formData = new FormData(this);
+
+        try {
+          const response = await fetch(`/dashboard/edit-schedule/${scheduleId}`, {
+            method: 'POST',
+            body: formData
+          });
+          const result = await response.text(); // Assuming HTML response with redirect
+          
+          // FastAPI will likely return a redirect, so we'll just reload the page
+          // A more sophisticated approach would be to parse the HTML and update parts of the DOM
+          window.location.href = '/dashboard';
+          // For partial update, we would check if response.ok and then refreshUpcomingWorkouts();
+          // Since the backend for edit-schedule returns HTML response and then redirects,
+          // the simplest is to just reload the page to get all updated stats.
+
+        } catch (error) {
+          console.error('Error updating schedule:', error);
+          alert('Произошла ошибка при обновлении тренировки.');
+        }
+        editScheduleModal.style.display = 'none';
+      });
+    }
+
+    // Initial attachment of event listeners
+    attachEventListenersToWorkoutButtons();
+  });
+</script>
 {% endblock %}

@@ -162,14 +162,17 @@ async def edit_schedule_submit(request: Request, schedule_id: int = Path(...), a
         )
     # Обновляем расписание
     async with AsyncSessionLocal() as session:
-        result = await session.execute(select(Goal).where(Goal.id == schedule_id))
+        result = await session.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user_id))
         schedule = result.scalars().first()
         if schedule:
             schedule.activity = activity
             schedule.scheduled_time = scheduled_dt
             session.add(schedule)
             await session.commit()
-    return StarletteRedirectResponse("/", status_code=302)
+            request.session["success"] = "Тренировка успешно обновлена!"
+        else:
+            request.session["error"] = "Запланированная тренировка не найдена или доступ запрещён."
+    return StarletteRedirectResponse("/dashboard", status_code=302)
 
 @router.get("/upcoming-workouts", response_class=HTMLResponse)
 async def upcoming_workouts_partial(request: Request, user: User = Depends(get_current_user)):
@@ -193,14 +196,31 @@ async def get_schedule_data(schedule_id: int, user: User = Depends(get_current_u
         }
 
 @router.post("/start-schedule/{schedule_id}")
-async def start_schedule(schedule_id: int, user: User = Depends(get_current_user)):
-    async with AsyncSessionLocal() as session:
-        result = await session.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user.id))
-        schedule = result.scalars().first()
-        if schedule:
-            await session.delete(schedule)
-            await session.commit()
-    return JSONResponse({"success": True})
+async def start_schedule(schedule_id: int, request: Request, user: User = Depends(get_current_user)):
+    if isinstance(user, StarletteRedirectResponse):
+        return user
+    try:
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user.id))
+            schedule = result.scalars().first()
+            
+            if not schedule:
+                return JSONResponse({"status": "error", "message": "Запланированная тренировка не найдена."}, status_code=404)
+
+            # Добавляем тренировку в историю завершенных тренировок
+            # Предполагаем, что для 'старта' тренировки интенсивность будет 'Обычная', длительность - 30 минут (можно потом отредактировать)
+            # А комментарий - название запланированной тренировки.
+            await add_workout(user.id, schedule.activity, "Обычная", 30.0, f"Начата запланированная тренировка: {schedule.activity}")
+
+            # Удаляем тренировку из запланированных
+            await delete_schedule(schedule.id, user.id)
+
+            request.session["success"] = "Тренировка успешно начата и добавлена в историю!"
+            return JSONResponse({"status": "success", "message": "Тренировка успешно начата!", "redirect_url": "/dashboard"})
+    except Exception as e:
+        print(f"Ошибка при начале запланированной тренировки: {e}")
+        request.session["error"] = "Произошла ошибка при начале тренировки."
+        return JSONResponse({"status": "error", "message": "Произошла ошибка при начале тренировки."}, status_code=500)
 
 @router.post("/finish-schedule/{schedule_id}")
 async def finish_schedule(schedule_id: int, request: Request, user: User = Depends(get_current_user)):
