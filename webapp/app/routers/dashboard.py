@@ -132,7 +132,7 @@ async def add_schedule_route(request: Request, activity: str = Form(...), schedu
 async def delete_schedule_route(request: Request, schedule_id: int = Path(...)):
     user_id = request.session.get("user_id")
     if not user_id:
-        return StarletteRedirectResponse("/login", status_code=302)
+        return JSONResponse(status_code=401, content={"status": "error", "message": "Пользователь не авторизован."})
     await delete_schedule(schedule_id, user_id)
     return JSONResponse({"success": True})
 
@@ -205,7 +205,7 @@ async def get_schedule_data(schedule_id: int, user: User = Depends(get_current_u
 @router.post("/start-schedule/{schedule_id}")
 async def start_schedule(schedule_id: int, request: Request, user: User = Depends(get_current_user)):
     if isinstance(user, StarletteRedirectResponse):
-        return user
+        return JSONResponse(status_code=401, content={"status": "error", "message": "Пользователь не авторизован."})
     try:
         async with AsyncSessionLocal() as session:
             result = await session.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user.id))
