@@ -288,3 +288,58 @@ async def workouts_list_partial(request: Request, user: User = Depends(get_curre
         "workouts_list_partial.html",
         {"request": request, "workouts": formatted_workouts}
     )
+
+@router.post("/start-suggested", response_class=JSONResponse)
+async def start_suggested_workout_route(
+    request: Request,
+    user: User = Depends(get_current_user),
+    activity: str = Form(...),
+    intensity: str = Form(...),
+    duration: float = Form(None),
+    comment: str = Form(None),
+    csrf_token: str = Form(...)
+):
+    if isinstance(user, StarletteRedirectResponse):
+        return user
+
+    if csrf_token != request.session.get("csrf_token"):
+        return JSONResponse({"status": "error", "message": "Недействительный CSRF-токен."}, status_code=400)
+
+    if not activity.strip() or not intensity.strip():
+        return JSONResponse({"status": "error", "message": "Активность и интенсивность не могут быть пустыми."}, status_code=400)
+    
+    # Set default duration if not provided (e.g., 5 minutes for a quick start)
+    if duration is None or duration <= 0:
+        duration = 5.0 # Default duration for starting a suggested workout
+
+    try:
+        await add_workout(user.id, activity, intensity, duration, comment)
+        # We can fetch the added workout to get calories_burned if needed for the response
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(
+                select(Workout)
+                .where(Workout.user_id == user.id)
+                .where(Workout.activity == activity)
+                .where(Workout.intensity == intensity)
+                .where(Workout.duration == duration)
+                .order_by(Workout.created_at.desc())
+                .limit(1)
+            )
+            workout = result.scalars().first()
+
+        # Send Telegram notification (optional, based on existing logic)
+        if user.telegram_id and workout:
+            bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+            if bot_token:
+                bot = Bot(token=bot_token, session=AiohttpSession())
+                await bot.send_message(
+                    chat_id=user.telegram_id,
+                    text=f"Начата новая тренировка!\nАктивность: {activity}\nИнтенсивность: {intensity}\nДлительность: {duration} мин.",
+                    parse_mode=ParseMode.HTML
+                )
+                await bot.session.close()
+
+        return JSONResponse({"status": "success", "message": "Тренировка успешно начата!", "redirect_url": "/dashboard"})
+    except Exception as e:
+        print(f"Ошибка при начале тренировки: {e}")
+        return JSONResponse({"status": "error", "message": "Произошла ошибка при начале тренировки. Попробуйте снова."}, status_code=500)

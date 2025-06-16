@@ -83,7 +83,7 @@
   <div class="section">
     <h2 class="section-title"><i class="fas fa-book-open" style="color: var(--primary); margin-right: 10px;"></i>Библиотека тренировок</h2>
     <div class="workout-grid">
-      <div class="workout-card">
+      <div class="workout-card" data-activity="Утренняя зарядка" data-intensity="Обычная" data-duration="15" data-comment="Быстрая разминка для бодрого начала дня.">
         <div class="workout-header">
           <div class="workout-icon" style="background-color: var(--primary-light); color: var(--primary);">
             <i class="fas fa-sun"></i>
@@ -96,10 +96,10 @@
             <span><i class="fas fa-clock"></i> 15 мин</span>
             <span><i class="fas fa-bullseye"></i> Общая разминка</span>
           </div>
-          <button class="btn btn-primary btn-sm">Начать</button>
+          <button class="btn btn-primary btn-sm start-workout-btn">Начать</button>
         </div>
       </div>
-      <div class="workout-card">
+      <div class="workout-card" data-activity="Силовая тренировка для всего тела" data-intensity="Высокая" data-duration="45" data-comment="Комплекс упражнений для набора мышечной массы.">
         <div class="workout-header">
           <div class="workout-icon" style="background-color: var(--tertiary-light); color: var(--tertiary);">
             <i class="fas fa-weight-hanging"></i>
@@ -112,10 +112,10 @@
             <span><i class="fas fa-clock"></i> 45 мин</span>
             <span><i class="fas fa-bullseye"></i> Набор массы</span>
           </div>
-          <button class="btn btn-primary btn-sm">Начать</button>
+          <button class="btn btn-primary btn-sm start-workout-btn">Начать</button>
         </div>
       </div>
-      <div class="workout-card">
+      <div class="workout-card" data-activity="Кардио-интервалы (ВИИТ)" data-intensity="Высокая" data-duration="30" data-comment="Высокоинтенсивные интервальные тренировки.">
         <div class="workout-header">
           <div class="workout-icon" style="background-color: var(--danger-light); color: var(--danger);">
             <i class="fas fa-fire"></i>
@@ -128,10 +128,10 @@
             <span><i class="fas fa-clock"></i> 30 мин</span>
             <span><i class="fas fa-bullseye"></i> Выносливость, жиросжигание</span>
           </div>
-          <button class="btn btn-primary btn-sm">Начать</button>
+          <button class="btn btn-primary btn-sm start-workout-btn">Начать</button>
         </div>
       </div>
-      <div class="workout-card">
+      <div class="workout-card" data-activity="Вечерняя йога для расслабления" data-intensity="Низкая" data-duration="20" data-comment="Мягкая йога для снятия стресса и улучшения гибкости.">
         <div class="workout-header">
           <div class="workout-icon" style="background-color: var(--success-light); color: var(--success);">
             <i class="fas fa-leaf"></i>
@@ -144,7 +144,7 @@
             <span><i class="fas fa-clock"></i> 20 мин</span>
             <span><i class="fas fa-bullseye"></i> Гибкость, расслабление</span>
           </div>
-          <button class="btn btn-primary btn-sm">Начать</button>
+          <button class="btn btn-primary btn-sm start-workout-btn">Начать</button>
         </div>
       </div>
     </div>
@@ -299,6 +299,48 @@
 
     // Initial filter on page load
     filterWorkouts();
+
+    // Handle starting a suggested workout
+    const startWorkoutButtons = document.querySelectorAll('.start-workout-btn');
+    startWorkoutButtons.forEach(button => {
+      button.addEventListener('click', async function() {
+        const card = this.closest('.workout-card');
+        if (!card) return;
+
+        const activity = card.dataset.activity;
+        const intensity = card.dataset.intensity;
+        const duration = card.dataset.duration || 5; // Default to 5 minutes if not specified
+        const comment = card.dataset.comment || '';
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+        const formData = new FormData();
+        formData.append('activity', activity);
+        formData.append('intensity', intensity);
+        formData.append('duration', duration);
+        formData.append('comment', comment);
+        formData.append('csrf_token', csrfToken);
+
+        try {
+          const response = await fetch('/workouts/start-suggested', {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+
+          if (result.status === 'success') {
+            alert(result.message);
+            // Optionally, redirect to dashboard or refresh relevant sections
+            window.location.href = result.redirect_url; // Redirect to dashboard
+          } else {
+            alert('Ошибка: ' + result.message);
+          }
+        } catch (error) {
+          console.error('Ошибка при начале тренировки:', error);
+          alert('Произошла ошибка сети или сервера.');
+        }
+      });
+    });
   });
 </script>
 {% endblock %}
