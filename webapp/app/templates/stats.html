@@ -13,7 +13,7 @@
       </div>
       <div class="workout-content">
         <div class="workout-title">Всего тренировок</div>
-        <div class="workout-description">48</div>
+        <div class="workout-description">{{ all_time_stats.total_workouts }}</div>
       </div>
     </div>
     <div class="workout-card">
@@ -24,7 +24,7 @@
       </div>
       <div class="workout-content">
         <div class="workout-title">Общее время</div>
-        <div class="workout-description">1280 мин</div>
+        <div class="workout-description">{{ all_time_stats.total_minutes }} мин</div>
       </div>
     </div>
     <div class="workout-card">
@@ -35,7 +35,7 @@
       </div>
       <div class="workout-content">
         <div class="workout-title">Сожжено калорий</div>
-        <div class="workout-description">15,400</div>
+        <div class="workout-description">{{ all_time_stats.total_calories }}</div>
       </div>
     </div>
   </div>
@@ -54,45 +54,21 @@
   <div class="section">
     <h2 class="section-title"><i class="fas fa-bullseye" style="color: var(--primary); margin-right: 10px;"></i>Прогресс по целям</h2>
     <div class="goals-list">
-      <div class="goal-item">
-        <div class="goal-info">
-          <div class="goal-name">Тренировки в неделю</div>
-          <div class="goal-value">4/5</div>
-        </div>
-        <div class="goal-progress-bg">
-          <div class="goal-progress-fill" style="width: 80%;"></div>
-        </div>
-      </div>
-      
-      <div class="goal-item">
-        <div class="goal-info">
-          <div class="goal-name">Время тренировок</div>
-          <div class="goal-value">320/400 мин</div>
-        </div>
-        <div class="goal-progress-bg">
-          <div class="goal-progress-fill" style="width: 80%;"></div>
-        </div>
-      </div>
-      
-      <div class="goal-item">
-        <div class="goal-info">
-          <div class="goal-name">Снижение веса</div>
-          <div class="goal-value">3/5 кг</div>
-        </div>
-        <div class="goal-progress-bg">
-          <div class="goal-progress-fill" style="width: 60%;"></div>
-        </div>
-      </div>
-      
-      <div class="goal-item">
-        <div class="goal-info">
-          <div class="goal-name">Увеличение силы</div>
-          <div class="goal-value">15/20 кг</div>
-        </div>
-        <div class="goal-progress-bg">
-          <div class="goal-progress-fill" style="width: 75%;"></div>
-        </div>
-      </div>
+      {% if user_goals %}
+        {% for goal in user_goals %}
+          <a href="/goals" class="goal-item" style="text-decoration:none; color:inherit; cursor:pointer;">
+            <div class="goal-info">
+              <div class="goal-name">{{ goal.goal_type|capitalize }}</div>
+              <div class="goal-value">{{ goal.current_value|round(1) }}/{{ goal.target_value|round(1) }}{% if goal.goal_type == 'duration' %} мин{% elif goal.goal_type == 'calories' %} ккал{% elif goal.goal_type == 'workouts' %} трен.{% endif %}</div>
+            </div>
+            <div class="goal-progress-bg">
+              <div class="goal-progress-fill" style="width: {{ goal.progress|round(0) }}%;"></div>
+            </div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <div style="color: var(--text-muted); padding: 24px; text-align: center;">Нет активных целей</div>
+      {% endif %}
     </div>
   </div>
 </div>

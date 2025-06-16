@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, select
 from starlette.responses import RedirectResponse as StarletteRedirectResponse
-from webapp.app.services.db import AsyncSessionLocal, Workout, get_user_by_id, get_user_stats, get_weekly_stats, get_monthly_stats, get_monthly_activity_trend, User
+from webapp.app.services.db import AsyncSessionLocal, Workout, get_user_by_id, get_user_stats, get_weekly_stats, get_monthly_stats, get_monthly_activity_trend, User, get_user_goals, Goal
 from datetime import datetime, timedelta
 import secrets
 
@@ -35,6 +35,7 @@ async def stats(request: Request, user: User = Depends(get_current_user), period
     weekly_stats = await get_weekly_stats(user.id)
     monthly_stats = await get_monthly_stats(user.id)
     monthly_trend = await get_monthly_activity_trend(user.id)
+    user_goals = await get_user_goals(user.id)
 
     # Отладочный вывод
     print(f"all_time_stats: {all_time_stats}")
@@ -91,6 +92,7 @@ async def stats(request: Request, user: User = Depends(get_current_user), period
             "activity_breakdown": activity_breakdown if activity_breakdown else [],
             "monthly_trend": monthly_trend if monthly_trend else [],
             "period": period,
+            "user_goals": user_goals,
             "csrf_token": request.session.get("csrf_token")
         }
     )
