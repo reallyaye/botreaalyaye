@@ -61,7 +61,8 @@
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-    <script src="/static/js/main.js?v=1.0.2"></script>
+    <script src="{{ request.url_for('static', path='js/dashboard.js') }}"></script>
+    <script src="{{ request.url_for('static', path='js/main.js') }}?v=1.0.2"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

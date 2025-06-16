@@ -261,3 +261,16 @@ async def stats_json(request: Request, user: User = Depends(get_current_user)):
         "total_calories": all_time_stats["total_calories"],
         "achievements_count": achievements_count
     }
+
+async def delete_schedule(schedule_id: int, user_id: int):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Schedule).where(Schedule.id == schedule_id, Schedule.user_id == user_id))
+        schedule = result.scalars().first()
+        if schedule:
+            await session.delete(schedule)
+            await session.commit()
+            print(f"DEBUG: Successfully deleted schedule ID {schedule_id} for user {user_id}")
+        else:
+            print(f"DEBUG: Attempted to delete non-existent or unauthorized schedule ID {schedule_id} for user {user_id}")
+
+async def get_pending_reminders():
