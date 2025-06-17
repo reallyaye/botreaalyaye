@@ -109,12 +109,16 @@ async def program_equipment(message: Message, state: FSMContext):
 
     await message.answer("🔍 Генерирую программу, подождите…")
 
+    # Отправляем индикатор "печатает..."
+    await message.answer_chat_action("typing")
+
     # выполняем блокирующий запрос в отдельном потоке
     def ai_request():
         system = (
             "You are a fitness coach. "
-            "Based on the following user data, generate a 1-week training plan. "
-            "Respond with days and exercises clearly."
+            "Generate a concise 1-week training plan. "
+            "Format: Day 1: [exercises], Day 2: [exercises], etc. "
+            "Keep it brief but informative."
         )
         user_content = (
             f"Goal: {responses['goal']}\n"
@@ -128,8 +132,9 @@ async def program_equipment(message: Message, state: FSMContext):
                 {"role": "system", "content": system},
                 {"role": "user",   "content": user_content},
             ],
-            temperature=0.2,
-            top_p=0.1,
+            temperature=0.7,  # Увеличиваем для более быстрой генерации
+            top_p=0.9,       # Увеличиваем для более быстрой генерации
+            max_tokens=500,  # Ограничиваем длину ответа
         )
 
     try:
@@ -139,5 +144,10 @@ async def program_equipment(message: Message, state: FSMContext):
         await state.clear()
         return await message.answer(f"❌ Ошибка генерации: {e}", reply_markup=main_menu)
 
-    await message.answer(f"📋 Вот ваша программа:\n\n{program_text}", reply_markup=main_menu)
+    # Отправляем результат с форматированием
+    await message.answer(
+        f"📋 Вот ваша программа:\n\n{program_text}",
+        reply_markup=main_menu,
+        parse_mode="HTML"
+    )
     await state.clear()
