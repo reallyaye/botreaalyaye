@@ -172,5 +172,16 @@ async def ai_target_weight(message: Message, state: FSMContext):
         await state.clear()
         return await message.answer(f"❌ Ошибка генерации: {e}", reply_markup=main_menu)
 
-    await message.answer(f"📋 Вот ваша программа на неделю:\n\n{program_text}", reply_markup=main_menu)
+    # Функция для отправки длинных сообщений
+    MAX_MESSAGE_LENGTH = 4096
+    async def send_long_message(message, text, **kwargs):
+        for i in range(0, len(text), MAX_MESSAGE_LENGTH):
+            await message.answer(text[i:i+MAX_MESSAGE_LENGTH], **kwargs)
+
+    # Отправляем программу частями
+    await send_long_message(
+        message,
+        f"📋 Вот ваша программа на неделю:\n\n{program_text}",
+        reply_markup=main_menu
+    )
     await state.clear()
