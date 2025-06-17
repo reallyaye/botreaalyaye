@@ -116,7 +116,7 @@ async def program_equipment(message: Message, state: FSMContext):
     def ai_request():
         try:
             system = (
-                "You are a fitness coach. "
+                "You are a professional fitness coach. "
                 "Generate a concise 1-week training plan. "
                 "Format: Day 1: [exercises], Day 2: [exercises], etc. "
                 "Keep it brief but informative."
@@ -128,9 +128,13 @@ async def program_equipment(message: Message, state: FSMContext):
                 f"Equipment: {responses['equipment']}\n"
             )
             
-            print(f"Sending request to AI with model: DeepSeek-R1")
+            print("=== AI Request Details ===")
+            print(f"API Key present: {'Yes' if API_KEY else 'No'}")
+            print(f"Base URL: {openai_client.base_url}")
+            print(f"Model: DeepSeek-R1")
             print(f"System prompt: {system}")
             print(f"User content: {user_content}")
+            print("========================")
             
             response = openai_client.chat.completions.create(
                 model="DeepSeek-R1",
@@ -138,16 +142,25 @@ async def program_equipment(message: Message, state: FSMContext):
                     {"role": "system", "content": system},
                     {"role": "user", "content": user_content},
                 ],
-                temperature=0.7,
-                top_p=0.9,
-                max_tokens=500,
+                temperature=0.1,  # Уменьшаем для более стабильных ответов
+                top_p=0.1,       # Уменьшаем для более стабильных ответов
+                max_tokens=1000,  # Увеличиваем лимит токенов
             )
             
-            print(f"AI Response received: {response}")
+            print("=== AI Response ===")
+            print(f"Response object: {response}")
+            print(f"Choices: {response.choices}")
+            if response.choices:
+                print(f"First choice content: {response.choices[0].message.content}")
+            print("==================")
+            
             return response
             
         except Exception as e:
-            print(f"Error in ai_request: {str(e)}")
+            print(f"=== AI Request Error ===")
+            print(f"Error type: {type(e).__name__}")
+            print(f"Error message: {str(e)}")
+            print("======================")
             raise e
 
     try:
