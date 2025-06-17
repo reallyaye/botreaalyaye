@@ -1,0 +1,18 @@
+<div class="goals-list">
+  {% if user_goals %}
+    {% for goal in user_goals %}
+      <div class="goal-item" data-goal-id="{{ goal.id }}">
+        <div class="goal-info">
+          <div class="goal-name">{{ goal.goal_type|capitalize }}</div>
+          <div class="goal-value">{{ goal.current_value|round(1) }}/{{ goal.target_value|round(1) }}{% if goal.goal_type == 'duration' %} мин{% elif goal.goal_type == 'calories' %} ккал{% elif goal.goal_type == 'workouts' %} трен.{% endif %}</div>
+        </div>
+        <div class="goal-progress-bg">
+          <div class="goal-progress-fill" style="width: {{ goal.progress|round(0) }}%;"></div>
+        </div>
+        <button class="btn btn-danger btn-sm delete-goal-btn" data-goal-id="{{ goal.id }}" style="margin-left:12px;">Удалить</button>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div style="color: var(--text-muted); padding: 24px; text-align: center;">Нет активных целей</div>
+  {% endif %}
+</div> 

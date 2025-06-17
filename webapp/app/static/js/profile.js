@@ -169,38 +169,70 @@ function bindGoalsForm() {
         }
     });
 }
-            const goalDate = card.querySelector('input[type="date"]').value;
-            const goalPriority = card.querySelector('select:nth-of-type(2)').value;
-            
-            formData.append('goal_type', goalType);
-            formData.append('value', goalValue);
-            formData.append('target_date', goalDate);
-            formData.append('priority', goalPriority);
-            
-            try {
-                const resp = await fetch('/goals/add', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (resp.ok) {
-                    showNotification('Цель добавлена!', 'success');
-                    // Очистка формы
-                    card.querySelectorAll('input, select').forEach(input => {
-                        if (input.type === 'number' || input.type === 'text') input.value = '';
-                    });
-                    // Обновить список целей
-                    updateGoalsProgress();
-                } else {
-                    showNotification('Ошибка при добавлении цели', 'error');
-                }
-            } catch (err) {
-                showNotification('Ошибка при добавлении цели', 'error');
-                console.error(err);
-            }
-        ;
-    
 
+// --- ДОБАВЛЕНО: AJAX-работа с целями ---
+document.addEventListener('DOMContentLoaded', function() {
+  bindGoalsAjax();
+});
+
+function bindGoalsAjax() {
+  const addGoalForm = document.getElementById('add-goal-form');
+  if (addGoalForm) {
+    addGoalForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formData = new FormData(addGoalForm);
+      try {
+        const response = await fetch('/goals/add-json', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+          showNotification(data.message, 'success');
+          addGoalForm.reset();
+          await refreshGoalsList();
+        } else {
+          showNotification(data.message || 'Ошибка!', 'error');
+        }
+      } catch (error) {
+        showNotification('Ошибка сети или сервера при добавлении цели.', 'error');
+      }
+    });
+  }
+  // Делегирование для кнопок удаления
+  document.getElementById('goals-list-container').addEventListener('click', async function(e) {
+    if (e.target.classList.contains('delete-goal-btn')) {
+      const goalId = e.target.dataset.goalId;
+      const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+      if (!confirm('Удалить эту цель?')) return;
+      const formData = new FormData();
+      formData.append('csrf_token', csrfToken);
+      try {
+        const response = await fetch(`/goals/delete-json/${goalId}`, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+          showNotification(data.message, 'success');
+          await refreshGoalsList();
+        } else {
+          showNotification(data.message || 'Ошибка!', 'error');
+        }
+      } catch (error) {
+        showNotification('Ошибка сети или сервера при удалении цели.', 'error');
+      }
+    }
+  });
+}
+
+async function refreshGoalsList() {
+  const container = document.getElementById('goals-list-container');
+  if (!container) return;
+  const response = await fetch('/goals/list');
+  const html = await response.text();
+  container.innerHTML = html;
+}
 
 // Обработчик формы настроек аккаунта
 function bindAccountSettingsForm() {

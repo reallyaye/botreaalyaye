@@ -155,70 +155,45 @@
       <div class="card-header">
         <h3 class="card-title">Мои цели</h3>
         <span class="tab-hint">Следите за прогрессом и добавляйте новые цели.</span>
-        <button class="btn btn-sm btn-outline">
-          <i class="fas fa-edit"></i>
-        </button>
       </div>
       <div class="card-body">
-        <div class="goals-list">
-          {% if user_goals %}
-            {% for goal in user_goals %}
-              <div class="goal-item">
-                <div class="goal-info">
-                  <div class="goal-name">{{ goal.goal_type|capitalize }}</div>
-                  <div class="goal-value">{{ goal.current_value|round(1) }}/{{ goal.target_value|round(1) }}{% if goal.goal_type == 'duration' %} мин{% elif goal.goal_type == 'calories' %} ккал{% elif goal.goal_type == 'workouts' %} трен.{% endif %}</div>
-                </div>
-                <div class="goal-progress-bg">
-                  <div class="goal-progress-fill" style="width: {{ goal.progress|round(0) }}%;"></div>
-                </div>
-              </div>
-            {% endfor %}
-          {% else %}
-            <div style="color: var(--text-muted); padding: 24px; text-align: center;">Нет активных целей</div>
-          {% endif %}
+        <div id="goals-list-container">
+          {% include "goals_list_partial.html" %}
         </div>
       </div>
     </div>
-    
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Добавить новую цель</h3>
       </div>
       <div class="card-body">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Тип цели</label>
-            <select class="form-control">
-              <option>Снижение веса</option>
-              <option>Набор мышечной массы</option>
-              <option>Увеличение выносливости</option>
-              <option>Улучшение гибкости</option>
-              <option>Другое</option>
-            </select>
+        <form id="add-goal-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Тип цели</label>
+              <select class="form-control" name="goal_type" required>
+                <option value="calories">Сжечь калории</option>
+                <option value="workouts">Количество тренировок</option>
+                <option value="duration">Минуты тренировок</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Значение</label>
+              <input type="number" class="form-control" name="target_value" placeholder="Введите значение" required>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Значение</label>
-            <input type="number" class="form-control" placeholder="Введите значение">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Срок достижения</label>
+              <input type="date" class="form-control" name="deadline" required>
+            </div>
           </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Срок достижения</label>
-            <input type="date" class="form-control">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Приоритет</label>
-            <select class="form-control">
-              <option>Низкий</option>
-              <option selected>Средний</option>
-              <option>Высокий</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn btn-primary">
-          <i class="fas fa-plus btn-icon"></i>
-          Добавить цель
-        </button>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-primary" type="submit">
+            <i class="fas fa-plus btn-icon"></i>
+            Добавить цель
+          </button>
+        </form>
       </div>
     </div>
   </div>
