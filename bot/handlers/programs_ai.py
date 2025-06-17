@@ -172,14 +172,22 @@ async def program_equipment(message: Message, state: FSMContext):
 
     # Отправляем результат с форматированием
     try:
-        await message.answer(
+        MAX_MESSAGE_LENGTH = 4096
+
+        async def send_long_message(message, text, **kwargs):
+            for i in range(0, len(text), MAX_MESSAGE_LENGTH):
+                await message.answer(text[i:i+MAX_MESSAGE_LENGTH], **kwargs)
+
+        await send_long_message(
+            message,
             f"📋 Вот ваша программа:\n\n{program_text}",
             reply_markup=main_menu,
             parse_mode="HTML"
         )
     except Exception as e:
         print(f"Error sending message: {str(e)}")
-        await message.answer(
+        await send_long_message(
+            message,
             f"📋 Вот ваша программа:\n\n{program_text}",
             reply_markup=main_menu
         )
