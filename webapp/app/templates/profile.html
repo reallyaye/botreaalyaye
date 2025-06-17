@@ -56,92 +56,98 @@
     <button class="profile-tab" data-tab="settings">Настройки</button>
   </div>
   <div class="profile-tab-content active" id="personal-tab">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Личные данные</h3>
-        <span class="tab-hint">Ваши основные сведения. Для изменения нажмите "Редактировать".</span>
-        <button class="btn btn-sm btn-outline">
-          <i class="fas fa-edit"></i>
-        </button>
-      </div>
-      <div class="card-body">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Имя</label>
-            <input type="text" class="form-control" value="Александр" disabled>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Фамилия</label>
-            <input type="text" class="form-control" value="Иванов" disabled>
-          </div>
+    <form id="profile-form" action="/profile/update" method="post" enctype="multipart/form-data">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Личные данные</h3>
+          <span class="tab-hint">Ваши основные сведения. Для изменения нажмите "Редактировать".</span>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" value="alexander@example.com" disabled>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Имя</label>
+              <input type="text" class="form-control" name="name" value="{{ name }}" disabled required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Возраст</label>
+              <input type="number" class="form-control" name="age" value="{{ age }}" min="1" max="120" disabled required>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Телефон</label>
-            <input type="tel" class="form-control" value="+7 (999) 123-45-67" disabled>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" value="{{ username }}" disabled>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Телефон</label>
+              <input type="tel" class="form-control" value="" disabled>
+            </div>
           </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Дата рождения</label>
-            <input type="date" class="form-control" value="1990-05-15" disabled>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Пол</label>
-            <select class="form-control" disabled>
-              <option selected>Мужской</option>
-              <option>Женский</option>
-              <option>Другой</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Физические параметры</h3>
-        <button class="btn btn-sm btn-outline">
-          <i class="fas fa-edit"></i>
-        </button>
-      </div>
-      <div class="card-body">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Рост (см)</label>
-            <input type="number" class="form-control" value="182" disabled>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Вес (кг)</label>
-            <input type="number" class="form-control" value="78" disabled>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Уровень активности</label>
-            <select class="form-control" disabled>
-              <option>Низкий</option>
-              <option selected>Средний</option>
-              <option>Высокий</option>
-              <option>Очень высокий</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Опыт тренировок</label>
-            <select class="form-control" disabled>
-              <option>Новичок</option>
-              <option selected>Средний</option>
-              <option>Продвинутый</option>
-              <option>Профессионал</option>
-            </select>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Дата рождения</label>
+              <input type="date" class="form-control" value="" disabled>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Пол</label>
+              <select class="form-control" name="gender" disabled>
+                <option value="male" {% if user and user.gender == 'male' %}selected{% endif %}>Мужской</option>
+                <option value="female" {% if user and user.gender == 'female' %}selected{% endif %}>Женский</option>
+                <option value="other" {% if user and user.gender == 'other' %}selected{% endif %}>Другой</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Физические параметры</h3>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Рост (см)</label>
+              <input type="number" class="form-control" name="height" value="{{ height }}" min="1" max="300" disabled required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Вес (кг)</label>
+              <input type="number" class="form-control" name="weight" value="{{ weight }}" min="1" max="500" disabled required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Уровень активности</label>
+              <select class="form-control" name="activity_level" disabled required>
+                <option value="sedentary" {% if activity_level == 'sedentary' %}selected{% endif %}>Низкий</option>
+                <option value="moderate" {% if activity_level == 'moderate' %}selected{% endif %}>Средний</option>
+                <option value="high" {% if activity_level == 'high' %}selected{% endif %}>Высокий</option>
+                <option value="very_high" {% if activity_level == 'very_high' %}selected{% endif %}>Очень высокий</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Опыт тренировок</label>
+              <select class="form-control" name="workout_types" disabled required>
+                <option value="beginner" {% if workout_types == 'beginner' %}selected{% endif %}>Новичок</option>
+                <option value="intermediate" {% if workout_types == 'intermediate' %}selected{% endif %}>Средний</option>
+                <option value="advanced" {% if workout_types == 'advanced' %}selected{% endif %}>Продвинутый</option>
+                <option value="pro" {% if workout_types == 'pro' %}selected{% endif %}>Профессионал</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Аватар</label>
+              <input type="file" class="form-control" name="avatar" accept="image/*" disabled>
+              {% if avatar_url %}
+                <img src="/static/avatars/{{ avatar_url }}" alt="avatar" style="max-width:80px; border-radius:50%; margin-top:8px;">
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit" style="display:none;">Сохранить</button>
+    </form>
+    <button class="btn btn-primary" id="editProfileBtn" type="button" style="margin-top:16px;">Редактировать</button>
   </div>
   
   <div class="profile-tab-content" id="goals-tab">

@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const editScheduleIdInput = document.getElementById('edit-schedule-id');
   const editActivityInput = document.getElementById('edit-activity');
   const editScheduledTimeInput = document.getElementById('edit-scheduled-time');
+  const addScheduleForm = document.getElementById('add-schedule-form');
 
   // Function to refresh upcoming workouts list
   async function refreshUpcomingWorkouts() {
@@ -172,6 +173,29 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (error) {
       console.error('Network error refreshing dashboard stats:', error);
     }
+  }
+
+  // --- ДОБАВЛЕНО: AJAX-отправка формы добавления тренировки ---
+  if (addScheduleForm) {
+    addScheduleForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formData = new FormData(addScheduleForm);
+      try {
+        const response = await fetch('/dashboard/add-schedule', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+          addScheduleForm.reset();
+          refreshUpcomingWorkouts();
+        } else {
+          alert(data.message || 'Ошибка!');
+        }
+      } catch (error) {
+        alert('Ошибка сети или сервера при добавлении тренировки.');
+      }
+    });
   }
 
   // Initial call to attach event listeners when the page loads
