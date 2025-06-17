@@ -114,40 +114,74 @@ async def program_equipment(message: Message, state: FSMContext):
 
     # выполняем блокирующий запрос в отдельном потоке
     def ai_request():
-        system = (
-            "You are a fitness coach. "
-            "Generate a concise 1-week training plan. "
-            "Format: Day 1: [exercises], Day 2: [exercises], etc. "
-            "Keep it brief but informative."
-        )
-        user_content = (
-            f"Goal: {responses['goal']}\n"
-            f"Experience: {responses['experience']}\n"
-            f"Frequency per week: {responses['frequency']}\n"
-            f"Equipment: {responses['equipment']}\n"
-        )
-        return openai_client.chat.completions.create(
-            model="DeepSeek-R1",
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user",   "content": user_content},
-            ],
-            temperature=0.7,  # Увеличиваем для более быстрой генерации
-            top_p=0.9,       # Увеличиваем для более быстрой генерации
-            max_tokens=500,  # Ограничиваем длину ответа
-        )
+        try:
+            system = (
+                "You are a fitness coach. "
+                "Generate a concise 1-week training plan. "
+                "Format: Day 1: [exercises], Day 2: [exercises], etc. "
+                "Keep it brief but informative."
+            )
+            user_content = (
+                f"Goal: {responses['goal']}\n"
+                f"Experience: {responses['experience']}\n"
+                f"Frequency per week: {responses['frequency']}\n"
+                f"Equipment: {responses['equipment']}\n"
+            )
+            
+            print(f"Sending request to AI with model: DeepSeek-R1")
+            print(f"System prompt: {system}")
+            print(f"User content: {user_content}")
+            
+            response = openai_client.chat.completions.create(
+                model="DeepSeek-R1",
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user_content},
+                ],
+                temperature=0.7,
+                top_p=0.9,
+                max_tokens=500,
+            )
+            
+            print(f"AI Response received: {response}")
+            return response
+            
+        except Exception as e:
+            print(f"Error in ai_request: {str(e)}")
+            raise e
 
     try:
+        print("Starting AI request...")
         resp = await asyncio.to_thread(ai_request)
+        print(f"Raw response: {resp}")
+        
+        if not resp or not resp.choices:
+            raise Exception("Empty response from AI")
+            
         program_text = resp.choices[0].message.content.strip()
+        print(f"Extracted program text: {program_text}")
+        
+        if not program_text:
+            raise Exception("Empty program text")
+            
     except Exception as e:
+        error_msg = f"❌ Ошибка генерации: {str(e)}"
+        print(error_msg)
         await state.clear()
-        return await message.answer(f"❌ Ошибка генерации: {e}", reply_markup=main_menu)
+        return await message.answer(error_msg, reply_markup=main_menu)
 
     # Отправляем результат с форматированием
-    await message.answer(
-        f"📋 Вот ваша программа:\n\n{program_text}",
-        reply_markup=main_menu,
-        parse_mode="HTML"
-    )
+    try:
+        await message.answer(
+            f"📋 Вот ваша программа:\n\n{program_text}",
+            reply_markup=main_menu,
+            parse_mode="HTML"
+        )
+    except Exception as e:
+        print(f"Error sending message: {str(e)}")
+        await message.answer(
+            f"📋 Вот ваша программа:\n\n{program_text}",
+            reply_markup=main_menu
+        )
+    
     await state.clear()
